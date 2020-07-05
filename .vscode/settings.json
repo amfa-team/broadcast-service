@@ -1,3 +1,21 @@
 {
-  "eslint.enable": true
+  "eslint.enable": true,
+  "prettier.packageManager": "yarn",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    // For ESLint
+    "source.fixAll.eslint": true,
+    // For TSLint
+    "source.fixAll.tslint": true,
+    // For Stylelint
+    "source.fixAll.stylelint": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.alwaysShowStatus": true,
+  "eslint.packageManager": "yarn",
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
+  "cSpell.words": [
+    "mediasoup"
+  ]
 }
