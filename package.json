@@ -1,0 +1,12 @@
+{
+  "name": "picnic-sfu",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/amfa-team/picnic-sfu.git",
+  "author": "Moroine Bentefrit <moroine.bentefrit@gmail.com>",
+  "license": "SEE LICENSE in LICENSE.md",
+  "devDependencies": {
+    "@types/node": "^14.0.14",
+    "typescript": "^3.9.6"
+  }
+}
