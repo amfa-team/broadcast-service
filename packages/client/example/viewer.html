@@ -15,25 +15,12 @@
 
 <body>
   <div class="container-fluid">
-    <pre>
+    <pre class="col-sm-6">
       <code id="context">
       </code>
     </pre>
-    <form id="scene-form">
-      <div class="form-group row">
-        <label for="scene-input" class="col-sm-2 col-form-label">Scene</label>
-        <div class="col-sm-8">
-          <input type="text" class="form-control" id="scene-input" required>
-          <div class="invalid-feedback" id="scene-invalid"></div>
-        </div>
-        <div class="col-sm-2">
-          <button type="submit" class="btn btn-primary">Create Scene</button>
-        </div>
-      </div>
-    </form>
-    <div class="col-sm-12">
-      <button type="button" class="col-sm-2 btn btn-primary" id="stream">View</button>
-      <video class="col-sm-10" id="video"></video>
+    <div class="col-sm-6">
+      <video class="col-sm-12" id="video"></video>
     </div>
   </div>
 
@@ -58,41 +45,25 @@
         context = ctx;
         $('#context').text(JSON.stringify(context, null, 2));
       }
-      updateContext(null);
 
-      $('#scene-form').submit((e) => {
-        e.preventDefault();
-        const name = $('#scene-input').val();
+      picnicSFU.createScene('hello')
+        .then((ctx) => {
+          updateContext(ctx);
 
-        $('#scene-input').removeClass('is-invalid');
-        $('#scene-input').removeClass('is-valid');
-
-        picnicSFU.createScene(name)
-          .then((ctx) => {
-            updateContext(ctx);
-            $('#scene-input').addClass('is-valid');
-          })
-          .catch(e => {
-            $("#scene-invalid").text(e.message);
-            $('#scene-input').addClass('is-invalid');
-          });
-      });
-
-      $('#stream').click(() => {
-        picnicSFU.connectAsFollower(context)
-          .then((ctx) => {
-            updateContext(ctx);
-            const stream = new MediaStream();
-            stream.addTrack(ctx.videoTrack);
-            const v = document.getElementById('video');
-            v.srcObject = stream;
-            v.play();
-            $('#username-input').addClass('is-valid');
-          })
-          .catch(e => {
-            console.error(e.message);
-          });
-      });
+          return picnicSFU.connectAsFollower(context);
+        })
+        .then((ctx) => {
+          updateContext(ctx);
+          const stream = new MediaStream();
+          stream.addTrack(ctx.videoTrack);
+          const v = document.getElementById('video');
+          v.srcObject = stream;
+          v.play();
+          $('#username-input').addClass('is-valid');
+        })
+        .catch(e => {
+          console.error(e);
+        });
     });
   </script>
 </body>

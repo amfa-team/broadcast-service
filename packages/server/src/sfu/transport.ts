@@ -7,7 +7,7 @@ const WEB_RTC_TRANSPORT_OPTIONS = {
   listenIps: [
     {
       ip: "0.0.0.0",
-      announcedIp: "15.236.64.174", // TODO: env-vars
+      announcedIp: process.env.PUBLIC_IP, // TODO: env-vars
     },
   ],
   initialAvailableOutgoingBitrate: 1000000,

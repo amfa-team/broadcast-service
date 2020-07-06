@@ -21,11 +21,6 @@
     </pre>
     <form id="scene-form">
       <div class="form-group row">
-        <label for="scene-input" class="col-sm-2 col-form-label">Scene</label>
-        <div class="col-sm-8">
-          <input type="text" class="form-control" id="scene-input" required>
-          <div class="invalid-feedback" id="scene-invalid"></div>
-        </div>
         <div class="col-sm-2">
           <button type="submit" class="btn btn-primary">Create Scene</button>
         </div>
@@ -74,19 +69,19 @@
 
       $('#scene-form').submit((e) => {
         e.preventDefault();
-        const name = $('#scene-input').val();
+        const name = 'hello'; // $('#scene-input').val();
 
-        $('#scene-input').removeClass('is-invalid');
-        $('#scene-input').removeClass('is-valid');
+        // $('#scene-input').removeClass('is-invalid');
+        // $('#scene-input').removeClass('is-valid');
 
         picnicSFU.createScene(name)
           .then((ctx) => {
             updateContext(ctx);
-            $('#scene-input').addClass('is-valid');
+            // $('#scene-input').addClass('is-valid');
           })
           .catch(e => {
             $("#scene-invalid").text(e.message);
-            $('#scene-input').addClass('is-invalid');
+            // $('#scene-input').addClass('is-invalid');
           });
       });
 
