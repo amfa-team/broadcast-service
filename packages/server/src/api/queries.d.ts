@@ -1,9 +1,9 @@
 import { types } from "mediasoup";
 
-// export type CohortConnectFollowerRequest = {
-//   type: 'follower';
-//   sctpCapabilities: types.SctpCapabilities;
-// }
+export type CohortConnectFollowerRequest = {
+  type: "follower";
+  sctpCapabilities: types.SctpCapabilities;
+};
 
 export type CohortConnectSpeakerRequest = {
   type: "speaker";
@@ -11,10 +11,12 @@ export type CohortConnectSpeakerRequest = {
   username: string;
 };
 
-export type CohortConnectRequest = CohortConnectSpeakerRequest;
+export type CohortConnectRequest =
+  | CohortConnectSpeakerRequest
+  | CohortConnectSpeakerRequest;
 
 export type CohortConnectResponse = {
-  id: string;
+  transportId: string;
   iceParameters: types.IceParameters;
   iceCandidates: types.IceCandidates;
   dtlsParameters: types.DtlsParameters;

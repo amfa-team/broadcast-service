@@ -1,5 +1,3 @@
-import { types } from "mediasoup";
-
 export type Guest = {
   name: string;
 };
@@ -9,16 +7,17 @@ export type Host = Guest & {
 };
 
 export type Speaker = {
-  who: Host;
+  username: string;
   status: "connecting" | "ready" | "active";
-  transport: types.WebRtcTransport;
+  transportId: string;
+  producerId: string | null;
 };
 
 // A cohort represent streams broadcasted to a group of guests
 // This is used to represent user spread across MediaSoup routers.
 export type Cohort = {
   followers: Guest[];
-  speakers: Speaker[];
+  speakers: { [username: string]: Speaker };
   routerId: string;
 };
 

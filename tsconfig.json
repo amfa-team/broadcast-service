@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
-    "target": "es2019",
-    "module": "commonjs",
     "lib": [
       // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
       "es2019"
@@ -16,8 +13,6 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   }

@@ -32,3 +32,23 @@ export async function createTransport(
 
   return transport;
 }
+
+export function getTransport(transportId: string): types.WebRtcTransport {
+  const transport = transports.get(transportId);
+
+  if (transport == null) {
+    throw new Error("transport not found or deleted");
+  }
+
+  return transport;
+}
+
+export async function connectTransport(
+  transportId: string,
+  dtlsParameters: types.DtlsParameters
+): Promise<types.WebRtcTransport> {
+  const transport = getTransport(transportId);
+  await transport.connect({ dtlsParameters });
+
+  return transport;
+}

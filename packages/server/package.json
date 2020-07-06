@@ -18,12 +18,13 @@
   "scripts": {
     "start": "npm run build && node dist/index.js",
     "start:dev": "nodemon",
-    "build": "rimraf ./dist && tsc"
+    "build": "tsc -b"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mediasoup": "^3.6.9",
+    "mediasoup-client": "^3.6.11",
     "uuid": "^8.2.0"
   }
 }

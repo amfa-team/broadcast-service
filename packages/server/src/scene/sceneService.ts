@@ -4,7 +4,10 @@ import { Scene, Host, Cohort } from "./model";
 import { createRouter, getRouter } from "../sfu/routers";
 import { types } from "mediasoup";
 import { CohortConnectRequest, CohortConnectResponse } from "../api/queries";
-import { createTransport } from "../sfu/transport";
+import { createTransport, connectTransport } from "../sfu/transport";
+import { MediaKind } from "mediasoup/lib/types";
+import { createProducer } from "../sfu/producers";
+import { createConsumer } from "../sfu/consumers";
 
 const scenes: Map<string, Scene> = new Map();
 
@@ -16,7 +19,7 @@ async function createCohort(): Promise<Cohort> {
 
   return {
     followers: [],
-    speakers: [],
+    speakers: {},
     routerId: router.id,
   };
 }
@@ -58,7 +61,8 @@ export async function addHost(sceneId: string, host: Host): Promise<Scene> {
   const scene = await getOrCreateScene(sceneId);
 
   if (scene.hosts[host.name]) {
-    throw new Error("Host already exists");
+    // TODO: handle
+    // throw new Error("Host already exists");
   }
 
   scene.hosts[host.name] = host;
@@ -93,7 +97,7 @@ export function getHost(sceneId: string, username: string): Host {
   const host = scene.hosts[username];
 
   if (host == null) {
-    throw new Error("Host not found");
+    throw new Error("Host not found " + username);
   }
 
   return host;
@@ -104,28 +108,58 @@ export async function connectToCohort(
   routerId: string,
   request: CohortConnectRequest
 ): Promise<CohortConnectResponse> {
-  const { type, sctpCapabilities, username } = request;
   const cohort = getCohort(sceneId, routerId);
+  const transport = await createTransport(routerId, request.sctpCapabilities);
 
-  if (type === "speaker") {
-    // Ensure host exists
-    const host = getHost(sceneId, username);
-    const transport = await createTransport(routerId, sctpCapabilities);
-
-    cohort.speakers.push({
-      who: host,
+  if (request.type === "speaker") {
+    const { username } = request;
+    cohort.speakers[username] = {
+      username,
       status: "connecting",
-      transport,
-    });
-
-    return {
-      id: transport.id,
-      iceParameters: transport.iceParameters,
-      iceCandidates: transport.iceCandidates,
-      dtlsParameters: transport.dtlsParameters,
-      sctpParameters: transport.sctpParameters,
+      transportId: transport.id,
+      producerId: null,
     };
   }
 
-  throw new Error("connectToCohort: type follower not implemented");
+  return {
+    transportId: transport.id,
+    iceParameters: transport.iceParameters,
+    iceCandidates: transport.iceCandidates,
+    dtlsParameters: transport.dtlsParameters,
+    sctpParameters: transport.sctpParameters,
+  };
+}
+
+export async function onConnected(
+  transportId: string,
+  dtlsParameters: types.DtlsParameters
+): Promise<void> {
+  await connectTransport(transportId, dtlsParameters);
+}
+
+export async function produce(
+  sceneId: string,
+  routerId: string,
+  username: string,
+  kind: types.MediaKind,
+  rtpParameters: types.RtpParameters
+): Promise<types.Producer> {
+  const cohort = getCohort(sceneId, routerId);
+  const producer = await createProducer(
+    cohort.speakers[username].transportId,
+    kind,
+    rtpParameters
+  );
+  cohort.speakers[username].status = "active";
+  cohort.speakers[username].producerId = producer.id;
+
+  return producer;
+}
+
+export async function consume(
+  transportId: string,
+  producerId: string,
+  rtpCapabilities: types.RtpCapabilities
+): Promise<types.Consumer> {
+  return createConsumer(transportId, producerId, rtpCapabilities);
 }
