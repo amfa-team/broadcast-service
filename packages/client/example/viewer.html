@@ -15,6 +15,7 @@
 
 <body>
   <div class="container-fluid">
+    <button type="button" class="col-sm-12 btn btn-primary" id="stream">View</button>
     <pre class="col-sm-6">
       <code id="context">
       </code>
@@ -46,24 +47,26 @@
         $('#context').text(JSON.stringify(context, null, 2));
       }
 
-      picnicSFU.createScene('hello')
-        .then((ctx) => {
-          updateContext(ctx);
+      $('#stream').click(() => {
+        picnicSFU.createScene('hello')
+          .then((ctx) => {
+            updateContext(ctx);
 
-          return picnicSFU.connectAsFollower(context);
-        })
-        .then((ctx) => {
-          updateContext(ctx);
-          const stream = new MediaStream();
-          stream.addTrack(ctx.videoTrack);
-          const v = document.getElementById('video');
-          v.srcObject = stream;
-          v.play();
-          $('#username-input').addClass('is-valid');
-        })
-        .catch(e => {
-          console.error(e);
-        });
+            return picnicSFU.connectAsFollower(context);
+          })
+          .then((ctx) => {
+            updateContext(ctx);
+            const stream = new MediaStream();
+            stream.addTrack(ctx.videoTrack);
+            const v = document.getElementById('video');
+            v.srcObject = stream;
+            v.play();
+            $('#username-input').addClass('is-valid');
+          })
+          .catch(e => {
+            console.error(e);
+          });
+      });
     });
   </script>
 </body>
