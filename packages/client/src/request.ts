@@ -18,7 +18,7 @@ export async function get<T>(path: string): Promise<T> {
 }
 
 export async function post<T>(path: string, data: object): Promise<T> {
-  const res = await fetch(`http://localhost:8080${path}`, {
+  const res = await fetch(`http://${window.location.hostname}:8080${path}`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
