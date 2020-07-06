@@ -116,8 +116,9 @@ export async function connectAsSpeaker(
         "produce",
         async ({ kind, rtpParameters }, callback, errback) => {
           try {
+            const name = context.me && context.me.name;
             const producerId = await post(
-              `${basePath}/${cohort.routerId}/produce/${context.me?.name}/create`,
+              `${basePath}/${cohort.routerId}/produce/${name}/create`,
               { kind, rtpParameters }
             );
 

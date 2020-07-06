@@ -1,5 +1,5 @@
 export async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`http://localhost:8080${path}`);
+  const res = await fetch(`http://${window.location.hostname}:8080${path}`);
 
   if (!res.ok) {
     console.error(res.status);

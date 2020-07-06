@@ -11,7 +11,6 @@ import {
 import { validateHost } from "../validators/hostValidator";
 import { CohortConnectRequest } from "../queries";
 import { types } from "mediasoup";
-import { Consumer } from "mediasoup/lib/types";
 
 export function bindSceneController(app: Application): void {
   app.get("/scene/:sceneId", async (req, res) => {
