@@ -57,11 +57,11 @@ export function getScene(id: string): Scene {
 export async function addHost(sceneId: string, host: Host): Promise<Scene> {
   const scene = await getOrCreateScene(sceneId);
 
-  if (scene.hosts[host.id]) {
+  if (scene.hosts[host.name]) {
     throw new Error("Host already exists");
   }
 
-  scene.hosts[host.id] = host;
+  scene.hosts[host.name] = host;
 
   return scene;
 }

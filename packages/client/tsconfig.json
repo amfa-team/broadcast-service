@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": [
+      // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
+      "es2019",
+      "dom"
+    ]
+  },
+  "include": ["src"],
+  "references": [{ "path": "../server" }]
+}

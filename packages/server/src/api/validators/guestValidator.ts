@@ -11,9 +11,5 @@ export function validateGuest(guest: any): Guest {
     throw new Error('property "name" should be a string');
   }
 
-  if (typeof guest.id !== "string") {
-    throw new Error('property "id" should be a string');
-  }
-
   return guest;
 }

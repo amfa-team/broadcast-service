@@ -16,7 +16,7 @@ export function bindSceneController(app: Application): void {
       res.json({ success: true, payload });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, error });
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 
@@ -25,10 +25,13 @@ export function bindSceneController(app: Application): void {
       const { sceneId } = req.params;
       const host = validateHost(req.body);
       await addHost(sceneId, host);
-      res.status(204).send();
+      res.json({
+        success: true,
+        payload: host,
+      });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, error });
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 
@@ -39,7 +42,7 @@ export function bindSceneController(app: Application): void {
       res.json({ success: true, payload });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, error });
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 
@@ -52,7 +55,7 @@ export function bindSceneController(app: Application): void {
       res.json({ success: true, payload });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, error });
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 }

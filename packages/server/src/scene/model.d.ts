@@ -2,7 +2,6 @@ import { types } from "mediasoup";
 
 export type Guest = {
   name: string;
-  id: string;
 };
 
 export type Host = Guest & {
