@@ -1,16 +1,17 @@
+import { config } from "dotenv";
 import { startApi } from "./api/api";
-import { initWorkers } from "./sfu/workers";
+import { startup } from "./sfu/sfuService";
 
 async function startServer(): Promise<void> {
-  // TODO: control workers through process.cpus?
-  await initWorkers(1);
-
+  config();
+  await startup();
   await startApi();
 }
 
 process.on("unhandledRejection", (error) => {
   console.error("unhandledRejection", error);
 });
+
 process.on("uncaughtException", (error) => {
   console.error("uncaughtException", error);
 });

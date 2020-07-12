@@ -1,10 +1,4 @@
 import { types } from "mediasoup";
-import { pickAvailableWorker } from "./workers";
-import { WorkerUsage } from "./types";
-
-type RouterData = {
-  workerPID: number;
-};
 
 // https://mediasoup.org/documentation/v3/mediasoup/api/#RouterOptions
 const MEDIA_CODECS: types.RtpCodecCapability[] = [
@@ -55,23 +49,16 @@ const MEDIA_CODECS: types.RtpCodecCapability[] = [
   },
 ];
 
-const routers: Map<types.Router, RouterData> = new Map();
+type RouterMeta = {
+  workerPid: number;
+};
 
-function getWorkerUsage(): WorkerUsage {
-  const usage: WorkerUsage = {};
+const routers: Map<string, types.Router> = new Map();
+const routersMeta: WeakMap<types.Router, RouterMeta> = new WeakMap();
 
-  for (const [, { workerPID }] of routers) {
-    usage[workerPID] = {
-      routerCount: (usage?.[workerPID]?.routerCount ?? 0) + 0,
-    };
-  }
-
-  return usage;
-}
-
-export async function createRouter(): Promise<types.Router> {
-  const worker = pickAvailableWorker(getWorkerUsage());
-
+export async function createRouter(
+  worker: types.Worker
+): Promise<types.Router> {
   const router = await worker.createRouter({
     mediaCodecs: MEDIA_CODECS,
   });
@@ -79,21 +66,47 @@ export async function createRouter(): Promise<types.Router> {
   router.on("workerclose", () => {
     // Router is closed automatically
     console.log("worker closed so router closed");
-    routers.delete(router);
+    routers.delete(router.id);
+    // TODO: remove from topology but should never happen
   });
 
-  routers.set(router, { workerPID: worker.pid });
+  routers.set(router.id, router);
+  routersMeta.set(router, { workerPid: worker.pid });
 
   return router;
 }
 
 export function getRouter(routerId: string): types.Router {
-  for (const [router] of routers) {
-    if (router.id === routerId) {
+  const router = routers.get(routerId);
+
+  if (!router) {
+    throw new Error("router not found or deleted");
+  }
+
+  return router;
+}
+
+export function getRouters(): types.Router[] {
+  return [...routers.values()];
+}
+
+export function getRouterMeta(router: types.Router): RouterMeta {
+  const meta = routersMeta.get(router);
+
+  if (!meta) {
+    throw new Error("meta not found or deleted");
+  }
+
+  return meta;
+}
+
+export function getWorkerRouter(worker: types.Worker): types.Router {
+  const routers = getRouters();
+  for (const router of routers) {
+    if (getRouterMeta(router).workerPid === worker.pid) {
       return router;
     }
   }
 
-  // TODO: handle in cohort
-  throw new Error("router not found or deleted");
+  throw new Error("worker does not have associated router");
 }

@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
-import { bindSceneController } from "./controllers/sceneController";
+import { bindSceneController } from "./controllers/sfuController";
 
 function bind(app: Application): void {
   bindSceneController(app);

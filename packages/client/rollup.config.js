@@ -13,7 +13,12 @@ export default {
     format: "umd",
     name: "picnicSFU",
     sourcemap: true,
+    globals: {
+      react: "React",
+    },
   },
+  // All the used libs needs to be here
+  external: ["react", "react-dom"],
   plugins: [
     // Allows node_modules resolution
     resolve({
@@ -29,6 +34,7 @@ export default {
     production && terser(),
     !production &&
       serve({
+        host: "192.168.0.18",
         open: true,
         contentBase: ["dist", "example"],
       }),
