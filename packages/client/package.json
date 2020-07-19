@@ -1,5 +1,5 @@
 {
-  "name": "picnic-sfu-client",
+  "name": "@amfa-team/picnic-sdk",
   "version": "0.1.0",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
@@ -43,5 +43,9 @@
     "@babel/preset-typescript": "^7.10.4",
     "babel": "^6.23.0",
     "uuid": "^8.2.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com/"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "picnic-sfu",
+  "name": "@amfa-team/picnic-sfu",
   "version": "0.1.0",
   "main": "index.js",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
@@ -25,7 +25,8 @@
     "typescript": "^3.9.6"
   },
   "scripts": {
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "build": "(cd packages/client; yarn build)"
   },
   "husky": {
     "hooks": {
