@@ -1,6 +1,6 @@
 import { types } from "mediasoup-client";
 import useUserMedia from "./useUserMedia";
-import { useTransport } from "./useSendTransport";
+import { useTransport } from "./useTransport";
 import { useEffect, useState, useCallback, useDebugValue } from "react";
 import { sendStream } from "../sdk/sfuClient";
 
