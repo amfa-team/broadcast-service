@@ -1,6 +1,6 @@
 {
   "name": "@amfa-team/picnic-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.2",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
   "main": "dist/index.js",
@@ -37,7 +37,8 @@
     "build": "rollup -c rollup.config.js",
     "start:dev": "rollup -c rollup.config.js -w",
     "start": "yarn build && cp dist/* example/ && yarn serve",
-    "serve": "http-server ./example -p 80"
+    "serve": "http-server ./example -p 80",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.10.4",
