@@ -1,5 +1,5 @@
 {
-  "name": "picnic-sfu-server",
+  "name": "@amfa-team/picnic-api",
   "version": "0.1.0",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
@@ -27,5 +27,9 @@
     "mediasoup": "^3.6.9",
     "mediasoup-client": "^3.6.11",
     "uuid": "^8.2.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com/"
   }
 }
