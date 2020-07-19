@@ -49,6 +49,8 @@ web_modules/
 
 # Optional npm cache directory
 .npm
+.npmrc
+.yarnrc
 
 # Optional eslint cache
 .eslintcache
