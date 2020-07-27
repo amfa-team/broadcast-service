@@ -1,10 +1,10 @@
 import babel from "@rollup/plugin-babel";
-// import { terser } from "rollup-plugin-terser";
+import { terser } from "rollup-plugin-terser";
 import serve from "rollup-plugin-serve";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import autoExternal from "rollup-plugin-auto-external";
-import pkg from "./package.json";
+import typescript from "@rollup/plugin-typescript";
 
 const production = !process.env.ROLLUP_WATCH;
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
@@ -12,7 +12,7 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      file: pkg.main,
+      dir: "dist",
       format: "umd",
       name: "picnicSFU",
       sourcemap: true,
@@ -30,12 +30,12 @@ export default [
         preferBuiltins: false,
       }),
       commonjs(),
+      typescript(),
       babel({
         babelHelpers: "bundled",
         extensions,
       }),
-      // terser does not support optional chaining https://github.com/terser/terser/issues/567
-      // production && terser(),
+      production && terser(),
       !production &&
         serve({
           host: "192.168.0.18",
@@ -47,8 +47,8 @@ export default [
   {
     input: "src/index.ts",
     output: {
+      dir: "dist",
       name: "nugit-core-service",
-      file: pkg.module,
       format: "es",
       sourcemap: true,
     },
@@ -68,7 +68,7 @@ export default [
         plugins: [["@babel/plugin-transform-runtime", { useESModules: true }]],
       }),
       // terser does not support optional chaining https://github.com/terser/terser/issues/567
-      // production && terser(),
+      production && terser(),
     ],
   },
 ];

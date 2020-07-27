@@ -8,11 +8,12 @@
     "declarationMap": true,
     "sourceMap": true,
     "composite": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "noEmit": false
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": []
 }

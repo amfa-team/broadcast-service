@@ -7,7 +7,11 @@
       {
         "modules": false,
         "targets": {
-          "browsers": "last 2 chrome versions"
+          "chrome": 55,
+          "edge": 11,
+          "firefox": 60,
+          "safari": 11,
+          "node": "12.18"
         }
       }
     ]
