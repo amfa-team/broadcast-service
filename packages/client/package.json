@@ -1,6 +1,6 @@
 {
   "name": "@amfa-team/picnic-sdk",
-  "version": "0.2.0-alpha.4",
+  "version": "0.2.0-alpha.5",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
   "main": "dist/index.js",
