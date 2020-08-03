@@ -26,7 +26,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "build": "(cd packages/client; yarn build)"
+    "build": "(cd packages/server; yarn build) && (cd packages/client; yarn build)"
   },
   "husky": {
     "hooks": {

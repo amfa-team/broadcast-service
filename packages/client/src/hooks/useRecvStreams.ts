@@ -1,4 +1,4 @@
-import { useTransport } from "./useSendTransport";
+import { useTransport } from "./useTransport";
 import { types } from "mediasoup-client";
 import { useState, useEffect } from "react";
 import { recvStreams } from "../sdk/sfuClient";

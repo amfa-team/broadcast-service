@@ -2,7 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "sourceMap": true,
-    "composite": true,
+    "declaration": true,
+    "declarationDir": "dist",
+    "declarationMap": true,
     "moduleResolution": "node",
     "target": "ES6",
     "lib": [
@@ -14,5 +16,5 @@
     "jsx": "react"
   },
   "include": ["src"],
-  "references": [{ "path": "../server" }]
+  "references": [{ "path": "../server", "prepend": false }]
 }
