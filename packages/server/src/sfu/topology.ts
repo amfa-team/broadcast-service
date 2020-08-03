@@ -20,7 +20,6 @@ import {
 type ConsumerTopology = {
   id: string;
   kind: types.MediaKind;
-  producerUserId: string;
   producerId: string;
   state: {
     paused: boolean;
@@ -33,7 +32,6 @@ type ConsumerTopology = {
 
 type ProducerTopology = {
   id: string;
-  userId: string;
   kind: types.MediaKind;
   consumers: ConsumerTopology[];
   state: {
@@ -45,7 +43,6 @@ type ProducerTopology = {
 
 type TransportTopology = {
   id: string;
-  userId: string;
   producers: ProducerTopology[];
   consumers: ConsumerTopology[];
 };
@@ -69,7 +66,6 @@ function getConsumerTopology(consumer: types.Consumer): ConsumerTopology {
     id: consumer.id,
     kind: consumer.kind,
     producerId: consumer.producerId,
-    producerUserId: getProducerMeta(getProducer(consumer.producerId)).userId,
     state: {
       paused: consumer.paused,
       closed: consumer.closed,
@@ -86,7 +82,6 @@ async function getProducerTopology(
   return {
     id: producer.id,
     kind: producer.kind,
-    userId: getProducerMeta(producer).userId,
     consumers: getProducerConsumers(producer).map(getConsumerTopology),
     state: {
       paused: producer.paused,
@@ -101,7 +96,6 @@ async function getTransportTopology(
 ): Promise<TransportTopology> {
   return {
     id: transport.id,
-    userId: getTransportMeta(transport.id).userId,
     consumers: getTransportConsumers(transport.id).map(getConsumerTopology),
     producers: await Promise.all(
       getTransportProducers(transport).map(getProducerTopology)

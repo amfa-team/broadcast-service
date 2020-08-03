@@ -14,35 +14,33 @@ import {
   play,
 } from "../../sfu/sfuService";
 import { getServerTopology, cleanup } from "../../sfu/topology";
+import { handleSuccessResponse, handleErrorResponse } from "../../io/io";
 
 export function bindSceneController(app: Application): void {
   app.get("/topology", async (req, res) => {
     try {
       const payload = await getServerTopology();
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
   app.get("/cleanup", async (req, res) => {
     try {
       const payload = cleanup();
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
   app.get("/router-capabilities", async (req, res) => {
     try {
       const payload = getRouterCapabilities();
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
@@ -51,10 +49,9 @@ export function bindSceneController(app: Application): void {
       // TODO: InitConnectionParams validation
       const request: InitConnectionParams = req.body;
       const payload = await initConnection(request);
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
@@ -63,10 +60,9 @@ export function bindSceneController(app: Application): void {
       // TODO: validation
       const request: ConnectParams = req.body;
       const payload = await connect(request);
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
@@ -75,10 +71,9 @@ export function bindSceneController(app: Application): void {
       // TODO: validation
       const request: SendParams = req.body;
       const payload = await send(request);
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
@@ -87,21 +82,19 @@ export function bindSceneController(app: Application): void {
       // TODO: validation
       const request: ReceiveParams = req.body;
       const payload = await receive(request);
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 
-  app.get("/receive/:consumerId/play", async (req, res) => {
+  app.post("/receive/play", async (req, res) => {
     try {
-      const { consumerId } = req.params;
+      const { consumerId } = req.body;
       const payload = await play(consumerId);
-      res.json({ success: true, payload });
+      handleSuccessResponse(res, payload);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+      handleErrorResponse(res, error);
     }
   });
 }

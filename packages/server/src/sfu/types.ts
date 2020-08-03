@@ -1,7 +1,6 @@
 import { types } from "mediasoup";
 
 export type InitConnectionParams = {
-  userId: string;
   sctpCapabilities: types.SctpCapabilities;
 };
 
@@ -19,7 +18,6 @@ export type ConnectParams = {
 };
 
 export type SendParams = {
-  userId: string;
   transportId: string;
   kind: types.MediaKind;
   rtpParameters: types.RtpParameters;
@@ -27,7 +25,6 @@ export type SendParams = {
 
 export type ReceiveParams = {
   transportId: string;
-  userId: string;
   rtpCapabilities: types.RtpCapabilities;
 };
 
@@ -38,4 +35,4 @@ export type ConsumerInfo = {
   rtpParameters: types.RtpParameters;
 };
 
-export type ReceiveInfo = { [producerUserId: string]: ConsumerInfo[] };
+export type ReceiveInfo = { [producerId: string]: ConsumerInfo[] };

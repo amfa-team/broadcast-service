@@ -2,6 +2,7 @@ import { useTransport } from "./useTransport";
 import { types } from "mediasoup-client";
 import { useState, useEffect } from "react";
 import { recvStreams } from "../sdk/sfuClient";
+import { Settings } from "../types";
 
 type UseStage = {
   transport: null | types.Transport;
@@ -9,17 +10,17 @@ type UseStage = {
 };
 
 export default function useRecvStreams(
-  userId: string,
+  settings: Settings,
   device: types.Device
 ): UseStage {
-  const transport = useTransport(userId, device, "recv");
+  const transport = useTransport(settings, device, "recv");
   const [streams, setStreams] = useState<{
     [producerUserId: string]: MediaStream;
   }>({});
 
   useEffect(() => {
     if (transport !== null) {
-      recvStreams(userId, device, transport).then(setStreams);
+      recvStreams(settings, device, transport).then(setStreams);
     }
 
     return (): void => {

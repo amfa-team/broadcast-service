@@ -1,5 +1,4 @@
 import { get, post } from "./request";
-import { v4 as uuid } from "uuid";
 import { Device, types } from "mediasoup-client";
 import {
   InitConnectionParams,
@@ -10,11 +9,7 @@ import {
   ReceiveParams,
   ConsumerInfo,
 } from "../../../server/src/sfu/types";
-
-export function generateUserId(): string {
-  const userId = uuid();
-  return userId;
-}
+import { Settings } from "../types";
 
 export function createDevice(): types.Device {
   const device = new Device();
@@ -23,10 +18,11 @@ export function createDevice(): types.Device {
 }
 
 export async function loadDevice(
-  userId: string,
+  settings: Settings,
   device: types.Device
 ): Promise<void> {
   const routerRtpCapabilities = await get<types.RtpCapabilities>(
+    settings,
     "/router-capabilities"
   );
 
@@ -34,7 +30,7 @@ export async function loadDevice(
 }
 
 export async function createTransport(
-  userId: string,
+  settings: Settings,
   device: Device,
   type: "send" | "recv"
 ): Promise<types.Transport> {
@@ -43,7 +39,6 @@ export async function createTransport(
   }
 
   const request: InitConnectionParams = {
-    userId,
     sctpCapabilities: device.sctpCapabilities,
   };
 
@@ -53,7 +48,7 @@ export async function createTransport(
     iceCandidates,
     dtlsParameters,
     sctpParameters,
-  } = await post<ConnectionInfo>("/connect/init", request);
+  } = await post<ConnectionInfo>(settings, "/connect/init", request);
 
   const params = {
     id: transportId,
@@ -72,7 +67,7 @@ export async function createTransport(
   transport.on("connect", async ({ dtlsParameters }, callback, errback) => {
     try {
       const connectParams: ConnectParams = { transportId, dtlsParameters };
-      await post<void>(`/connect/create`, connectParams);
+      await post<void>(settings, `/connect/create`, connectParams);
       callback();
     } catch (e) {
       errback(e);
@@ -89,13 +84,12 @@ export async function createTransport(
       async ({ kind, rtpParameters }, callback, errback) => {
         try {
           const req: SendParams = {
-            userId,
             transportId,
             kind,
             rtpParameters,
           };
 
-          const producerId = await post(`/send/create`, req);
+          const producerId = await post(settings, `/send/create`, req);
 
           callback({ id: producerId });
         } catch (error) {
@@ -167,6 +161,7 @@ const consumers: Map<string, types.Consumer> = new Map();
 const consumerStreams: Map<string, MediaStream> = new Map();
 
 async function createConsumer(
+  settings: Settings,
   transport: types.Transport,
   info: ConsumerInfo
 ): Promise<types.Consumer> {
@@ -184,13 +179,14 @@ async function createConsumer(
 
   consumers.set(consumer.id, consumer);
 
-  await get<void>(`/receive/${info.consumerId}/play`);
+  await post<void>(settings, `/receive/play`, { consumerId: info.consumerId });
   consumer.resume();
 
   return consumer;
 }
 
 async function createRecvMediaStream(
+  settings: Settings,
   producerUserId: string,
   transport: types.Transport,
   infos: ConsumerInfo[]
@@ -199,7 +195,7 @@ async function createRecvMediaStream(
   consumerStreams.set(producerUserId, stream);
 
   const consumers = await Promise.all(
-    infos.map((info) => createConsumer(transport, info))
+    infos.map((info) => createConsumer(settings, transport, info))
   );
 
   consumers.forEach(({ track }) => {
@@ -212,234 +208,23 @@ async function createRecvMediaStream(
 }
 
 export async function recvStreams(
-  userId: string,
+  settings: Settings,
   device: types.Device,
   transport: types.Transport
-): Promise<{ [userId: string]: MediaStream }> {
+): Promise<{ [connectionId: string]: MediaStream }> {
   const req: ReceiveParams = {
-    userId,
     transportId: transport.id,
     rtpCapabilities: device.rtpCapabilities,
   };
 
-  const info = await post<ReceiveInfo>("/receive/create", req);
+  const info = await post<ReceiveInfo>(settings, "/receive/create", req);
 
   const tasks: Array<Promise<[string, MediaStream]>> = [];
   for (const [producerUserId, consumersInfos] of Object.entries(info)) {
     tasks.push(
-      createRecvMediaStream(producerUserId, transport, consumersInfos)
+      createRecvMediaStream(settings, producerUserId, transport, consumersInfos)
     );
   }
 
   return Object.fromEntries(await Promise.all(tasks));
 }
-
-// export async function connectAsSpeaker(
-//   context: SceneContext
-// ): Promise<SceneContext> {
-//   // TODO: if device already exists
-
-//   const device = new Device();
-
-//   const basePath = `/scene/${context.scene.id}/cohort`;
-
-//   if (context.scene.cohorts.length === 0) {
-//     throw new Error("connectAsSpeaker: scene doesn't have a valid cohort");
-//   }
-//   const routerRtpCapabilities = await get<types.RtpCapabilities>(
-//     `${basePath}/${context.scene.cohorts[0].routerId}/capabilities`
-//   );
-
-//   await device.load({ routerRtpCapabilities });
-
-//   const request: CohortConnectRequest = {
-//     type: "speaker",
-//     username: getUsername(context),
-//     sctpCapabilities: device.sctpCapabilities,
-//   };
-
-//   const stream = await navigator.mediaDevices.getUserMedia({
-//     video: {
-//       width: { ideal: 1280 },
-//       height: { ideal: 720 },
-//     },
-//   });
-//   const track = stream.getVideoTracks()[0];
-
-//   const connections = { ...context.connections };
-//   const producers = { ...context.producers };
-
-//   // TODO: use allSettled to handle errors
-//   await Promise.all(
-//     context.scene.cohorts.map(async (cohort) => {
-//       if (connections[cohort.routerId]) {
-//         // TODO: handle possible reconnections
-//         throw new Error(
-//           "connectAsSpeaker: connection already exists for cohort"
-//         );
-//       }
-//       const {
-//         transportId,
-//         iceParameters,
-//         iceCandidates,
-//         dtlsParameters,
-//         sctpParameters,
-//       } = await post<CohortConnectResponse>(
-//         `${basePath}/${cohort.routerId}/connect`,
-//         request
-//       );
-
-//       const sendTransport = device.createSendTransport({
-//         id: transportId,
-//         iceParameters,
-//         iceCandidates,
-//         dtlsParameters,
-//         sctpParameters,
-//         iceServers: [],
-//       });
-
-//       sendTransport.on(
-//         "connect",
-//         async ({ dtlsParameters }, callback, errback) => {
-//           try {
-//             await post<CohortConnectResponse>(
-//               `${basePath}/${cohort.routerId}/connect/${transportId}`,
-//               dtlsParameters
-//             );
-//             callback();
-//           } catch (e) {
-//             errback(e);
-//           }
-//         }
-//       );
-
-//       sendTransport.on(
-//         "produce",
-//         async ({ kind, rtpParameters }, callback, errback) => {
-//           try {
-//             const name = context.me && context.me.name;
-//             const producerId = await post(
-//               `${basePath}/${cohort.routerId}/produce/${name}/create`,
-//               { kind, rtpParameters }
-//             );
-
-//             callback({ id: producerId });
-//           } catch (error) {
-//             errback(error);
-//           }
-//         }
-//       );
-
-//       sendTransport.on("connectionstatechange", (e) => {
-//         console.log("sendTransport connection changed", e);
-//       });
-
-//       // TODO: save producer in context for start/pause/stop
-//       const producer = await sendTransport.produce({
-//         track,
-//         codecOptions: {
-//           videoGoogleStartBitrate: 1000,
-//           videoGoogleMaxBitrate: 2000000,
-//         },
-//         encodings: [
-//           { scaleResolutionDownBy: 4, maxBitrate: 500000 },
-//           { scaleResolutionDownBy: 2, maxBitrate: 1000000 },
-//           { scaleResolutionDownBy: 1, maxBitrate: 2000000 },
-//         ],
-//       });
-
-//       connections[cohort.routerId] = sendTransport;
-//       producers[producer.id] = producer;
-//     })
-//   );
-
-//   return {
-//     ...context,
-//     connections,
-//     videoTrack: track,
-//   };
-// }
-
-// export async function connectAsFollower(
-//   context: SceneContext
-// ): Promise<SceneContext> {
-//   // TODO: if device already exists
-
-//   const device = new Device();
-
-//   if (context.scene.cohorts.length === 0) {
-//     throw new Error("connectAsSpeaker: scene doesn't have a valid cohort");
-//   }
-//   const cohort = context.scene.cohorts[0];
-//   const basePath = `/scene/${context.scene.id}/cohort/${cohort.routerId}`;
-//   const routerRtpCapabilities = await get<types.RtpCapabilities>(
-//     `${basePath}/capabilities`
-//   );
-
-//   await device.load({ routerRtpCapabilities });
-
-//   const request: CohortConnectRequest = {
-//     type: "follower",
-//     sctpCapabilities: device.sctpCapabilities,
-//   };
-
-//   const connections = { ...context.connections };
-//   const speakerId = Object.keys(cohort.speakers)[0];
-//   if (!speakerId) {
-//     throw new Error("connectAsFollower: no speaker");
-//   }
-//   const speaker: Speaker | undefined = cohort.speakers[speakerId];
-
-//   const {
-//     transportId,
-//     iceParameters,
-//     iceCandidates,
-//     dtlsParameters,
-//     sctpParameters,
-//   } = await post<CohortConnectResponse>(`${basePath}/connect`, request);
-
-//   const recvTransport = device.createRecvTransport({
-//     id: transportId,
-//     iceParameters,
-//     iceCandidates,
-//     dtlsParameters,
-//     sctpParameters,
-//     iceServers: [],
-//   });
-
-//   recvTransport.on("connect", async ({ dtlsParameters }, callback, errback) => {
-//     try {
-//       await post<CohortConnectResponse>(
-//         `${basePath}/connect/${transportId}`,
-//         dtlsParameters
-//       );
-//       callback();
-//     } catch (e) {
-//       errback(e);
-//     }
-//   });
-
-//   recvTransport.on("connectionstatechange", (e) => {
-//     console.log("sendTransport connection changed", e);
-//   });
-
-//   const { consumerId, kind, rtpParameters } = await post(
-//     `/consume/${speaker.producerId}/${transportId}/create`,
-//     {
-//       rtpCapabilities: device.rtpCapabilities,
-//     }
-//   );
-
-//   const consumer = await recvTransport.consume({
-//     id: consumerId,
-//     producerId: speaker.producerId,
-//     kind,
-//     rtpParameters,
-//   });
-
-//   return {
-//     ...context,
-//     connections,
-//     videoTrack: consumer.track,
-//   };
-// }

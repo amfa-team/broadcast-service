@@ -1,5 +1,3 @@
-export { App } from "./components/App";
-export { default as Ask } from "./components/Ask";
 export { default as Broadcast } from "./components/Broadcast";
 export { default as Controls } from "./components/Controls";
 export { default as Stage } from "./components/Stage";

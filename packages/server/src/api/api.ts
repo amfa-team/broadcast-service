@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
 import { bindSceneController } from "./controllers/sfuController";
+import { authMiddleware } from "../security/security";
 
 function bind(app: Application): void {
   bindSceneController(app);
@@ -10,6 +11,7 @@ export function startApi(): Promise<void> {
   const app = express();
   app.use(cors());
   app.use(express.json());
+  app.use(authMiddleware);
 
   bind(app);
 
