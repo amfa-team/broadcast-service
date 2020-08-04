@@ -50,33 +50,33 @@ functions:
   sfu_initConnect:
     handler: src/sfu/handler.initConnect
     events:
-      - http:
-          path: sfu/connect/init
-          method: post
+      - websocket:
+          route: /sfu/connect/init
+          routeResponseSelectionExpression: $default
   sfu_createConnect:
     handler: src/sfu/handler.createConnect
     events:
-      - http:
-          path: sfu/connect/create
-          method: post
+      - websocket:
+          route: /sfu/connect/create
+          routeResponseSelectionExpression: $default
   sfu_createSend:
     handler: src/sfu/handler.createSend
     events:
-      - http:
-          path: sfu/send/create
-          method: post
+      - websocket:
+          route: /sfu/send/create
+          routeResponseSelectionExpression: $default
   sfu_createReceive:
     handler: src/sfu/handler.createReceive
     events:
-      - http:
-          path: sfu/receive/create
-          method: post
+      - websocket:
+          route: /sfu/receive/create
+          routeResponseSelectionExpression: $default
   sfu_playReceive:
     handler: src/sfu/handler.playReceive
     events:
-      - http:
-          path: sfu/receive/play
-          method: post
+      - websocket:
+          route: /sfu/receive/play
+          routeResponseSelectionExpression: $default
   # disconnect:
   #   handler: src/handler.disconnect
   #   events:

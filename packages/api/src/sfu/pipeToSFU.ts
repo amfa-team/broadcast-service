@@ -3,7 +3,13 @@ import { Role } from "../db/models/participant";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getServers } from "../db/repositories/serverRepository";
 import { Server } from "../db/models/server";
-import { handleHttpErrorResponse } from "../io/io";
+import {
+  wsOnlyRoute,
+  parseWsParticipantRequest,
+  handleWebSocketSuccessResponse,
+  handleWebSocketErrorResponse,
+} from "../io/io";
+import { JsonDecoder } from "ts.data.json";
 
 async function getDestServer(): Promise<Server> {
   const servers = await getServers();
@@ -55,33 +61,28 @@ export async function postToSFU<T>(path: string, data: unknown): Promise<T> {
 }
 
 export async function pipeToSFU(
-  role: Role | null,
+  roles: Role[],
   path: string,
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
+  const connectionId = wsOnlyRoute(event);
+
   try {
-    // await authParticipant(event, role);
-    const server = await getDestServer();
-
-    const options: RequestInit = {
-      method: event.httpMethod,
-      headers: { ...event.headers, "x-api-key": server.token },
-    };
-
-    if (event.body) {
-      options.body = event.body;
-    }
-
-    const res = await fetch(
-      "http://" + server.ip + ":" + server.port + path,
-      options
+    const req = await parseWsParticipantRequest(
+      event,
+      roles,
+      // No validation, it's just a pipe
+      JsonDecoder.succeed
     );
 
-    return {
-      statusCode: res.status,
-      body: await res.text().catch(() => "Unexpected SFU Error"),
-    };
+    try {
+      const payload = await postToSFU(path, req.data);
+
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
+    } catch (e) {
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
+    }
   } catch (e) {
-    return handleHttpErrorResponse(e);
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }

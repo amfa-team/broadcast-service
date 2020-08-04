@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import { createTransport } from "../sdk/sfuClient";
 import { types } from "mediasoup-client";
-import { Settings } from "../types";
+import { SDK } from "../types";
 
 export function useTransport(
-  settings: Settings,
-  device: types.Device,
+  sdk: SDK,
   type: "send" | "recv"
 ): types.Transport | null {
   const [transport, setTransport] = useState<types.Transport | null>(null);
 
   useEffect(() => {
-    createTransport(settings, device, type).then(setTransport);
+    createTransport(sdk, type).then(setTransport);
 
     return (): void => {
       // TODO: Should never happen
@@ -20,7 +19,7 @@ export function useTransport(
         transport.close();
       }
     };
-  }, []);
+  }, [sdk, type]);
 
   return transport;
 }

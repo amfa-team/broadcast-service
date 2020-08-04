@@ -17,6 +17,16 @@ const apigwManagementApi = new ApiGatewayManagementApi(
     : { apiVersion: "2018-11-29" }
 );
 
+export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
+  const { connectionId } = event.requestContext;
+
+  if (!connectionId) {
+    throw new Error(`Route: Require websocket connection`);
+  }
+
+  return connectionId;
+}
+
 export function parse(body: string | null): unknown {
   try {
     return body === null ? body : JSON.parse(body);

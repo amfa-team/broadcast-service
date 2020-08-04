@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { createDevice, loadDevice } from "../sdk/sfuClient";
-import { types } from "mediasoup-client";
-import { Settings } from "../types";
+import { createSDK } from "../sdk/sfuClient";
+import { Settings, SDK } from "../types";
 
 type SDKLoadingState = {
   loaded: false;
@@ -9,7 +8,7 @@ type SDKLoadingState = {
 
 type SDKLoadedState = {
   loaded: true;
-  device: types.Device;
+  sdk: SDK;
 };
 
 type SDKState = SDKLoadingState | SDKLoadedState;
@@ -18,13 +17,7 @@ export function useSDK(settings: Settings): SDKState {
   const [state, setSDKState] = useState<SDKState>({ loaded: false });
 
   useEffect(() => {
-    const device = createDevice();
-    loadDevice(settings, device).then(() =>
-      setSDKState({
-        loaded: true,
-        device,
-      })
-    );
+    createSDK(settings).then((sdk) => setSDKState({ loaded: true, sdk }));
     return (): void => {
       // TODO: handle disconnect
       console.error("should not be un-mounted");

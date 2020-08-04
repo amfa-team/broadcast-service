@@ -8,17 +8,8 @@ import {
   parseWsParticipantRequest,
   handleWebSocketSuccessResponse,
   handleWebSocketErrorResponse,
+  wsOnlyRoute,
 } from "../io/io";
-
-function wsOnlyRoute(event: APIGatewayProxyEvent): string {
-  const { connectionId } = event.requestContext;
-
-  if (!connectionId) {
-    throw new Error(`Route: Require websocket connection`);
-  }
-
-  return connectionId;
-}
 
 export async function routerCapabilities(
   event: APIGatewayProxyEvent
@@ -47,42 +38,34 @@ export async function routerCapabilities(
   } catch (e) {
     return handleWebSocketErrorResponse(connectionId, null, e);
   }
-
-  // const { token } = parseEvent(event, JsonDecoder.isNull(null));
-  // console.log(data);
-  // return {
-  //   statusCode: 500,
-  //   body: "Oops",
-  // };
-  // return pipeToSFU(null, "/router-capabilities", event);
 }
 
 export async function initConnect(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  return pipeToSFU(null, "/connect/init", event);
+  return pipeToSFU([Role.host, Role.guest], "/connect/init", event);
 }
 
 export async function createConnect(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  return pipeToSFU(null, "/connect/create", event);
+  return pipeToSFU([Role.host, Role.guest], "/connect/create", event);
 }
 
 export async function createSend(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  return pipeToSFU(Role.host, "/send/create", event);
+  return pipeToSFU([Role.host], "/send/create", event);
 }
 
 export async function createReceive(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  return pipeToSFU(null, "/receive/create", event);
+  return pipeToSFU([Role.host, Role.guest], "/receive/create", event);
 }
 
 export async function playReceive(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  return pipeToSFU(null, "/receive/play", event);
+  return pipeToSFU([Role.host, Role.guest], "/receive/play", event);
 }

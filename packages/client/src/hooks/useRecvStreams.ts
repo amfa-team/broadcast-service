@@ -2,25 +2,22 @@ import { useTransport } from "./useTransport";
 import { types } from "mediasoup-client";
 import { useState, useEffect } from "react";
 import { recvStreams } from "../sdk/sfuClient";
-import { Settings } from "../types";
+import { SDK } from "../types";
 
 type UseStage = {
   transport: null | types.Transport;
   streams: { [producerUserId: string]: MediaStream };
 };
 
-export default function useRecvStreams(
-  settings: Settings,
-  device: types.Device
-): UseStage {
-  const transport = useTransport(settings, device, "recv");
+export default function useRecvStreams(sdk: SDK): UseStage {
+  const transport = useTransport(sdk, "recv");
   const [streams, setStreams] = useState<{
     [producerUserId: string]: MediaStream;
   }>({});
 
   useEffect(() => {
     if (transport !== null) {
-      recvStreams(settings, device, transport).then(setStreams);
+      recvStreams(sdk, transport).then(setStreams);
     }
 
     return (): void => {
@@ -28,7 +25,7 @@ export default function useRecvStreams(
         transport.close();
       }
     };
-  }, [transport]);
+  }, [sdk, transport]);
 
   return { transport, streams };
 }

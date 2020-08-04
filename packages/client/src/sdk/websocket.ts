@@ -6,40 +6,70 @@ type PendingReq = {
   reject: (error: unknown) => void;
 };
 
-const pendingReqMap: Map<string, PendingReq> = new Map();
+type WsPendingReq = Map<string, PendingReq>;
 
-export function createWebSocket(): Promise<WebSocket> {
+const pendingReqMap: WeakMap<WebSocket, WsPendingReq> = new WeakMap();
+
+function onWsMessage(this: WebSocket, ev: MessageEvent) {
+  const res = JSON.parse(ev.data);
+
+  const wsPendingReq = pendingReqMap.get(this) ?? null;
+  if (wsPendingReq === null) {
+    console.error("onWsMessage: Pending request map not found");
+    return;
+  }
+
+  if (res.success) {
+    const pending = wsPendingReq.get(res.msgId);
+    if (pending) {
+      pending.resolve(res.payload);
+    } else {
+      console.error(
+        "onWsMessage: Received response for unknown or expired message",
+        res
+      );
+    }
+  } else {
+    const pending = wsPendingReq.get(res.msgId);
+    if (pending) {
+      pending.reject(res.error);
+    } else {
+      console.error(
+        "onWsMessage: Received response for unknown or expired message",
+        res
+      );
+    }
+  }
+}
+
+function onWsError(this: WebSocket, error: Event) {
+  console.error("OnWsError", error);
+}
+
+function onWsClose(this: WebSocket, event: CloseEvent) {
+  console.warn("onWsClose", event);
+  const wsPendingReq = pendingReqMap.get(this) ?? null;
+  if (wsPendingReq !== null) {
+    wsPendingReq.forEach((pendingReq) => {
+      pendingReq.reject("onWsClose");
+    });
+    pendingReqMap.delete(this);
+  }
+}
+
+export function createWebSocket(settings: Settings): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket("ws://localhost:3001");
-    ws.onmessage = (msg) => {
-      const res = JSON.parse(msg.data);
+    const ws = new WebSocket(settings.endpoint);
+    pendingReqMap.set(ws, new Map());
 
-      if (res.success) {
-        const pending = pendingReqMap.get(res.msgId);
-        if (pending) {
-          pending.resolve(res.payload);
-        } else {
-          console.error(
-            "Received response for unknown or expired message",
-            res
-          );
-        }
-      } else {
-        const pending = pendingReqMap.get(res.msgId);
-        if (pending) {
-          pending.reject(res.error);
-        } else {
-          console.error(
-            "Received response for unknown or expired message",
-            res
-          );
-        }
-      }
-    };
-
-    ws.onopen = () => resolve(ws);
-
-    ws.onerror = reject;
+    ws.addEventListener("message", onWsMessage);
+    ws.addEventListener("open", () => {
+      ws.removeEventListener("error", reject);
+      resolve(ws);
+    });
+    ws.addEventListener("error", reject);
+    ws.addEventListener("error", onWsError);
+    ws.addEventListener("close", onWsClose);
 
     return ws;
   });
@@ -47,8 +77,8 @@ export function createWebSocket(): Promise<WebSocket> {
 
 export async function sendMessage<T>(
   ws: WebSocket,
+  token: string,
   action: string,
-  settings: Settings,
   data: Record<string, unknown> | null
 ): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -56,11 +86,17 @@ export async function sendMessage<T>(
 
     let timeout: NodeJS.Timeout | null = null;
 
+    const wsPendingReq = pendingReqMap.get(ws) ?? null;
+    if (wsPendingReq === null) {
+      reject("sendMessage: No pending request map");
+      return;
+    }
+
     const clear = () => {
       if (timeout !== null) {
         clearTimeout(timeout);
       }
-      pendingReqMap.delete(msgId);
+      wsPendingReq.delete(msgId);
     };
 
     timeout = setTimeout(() => {
@@ -68,7 +104,7 @@ export async function sendMessage<T>(
       reject("Request timeout");
     }, 10000);
 
-    pendingReqMap.set(msgId, {
+    wsPendingReq.set(msgId, {
       resolve: (payload) => {
         clear();
         // TODO: validation?
@@ -80,13 +116,6 @@ export async function sendMessage<T>(
       },
     });
 
-    ws.send(
-      JSON.stringify({
-        action,
-        data,
-        token: settings.token,
-        msgId,
-      })
-    );
+    ws.send(JSON.stringify({ action, data, token, msgId }));
   });
 }

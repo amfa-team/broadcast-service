@@ -1,4 +1,3 @@
-import { get, post } from "./request";
 import { Device, types } from "mediasoup-client";
 import {
   InitConnectionParams,
@@ -9,8 +8,22 @@ import {
   ReceiveParams,
   ConsumerInfo,
 } from "../../../server/src/sfu/types";
-import { Settings } from "../types";
+import { Settings, SDK } from "../types";
 import { sendMessage, createWebSocket } from "./websocket";
+
+export async function createSDK(settings: Settings): Promise<SDK> {
+  const device = createDevice();
+  const ws = await createWebSocket(settings);
+  const sdk = {
+    ws,
+    token: settings.token,
+    device,
+  };
+
+  await loadDevice(sdk);
+
+  return sdk;
+}
 
 export function createDevice(): types.Device {
   const device = new Device();
@@ -18,32 +31,27 @@ export function createDevice(): types.Device {
   return device;
 }
 
-export async function loadDevice(
-  settings: Settings,
-  device: types.Device
-): Promise<void> {
-  const ws = await createWebSocket();
+export async function loadDevice(sdk: SDK): Promise<void> {
   const routerRtpCapabilities = await sendMessage<types.RtpCapabilities>(
-    ws,
+    sdk.ws,
+    sdk.token,
     "/sfu/router-capabilities",
-    settings,
     null
   );
 
-  await device.load({ routerRtpCapabilities });
+  await sdk.device.load({ routerRtpCapabilities });
 }
 
 export async function createTransport(
-  settings: Settings,
-  device: Device,
+  sdk: SDK,
   type: "send" | "recv"
 ): Promise<types.Transport> {
-  if (!device.loaded) {
+  if (!sdk.device.loaded) {
     throw new Error("createTransport: Device must be loaded");
   }
 
   const request: InitConnectionParams = {
-    sctpCapabilities: device.sctpCapabilities,
+    sctpCapabilities: sdk.device.sctpCapabilities,
   };
 
   const {
@@ -52,7 +60,12 @@ export async function createTransport(
     iceCandidates,
     dtlsParameters,
     sctpParameters,
-  } = await post<ConnectionInfo>(settings, "/connect/init", request);
+  } = await sendMessage<ConnectionInfo>(
+    sdk.ws,
+    sdk.token,
+    "/sfu/connect/init",
+    request
+  );
 
   const params = {
     id: transportId,
@@ -65,13 +78,18 @@ export async function createTransport(
 
   const transport =
     type === "send"
-      ? device.createSendTransport(params)
-      : device.createRecvTransport(params);
+      ? sdk.device.createSendTransport(params)
+      : sdk.device.createRecvTransport(params);
 
   transport.on("connect", async ({ dtlsParameters }, callback, errback) => {
     try {
       const connectParams: ConnectParams = { transportId, dtlsParameters };
-      await post<void>(settings, `/connect/create`, connectParams);
+      await sendMessage<ConnectionInfo>(
+        sdk.ws,
+        sdk.token,
+        "/sfu/connect/create",
+        connectParams
+      );
       callback();
     } catch (e) {
       errback(e);
@@ -93,7 +111,12 @@ export async function createTransport(
             rtpParameters,
           };
 
-          const producerId = await post(settings, `/send/create`, req);
+          const producerId = await sendMessage<number>(
+            sdk.ws,
+            sdk.token,
+            "/sfu/send/create",
+            req
+          );
 
           callback({ id: producerId });
         } catch (error) {
@@ -165,7 +188,7 @@ const consumers: Map<string, types.Consumer> = new Map();
 const consumerStreams: Map<string, MediaStream> = new Map();
 
 async function createConsumer(
-  settings: Settings,
+  sdk: SDK,
   transport: types.Transport,
   info: ConsumerInfo
 ): Promise<types.Consumer> {
@@ -183,14 +206,16 @@ async function createConsumer(
 
   consumers.set(consumer.id, consumer);
 
-  await post<void>(settings, `/receive/play`, { consumerId: info.consumerId });
+  await sendMessage<ConnectionInfo>(sdk.ws, sdk.token, "/sfu/receive/play", {
+    consumerId: info.consumerId,
+  });
   consumer.resume();
 
   return consumer;
 }
 
 async function createRecvMediaStream(
-  settings: Settings,
+  sdk: SDK,
   producerUserId: string,
   transport: types.Transport,
   infos: ConsumerInfo[]
@@ -199,7 +224,7 @@ async function createRecvMediaStream(
   consumerStreams.set(producerUserId, stream);
 
   const consumers = await Promise.all(
-    infos.map((info) => createConsumer(settings, transport, info))
+    infos.map((info) => createConsumer(sdk, transport, info))
   );
 
   consumers.forEach(({ track }) => {
@@ -212,21 +237,25 @@ async function createRecvMediaStream(
 }
 
 export async function recvStreams(
-  settings: Settings,
-  device: types.Device,
+  sdk: SDK,
   transport: types.Transport
 ): Promise<{ [connectionId: string]: MediaStream }> {
   const req: ReceiveParams = {
     transportId: transport.id,
-    rtpCapabilities: device.rtpCapabilities,
+    rtpCapabilities: sdk.device.rtpCapabilities,
   };
 
-  const info = await post<ReceiveInfo>(settings, "/receive/create", req);
+  const info = await sendMessage<ReceiveInfo>(
+    sdk.ws,
+    sdk.token,
+    "/sfu/receive/create",
+    req
+  );
 
   const tasks: Array<Promise<[string, MediaStream]>> = [];
   for (const [producerUserId, consumersInfos] of Object.entries(info)) {
     tasks.push(
-      createRecvMediaStream(settings, producerUserId, transport, consumersInfos)
+      createRecvMediaStream(sdk, producerUserId, transport, consumersInfos)
     );
   }
 
