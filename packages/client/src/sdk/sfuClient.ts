@@ -10,6 +10,7 @@ import {
   ConsumerInfo,
 } from "../../../server/src/sfu/types";
 import { Settings } from "../types";
+import { sendMessage, createWebSocket } from "./websocket";
 
 export function createDevice(): types.Device {
   const device = new Device();
@@ -21,9 +22,12 @@ export async function loadDevice(
   settings: Settings,
   device: types.Device
 ): Promise<void> {
-  const routerRtpCapabilities = await get<types.RtpCapabilities>(
+  const ws = await createWebSocket();
+  const routerRtpCapabilities = await sendMessage<types.RtpCapabilities>(
+    ws,
+    "/sfu/router-capabilities",
     settings,
-    "/router-capabilities"
+    null
   );
 
   await device.load({ routerRtpCapabilities });

@@ -7,7 +7,7 @@ import { Switch, Route, Link } from "react-router-dom";
 export default function App(): JSX.Element {
   const settings = {
     endpoint: "http://127.0.0.1:3000/dev",
-    token: "a7c020cc-1478-4c9b-9cb6-5fb2c3f01e3b",
+    token: "e2703fbb-c0de-4cf4-b8c9-06e316157347",
   };
   const state = useSDK(settings);
 

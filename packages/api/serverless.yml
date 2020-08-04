@@ -11,6 +11,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: eu-west-3
+  websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
 
 package:
   individually: true
@@ -43,9 +44,9 @@ functions:
   sfu_routerCapabilities:
     handler: src/sfu/handler.routerCapabilities
     events:
-      - http:
-          path: sfu/router-capabilities
-          method: get
+      - websocket:
+          route: /sfu/router-capabilities
+          routeResponseSelectionExpression: $default
   sfu_initConnect:
     handler: src/sfu/handler.initConnect
     events:
@@ -76,6 +77,10 @@ functions:
       - http:
           path: sfu/receive/play
           method: post
+  # disconnect:
+  #   handler: src/handler.disconnect
+  #   events:
+  #     - websocket: $disconnect
 
 resources:
   Resources:
@@ -101,6 +106,19 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: ip
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    connectionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: connections
+        AttributeDefinitions:
+          - AttributeName: connectionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connectionId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

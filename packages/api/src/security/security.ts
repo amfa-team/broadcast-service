@@ -1,21 +1,9 @@
-import type { APIGatewayProxyEvent } from "aws-lambda";
 import { findByToken } from "../db/repositories/participantRepository";
-import { ForbiddenError, InvalidRequestError } from "../io/exceptions";
+import { ForbiddenError } from "../io/exceptions";
 import { Participant, Role } from "../db/models/participant";
+import { WithToken } from "../io/types";
 
-export function getToken(event: APIGatewayProxyEvent): string {
-  const token = event.headers["x-api-key"];
-
-  if (!token) {
-    throw new InvalidRequestError("Missing x-api-key header");
-  }
-
-  return token;
-}
-
-export function authAdmin(event: APIGatewayProxyEvent): void {
-  const token = getToken(event);
-
+export function authAdmin({ token }: WithToken): void {
   if (!process.env.SECRET) {
     throw new Error("Missing SECRET env-vars");
   }
@@ -26,17 +14,16 @@ export function authAdmin(event: APIGatewayProxyEvent): void {
 }
 
 export async function authParticipant(
-  event: APIGatewayProxyEvent,
-  role: Role | null
+  { token }: WithToken,
+  roles: Role[]
 ): Promise<Participant> {
-  const token = getToken(event);
   const participant = await findByToken(token);
 
   if (participant == null) {
     throw new ForbiddenError();
   }
 
-  if (role !== null && participant.role !== role) {
+  if (!roles.includes(participant.role)) {
     throw new ForbiddenError();
   }
 
