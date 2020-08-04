@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
     "@typescript-eslint/parser": "^3.5.0",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
@@ -19,14 +19,15 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "4",
     "eslint-plugin-react": "^7.20.3",
-    "husky": ">=4",
-    "lint-staged": ">=10",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
     "typescript": "^3.9.6"
   },
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "build": "(cd packages/server; yarn build) && (cd packages/client; yarn build)"
+    "build": "(cd packages/server; yarn build) && (cd packages/client; yarn build)",
+    "prettier": "prettier --write ."
   },
   "husky": {
     "hooks": {

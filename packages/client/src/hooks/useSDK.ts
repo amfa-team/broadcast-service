@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { createDevice, loadDevice, generateUserId } from "../sdk/sfuClient";
+import { createDevice, loadDevice } from "../sdk/sfuClient";
 import { types } from "mediasoup-client";
+import { Settings } from "../types";
 
 type SDKLoadingState = {
   loaded: false;
@@ -9,22 +10,19 @@ type SDKLoadingState = {
 type SDKLoadedState = {
   loaded: true;
   device: types.Device;
-  userId: string;
 };
 
 type SDKState = SDKLoadingState | SDKLoadedState;
 
-export function useSDK(): SDKState {
+export function useSDK(settings: Settings): SDKState {
   const [state, setSDKState] = useState<SDKState>({ loaded: false });
 
   useEffect(() => {
     const device = createDevice();
-    const userId = generateUserId();
-    loadDevice(userId, device).then(() =>
+    loadDevice(settings, device).then(() =>
       setSDKState({
         loaded: true,
         device,
-        userId,
       })
     );
     return (): void => {

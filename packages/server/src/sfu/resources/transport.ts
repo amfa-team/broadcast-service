@@ -1,8 +1,8 @@
 import { types } from "mediasoup";
+import { getPublicIP } from "../../cluster/register";
 
 type TransportMeta = {
   routerId: string;
-  userId: string;
 };
 
 const transports: Map<string, types.WebRtcTransport> = new Map();
@@ -13,14 +13,13 @@ const transportsMeta: WeakMap<
 
 export async function createTransport(
   router: types.Router,
-  userId: string,
   sctpCapabilities: types.SctpCapabilities
 ): Promise<types.WebRtcTransport> {
   const transport = await router.createWebRtcTransport({
     listenIps: [
       {
         ip: process.env.LISTEN_IP ?? "0.0.0.0",
-        announcedIp: process.env.PUBLIC_IP,
+        announcedIp: getPublicIP(),
       },
     ],
     initialAvailableOutgoingBitrate: 1000000,
@@ -38,7 +37,7 @@ export async function createTransport(
     transports.delete(transport.id);
   });
 
-  transportsMeta.set(transport, { routerId: router.id, userId });
+  transportsMeta.set(transport, { routerId: router.id });
 
   return transport;
 }

@@ -80,11 +80,7 @@ export async function initConnection(
   const routerId = getLessUsedRouterId();
   const router = getRouter(routerId);
 
-  const transport = await createTransport(
-    router,
-    request.userId,
-    request.sctpCapabilities
-  );
+  const transport = await createTransport(router, request.sctpCapabilities);
 
   return {
     transportId: transport.id,
@@ -100,11 +96,11 @@ export async function connect(params: ConnectParams): Promise<void> {
 }
 
 export async function send(params: SendParams): Promise<string> {
-  const { transportId, userId, kind, rtpParameters } = params;
+  const { transportId, kind, rtpParameters } = params;
   const transport = getTransport(transportId);
   const { routerId } = getTransportMeta(transportId);
 
-  const producer = await createProducer(transport, userId, kind, rtpParameters);
+  const producer = await createProducer(transport, kind, rtpParameters);
 
   const sourceRouter = getRouter(routerId);
   const routers = getRouters();
@@ -121,7 +117,7 @@ export async function send(params: SendParams): Promise<string> {
 }
 
 export async function receive(params: ReceiveParams): Promise<ReceiveInfo> {
-  const { transportId, userId, rtpCapabilities } = params;
+  const { transportId, rtpCapabilities } = params;
   const producers = getProducers();
   const selfTransport = getTransport(transportId);
 
@@ -134,9 +130,9 @@ export async function receive(params: ReceiveParams): Promise<ReceiveInfo> {
   const tasks: Array<Promise<[types.Consumer, string]>> = [];
 
   for (const producer of producers) {
-    const { userId: producerUserId } = getProducerMeta(producer);
+    const { transportId: producerTransportId } = getProducerMeta(producer);
 
-    if (userId === producerUserId) {
+    if (transportId === producerTransportId) {
       // Do not receive self stream
       continue;
     }
@@ -145,14 +141,13 @@ export async function receive(params: ReceiveParams): Promise<ReceiveInfo> {
       tasks.push(
         createConsumer(
           selfTransport,
-          userId,
           producer.id,
           rtpCapabilities
-        ).then((consumer) => [consumer, producerUserId])
+        ).then((consumer) => [consumer, producer.id])
       );
     } else {
       tasks.push(
-        Promise.resolve([consumerByProducerId[producer.id], producerUserId])
+        Promise.resolve([consumerByProducerId[producer.id], producer.id])
       );
     }
   }

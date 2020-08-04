@@ -7,7 +7,6 @@ type RecvResource = {
 };
 
 export type SFUState = {
-  userId: string;
   device: types.Device;
   send: {
     transport: types.Transport | null;
@@ -17,6 +16,11 @@ export type SFUState = {
   };
   receive: {
     transport: types.Transport | null;
-    resources: { [userId: string]: RecvResource };
+    resources: { [producerId: string]: RecvResource };
   };
+};
+
+export type Settings = {
+  endpoint: string;
+  token: string;
 };

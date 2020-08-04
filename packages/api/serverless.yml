@@ -1,0 +1,118 @@
+service:
+  name: user-service-api
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-plugin-typescript
+  - serverless-dynamodb-local
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-3
+
+package:
+  individually: true
+
+functions:
+  registerParticipant:
+    handler: src/admin/handler.registerParticipant
+    events:
+      - http:
+          path: /admin/participant
+          method: post
+  listParticipants:
+    handler: src/admin/handler.listParticipants
+    events:
+      - http:
+          path: /admin/participant
+          method: get
+  registerServer:
+    handler: src/admin/handler.registerServer
+    events:
+      - http:
+          path: /admin/server
+          method: post
+  listServers:
+    handler: src/admin/handler.listServers
+    events:
+      - http:
+          path: /admin/server
+          method: get
+  sfu_routerCapabilities:
+    handler: src/sfu/handler.routerCapabilities
+    events:
+      - http:
+          path: sfu/router-capabilities
+          method: get
+  sfu_initConnect:
+    handler: src/sfu/handler.initConnect
+    events:
+      - http:
+          path: sfu/connect/init
+          method: post
+  sfu_createConnect:
+    handler: src/sfu/handler.createConnect
+    events:
+      - http:
+          path: sfu/connect/create
+          method: post
+  sfu_createSend:
+    handler: src/sfu/handler.createSend
+    events:
+      - http:
+          path: sfu/send/create
+          method: post
+  sfu_createReceive:
+    handler: src/sfu/handler.createReceive
+    events:
+      - http:
+          path: sfu/receive/create
+          method: post
+  sfu_playReceive:
+    handler: src/sfu/handler.playReceive
+    events:
+      - http:
+          path: sfu/receive/play
+          method: post
+
+resources:
+  Resources:
+    participantTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: participants
+        AttributeDefinitions:
+          - AttributeName: token
+            AttributeType: S
+        KeySchema:
+          - AttributeName: token
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    serverTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: servers
+        AttributeDefinitions:
+          - AttributeName: ip
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ip
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+custom:
+  serverless-offline:
+    useChildProcesses: true
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 9005
+      isMemory: true
+      migration: true

@@ -2,7 +2,6 @@ import { types } from "mediasoup";
 
 type ConsumerMeta = {
   transportId: string;
-  userId: string;
 };
 
 const consumers: Map<string, types.Consumer> = new Map();
@@ -10,7 +9,6 @@ const consumersMeta: WeakMap<types.Consumer, ConsumerMeta> = new Map();
 
 export async function createConsumer(
   transport: types.Transport,
-  userId: string,
   producerId: string,
   rtpCapabilities: types.RtpCapabilities
 ): Promise<types.Consumer> {
@@ -56,7 +54,7 @@ export async function createConsumer(
 
   // TODO: unset consumer onclose
   consumers.set(consumer.id, consumer);
-  consumersMeta.set(consumer, { transportId: transport.id, userId });
+  consumersMeta.set(consumer, { transportId: transport.id });
 
   return consumer;
 }

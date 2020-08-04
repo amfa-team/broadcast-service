@@ -3,6 +3,7 @@ import useUserMedia from "./useUserMedia";
 import { useTransport } from "./useTransport";
 import { useEffect, useState, useCallback, useDebugValue } from "react";
 import { sendStream } from "../sdk/sfuClient";
+import { Settings } from "../types";
 
 type UseBroadcast = {
   error: null | string;
@@ -13,11 +14,11 @@ type UseBroadcast = {
 };
 
 export default function useBroadcast(
-  userId: string,
+  settings: Settings,
   device: types.Device
 ): UseBroadcast {
   const { stream, error } = useUserMedia();
-  const transport = useTransport(userId, device, "send");
+  const transport = useTransport(settings, device, "send");
   const [videoProducer, setVideoProducer] = useState<types.Producer | null>(
     null
   );

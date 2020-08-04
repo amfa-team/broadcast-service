@@ -2,14 +2,15 @@ import React from "react";
 import Video from "./Video";
 import { types } from "mediasoup-client";
 import useRecvStreams from "../hooks/useRecvStreams";
+import { Settings } from "../types";
 
 type StageProps = {
   device: types.Device;
-  userId: string;
+  settings: Settings;
 };
 
 export default function Stage(props: StageProps): JSX.Element {
-  const { streams } = useRecvStreams(props.userId, props.device);
+  const { streams } = useRecvStreams(props.settings, props.device);
 
   return (
     <div>
