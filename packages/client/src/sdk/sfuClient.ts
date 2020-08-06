@@ -7,7 +7,7 @@ import {
   ReceiveInfo,
   ReceiveParams,
   ConsumerInfo,
-} from "../../../server/src/sfu/types";
+} from "../../../types";
 import { Settings, SDK } from "../types";
 import { sendMessage, createWebSocket } from "./websocket";
 

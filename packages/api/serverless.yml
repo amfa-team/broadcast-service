@@ -77,10 +77,10 @@ functions:
       - websocket:
           route: /sfu/receive/play
           routeResponseSelectionExpression: $default
-  # disconnect:
-  #   handler: src/handler.disconnect
-  #   events:
-  #     - websocket: $disconnect
+  disconnect:
+    handler: src/sfu/handler.disconnect
+    events:
+      - websocket: $disconnect
 
 resources:
   Resources:
@@ -133,4 +133,4 @@ custom:
     start:
       port: 9005
       isMemory: true
-      migration: true
+      migrate: true

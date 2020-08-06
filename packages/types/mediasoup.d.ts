@@ -1,4 +1,4 @@
-import { types } from "mediasoup";
+import type { types } from "mediasoup";
 
 export type InitConnectionParams = {
   sctpCapabilities: types.SctpCapabilities;
@@ -16,6 +16,10 @@ export type ConnectParams = {
   transportId: string;
   dtlsParameters: types.DtlsParameters;
 };
+
+export interface DestroyConnectionParams {
+  transportId: string;
+}
 
 export type SendParams = {
   transportId: string;

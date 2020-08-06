@@ -15,6 +15,5 @@
     "esModuleInterop": true,
     "jsx": "react"
   },
-  "include": ["src"],
-  "references": [{ "path": "../server", "prepend": false }]
+  "include": ["src"]
 }

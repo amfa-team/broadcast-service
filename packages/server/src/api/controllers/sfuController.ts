@@ -2,13 +2,15 @@ import { Application } from "express";
 import {
   InitConnectionParams,
   ConnectParams,
+  DestroyConnectionParams,
   SendParams,
   ReceiveParams,
-} from "../../sfu/types";
+} from "../../../../types";
 import {
   getRouterCapabilities,
   initConnection,
   connect,
+  disconnect,
   send,
   receive,
   play,
@@ -60,6 +62,17 @@ export function bindSceneController(app: Application): void {
       // TODO: validation
       const request: ConnectParams = req.body;
       const payload = await connect(request);
+      handleSuccessResponse(res, payload);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  });
+
+  app.post("/connect/destroy", async (req, res) => {
+    try {
+      // TODO: validation
+      const { transportId }: DestroyConnectionParams = req.body;
+      const payload = disconnect(transportId);
       handleSuccessResponse(res, payload);
     } catch (error) {
       handleErrorResponse(res, error);

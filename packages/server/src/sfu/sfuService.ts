@@ -4,6 +4,7 @@ import { types } from "mediasoup";
 import {
   createTransport,
   connectTransport,
+  destroyTransport,
   getTransportMeta,
   getTransport,
   getTransportUsage,
@@ -25,7 +26,7 @@ import {
   SendParams,
   ReceiveParams,
   ReceiveInfo,
-} from "./types";
+} from "../../../types";
 
 async function initWorker(): Promise<void> {
   const worker = await createWorker();
@@ -93,6 +94,10 @@ export async function initConnection(
 
 export async function connect(params: ConnectParams): Promise<void> {
   await connectTransport(params.transportId, params.dtlsParameters);
+}
+
+export function disconnect(transportId: string): void {
+  destroyTransport(transportId);
 }
 
 export async function send(params: SendParams): Promise<string> {

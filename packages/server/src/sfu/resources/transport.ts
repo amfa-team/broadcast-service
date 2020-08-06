@@ -89,6 +89,11 @@ export async function connectTransport(
   return transport;
 }
 
+export function destroyTransport(transportId: string): void {
+  const transport = getTransport(transportId);
+  transport.close();
+}
+
 export function getRouterTransports(router: types.Router): types.Transport[] {
   return [...transports.values()].filter(
     (transport) => getTransportMeta(transport.id).routerId === router.id

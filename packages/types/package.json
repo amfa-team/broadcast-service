@@ -1,0 +1,21 @@
+{
+  "name": "@amfa-team/broadcast-types",
+  "private": true,
+  "version": "0.1.0",
+  "repository": "https://github.com/amfa-team/picnic-sfu.git",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "main": "src/index.js",
+  "types": "src/index.ts",
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "mediasoup": "^3.6.9",
+    "mediasoup-client": "^3.6.11"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
