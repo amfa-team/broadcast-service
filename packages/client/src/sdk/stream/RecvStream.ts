@@ -100,8 +100,6 @@ export default class RecvStream {
       this.#videoConsumer = consumer;
     }
 
-    debugger;
-
     this.#stream.addTrack(consumer.track);
   }
 

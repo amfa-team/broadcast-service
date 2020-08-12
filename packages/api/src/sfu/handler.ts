@@ -26,8 +26,6 @@ export async function routerCapabilities(
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
-  console.warn(connectionId);
-
   try {
     const req = await parseWsParticipantRequest(
       event,
@@ -59,6 +57,14 @@ export async function disconnect(
 
   try {
     try {
+      // There is 2 types of disconnect clean & unclean
+      //    - clean: client or server close explicitly
+      //    - unclean: network errors, client crash...
+
+      // TODO: handle clean disconnect on websocket timeout (i.e. 2 hours) without cutting the stream
+      // TODO: handle reconnect after unclean (client crash)
+      // TODO: handle disconnect (pause stream?) when unclean disconnect (idle timeout is 10min)
+      // TODO: prevent idle timeout by sending ping
       await onDisconnect(connectionId);
       return handleSuccessResponse(null);
     } catch (e) {

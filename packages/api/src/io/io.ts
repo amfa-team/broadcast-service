@@ -163,6 +163,8 @@ export async function postToConnection(
   connectionId: string,
   data: string
 ): Promise<void> {
+  // TODO: handles 410 Gone error
+  // https://medium.com/@lancers/websocket-api-what-does-it-mean-that-disconnect-is-a-best-effort-event-317b7021456f
   await apigwManagementApi
     .postToConnection({
       ConnectionId: connectionId,
