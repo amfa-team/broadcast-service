@@ -12,6 +12,5 @@
     "lib": ["es2019"],
     "rootDir": "."
   },
-  "include": ["src"],
-  "references": [{ "path": "../models" }]
+  "include": ["src"]
 }

@@ -6,8 +6,8 @@ import { Switch, Route, Link } from "react-router-dom";
 
 export default function App(): JSX.Element {
   const settings = {
-    endpoint: "http://127.0.0.1:3000/dev",
-    token: "a7c020cc-1478-4c9b-9cb6-5fb2c3f01e3b",
+    endpoint: "ws://127.0.0.1:3001",
+    token: "44408f17-5629-4ac5-ab24-6129afb3cd42",
   };
   const state = useSDK(settings);
 
@@ -18,10 +18,10 @@ export default function App(): JSX.Element {
   return (
     <Switch>
       <Route path="/broadcast">
-        <Broadcast settings={settings} device={state.device} />
+        <Broadcast sdk={state.sdk} />
       </Route>
       <Route path="/view">
-        <Stage settings={settings} device={state.device} />
+        <Stage sdk={state.sdk} />
       </Route>
       <Route>
         <nav>

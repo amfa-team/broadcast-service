@@ -13,7 +13,7 @@
     "typescript": "^3.9.7"
   },
   "scripts": {
-    "start": "serverless offline",
+    "start": "serverless offline --useWebsocket",
     "build": "tsc -b",
     "sls": "serverless",
     "dynamo:install": "serverless dynamodb install",

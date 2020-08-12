@@ -1,19 +1,16 @@
 import React from "react";
 import Controls from "./Controls";
 import Video from "./Video";
-import { types } from "mediasoup-client";
 import useBroadcast from "../hooks/useBroadcast";
-import { Settings } from "../types";
+import { SDK } from "../types";
 
 type BroadcastProps = {
-  device: types.Device;
-  settings: Settings;
+  sdk: SDK;
 };
 
 export default function Broadcast(props: BroadcastProps): JSX.Element {
   const { error, stream, pause, audioPaused, videoPaused } = useBroadcast(
-    props.settings,
-    props.device
+    props.sdk
   );
 
   if (error) {

@@ -24,3 +24,9 @@ export type Settings = {
   endpoint: string;
   token: string;
 };
+
+export interface SDK {
+  token: string;
+  ws: WebSocket;
+  device: types.Device;
+}
