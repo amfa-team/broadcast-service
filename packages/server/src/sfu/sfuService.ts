@@ -9,16 +9,10 @@ import {
   getTransport,
   getTransportUsage,
 } from "./resources/transport";
-import {
-  createProducer,
-  getProducers,
-  getProducerMeta,
-  getProducer,
-} from "./resources/producers";
+import { createProducer, getProducer } from "./resources/producers";
 import {
   createConsumer,
   getConsumer,
-  getTransportConsumers,
   getProducerConsumer,
 } from "./resources/consumers";
 import {
@@ -27,7 +21,6 @@ import {
   ConnectParams,
   SendParams,
   ReceiveParams,
-  ReceiveInfo,
   ConsumerInfo,
 } from "../../../types";
 

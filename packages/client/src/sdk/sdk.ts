@@ -5,6 +5,7 @@ import { PicnicDevice } from "./device/device";
 import SendStream from "./stream/SendStream";
 import { PicnicTransport } from "./transport/transport";
 import RecvStream from "./stream/RecvStream";
+import { ServerEventMap } from "./events/event";
 
 interface SDKEvent<T> extends Event {
   data: T;
@@ -18,69 +19,6 @@ interface SDKEventMap {
 }
 
 type StreamState = "initial" | "loading" | "ready";
-
-interface StreamEventMap {
-  state: SDKEvent<StreamState>;
-}
-
-// Audio + Video
-interface Stream extends EventTarget {
-  addEventListener<K extends keyof StreamEventMap>(
-    type: K,
-    listener: (this: MessagePort, ev: StreamEventMap[K]) => void,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-
-  removeEventListener<K extends keyof StreamEventMap>(
-    type: K,
-    listener: (this: MessagePort, ev: StreamEventMap[K]) => void,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-
-  load(): void;
-
-  pause(): void;
-
-  play(): void;
-}
-
-interface Transport extends EventTarget {
-  addEventListener<K extends keyof StreamEventMap>(
-    type: K,
-    listener: (this: MessagePort, ev: StreamEventMap[K]) => void,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-
-  removeEventListener<K extends keyof StreamEventMap>(
-    type: K,
-    listener: (this: MessagePort, ev: StreamEventMap[K]) => void,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-
-  load(type: "send" | "recv"): void;
-
-  close(): void;
-}
 
 interface SDK extends EventTarget {
   readonly state: State;
@@ -140,15 +78,17 @@ export class Picnic extends EventTarget implements SDK {
     await this.#device.loadDevice();
     await this.#recvTransport.load();
 
-    this.#ws.addEventListener("stream:add", (event: any) => {
-      this.#addStream(event.data);
+    this.#ws.addEventListener("stream:add", (event) => {
+      const { data } = event as ServerEventMap["stream:add"];
+      this.#addStream(data);
       const evt = new MessageEvent("stream:update", {
         data: this.#recvStreams,
       });
       this.dispatchEvent(evt);
     });
-    this.#ws.addEventListener("stream:remove", (event: any) => {
-      this.#removeStream(event.data);
+    this.#ws.addEventListener("stream:remove", (event) => {
+      const { data } = event as ServerEventMap["stream:remove"];
+      this.#removeStream(data);
       const evt = new MessageEvent("stream:update", {
         data: this.#recvStreams,
       });

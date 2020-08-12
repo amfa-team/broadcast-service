@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { Settings } from "../../types";
+import { PicnicEvent } from "../events/event";
 
 type PendingReq = {
   resolve: (payload: unknown) => void;
@@ -104,9 +105,7 @@ export class PicnicWebSocket extends EventTarget {
     }
 
     if (msg.type === "event") {
-      const event = new MessageEvent(msg.payload.type, {
-        data: msg.payload.data,
-      });
+      const event = new PicnicEvent(msg.payload.type, msg.payload.data);
       this.dispatchEvent(event);
     }
   };
