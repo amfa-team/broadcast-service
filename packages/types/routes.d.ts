@@ -4,9 +4,9 @@ import {
   ConnectionInfo,
   ConnectParams,
   DestroyConnectionParams,
-  ReceiveInfo,
   ReceiveParams,
   SendParams,
+  ConsumerInfo,
 } from "./mediasoup";
 
 export type Route<P extends string, I, O> = {
@@ -44,7 +44,7 @@ export type CreateSendRoute = Route<"/send/create", SendParams, string>;
 export type CreateReceiveRoute = Route<
   "/receive/create",
   ReceiveParams,
-  ReceiveInfo
+  ConsumerInfo
 >;
 
-export type PlayReceiveRoute = Route<"/receive/play", ReceiveParams, null>;
+export type PlayReceiveRoute = Route<"/receive/play", string, null>;

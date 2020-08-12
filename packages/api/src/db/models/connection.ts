@@ -4,7 +4,8 @@ export interface CreateConnection {
 }
 
 export interface Connection extends CreateConnection {
-  transportId: string | null;
+  sendTransportId: string | null;
+  recvTransportId: string | null;
 }
 
 export interface UpdateConnection extends Partial<Connection> {

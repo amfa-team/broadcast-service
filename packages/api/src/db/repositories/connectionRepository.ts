@@ -12,7 +12,8 @@ export async function createConnection(
 ): Promise<Connection> {
   const connection: Connection = {
     ...params,
-    transportId: null,
+    sendTransportId: null,
+    recvTransportId: null,
   };
   await dynamoDb.put({ TableName, Item: connection }).promise();
   return connection;

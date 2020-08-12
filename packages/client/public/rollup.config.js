@@ -34,9 +34,23 @@ export default [
       babel({
         babelHelpers: "bundled",
         extensions,
+        presets: [
+          "@babel/preset-typescript",
+          "@babel/preset-react",
+          [
+            "@babel/preset-env",
+            {
+              modules: false,
+              targets: {
+                browsers: "last 2 chrome versions",
+              },
+            },
+          ],
+        ],
       }),
       serve({
         open: true,
+        host: "0.0.0.0",
         contentBase: ["public"],
         historyApiFallback: true,
         port: 4000,

@@ -2,20 +2,14 @@ import React from "react";
 import Controls from "./Controls";
 import Video from "./Video";
 import useBroadcast from "../hooks/useBroadcast";
-import { SDK } from "../types";
+import { Picnic } from "../sdk/sdk";
 
 type BroadcastProps = {
-  sdk: SDK;
+  sdk: Picnic;
 };
 
 export default function Broadcast(props: BroadcastProps): JSX.Element {
-  const { error, stream, pause, audioPaused, videoPaused } = useBroadcast(
-    props.sdk
-  );
-
-  if (error) {
-    return <div>{error}</div>;
-  }
+  const { stream, pause } = useBroadcast(props.sdk);
 
   if (stream === null) {
     return <div>Please enable Mic/Video</div>;
@@ -25,10 +19,10 @@ export default function Broadcast(props: BroadcastProps): JSX.Element {
     <div>
       <Controls
         pause={pause}
-        audioPaused={audioPaused}
-        videoPaused={videoPaused}
+        audioPaused={stream.isAudioPaused()}
+        videoPaused={stream.isVideoPaused()}
       />
-      <Video stream={stream} muted flip />
+      <Video stream={stream.getUserMediaStream()} muted flip />
     </div>
   );
 }

@@ -1,85 +1,39 @@
-import { types } from "mediasoup-client";
-import useUserMedia from "./useUserMedia";
-import { useTransport } from "./useTransport";
-import { useEffect, useState, useCallback, useDebugValue } from "react";
-import { sendStream } from "../sdk/sfuClient";
-import { SDK } from "../types";
+import { useEffect, useState, useCallback } from "react";
+import SendStream from "../sdk/stream/SendStream";
+import { Picnic } from "../sdk/sdk";
 
 type UseBroadcast = {
-  error: null | string;
-  stream: null | MediaStream;
-  audioPaused: boolean;
-  videoPaused: boolean;
+  stream: SendStream | null;
   pause: (audio: boolean, video: boolean) => void;
 };
 
-export default function useBroadcast(sdk: SDK): UseBroadcast {
-  const { stream, error } = useUserMedia();
-  const transport = useTransport(sdk, "send");
-  const [videoProducer, setVideoProducer] = useState<types.Producer | null>(
-    null
-  );
-  const [audioProducer, setAudioProducer] = useState<types.Producer | null>(
-    null
-  );
-  const [ready, setReady] = useState(false);
-  const [audioPaused, setAudioPaused] = useState(
-    audioProducer?.paused ?? false
-  );
-  const [videoPaused, setVideoPaused] = useState(
-    videoProducer?.paused ?? false
-  );
-
-  useDebugValue({ videoPaused, audioPaused, audioProducer, videoProducer });
-
-  const pause = useCallback(
-    (audio: boolean, video: boolean) => {
-      if (audioProducer && audioProducer.paused !== audio) {
-        if (audio) {
-          audioProducer.pause();
-        } else {
-          audioProducer.resume();
-        }
-      }
-      if (videoProducer && videoProducer.paused !== video) {
-        if (video) {
-          videoProducer.pause();
-        } else {
-          videoProducer.resume();
-        }
-      }
-      setAudioPaused(audio);
-      setVideoPaused(video);
-    },
-    [audioProducer, videoProducer]
-  );
+export default function useBroadcast(sdk: Picnic): UseBroadcast {
+  const [stream, setStream] = useState<SendStream | null>(null);
 
   useEffect(() => {
-    if (transport && stream) {
-      sendStream(transport, stream)
-        .then(({ audio, video }) => {
-          setReady(true);
-          setVideoProducer(video);
-          setAudioProducer(audio);
-        })
-        .catch(console.error);
-    }
+    // TODO: handle errors
+    sdk.broadcast().then(setStream);
 
     return (): void => {
-      if (videoProducer) {
-        videoProducer.close();
-      }
-      if (audioProducer) {
-        audioProducer.close();
-      }
+      // TODO: handle unmount
     };
-  }, [stream, transport]);
+  }, [sdk]);
 
-  return {
-    error,
-    stream: ready ? stream : null,
-    audioPaused,
-    videoPaused,
-    pause,
-  };
+  const pause = useCallback(
+    (pauseAudio, pauseVideo) => {
+      if (pauseAudio) {
+        stream?.pauseAudio();
+      } else {
+        stream?.resumeAudio();
+      }
+      if (pauseVideo) {
+        stream?.pauseVideo();
+      } else {
+        stream?.resumeVideo();
+      }
+    },
+    [stream]
+  );
+
+  return { stream, pause };
 }

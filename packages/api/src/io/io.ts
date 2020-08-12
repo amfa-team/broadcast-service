@@ -10,6 +10,8 @@ import {
   WsParticipantRequest,
 } from "./types";
 import { Role } from "../db/models/participant";
+import { getAllConnections } from "../db/repositories/connectionRepository";
+import { getAllSettledValues } from "./promises";
 
 const apigwManagementApi = new ApiGatewayManagementApi(
   process.env.IS_OFFLINE
@@ -149,11 +151,32 @@ export function handleSuccessResponse(
   return {
     statusCode: 200,
     body: JSON.stringify({
+      type: "response",
       success: true,
       payload: data,
       msgId,
     }),
   };
+}
+
+export async function postToConnection(
+  connectionId: string,
+  data: string
+): Promise<void> {
+  await apigwManagementApi
+    .postToConnection({
+      ConnectionId: connectionId,
+      Data: data,
+    })
+    .promise();
+}
+
+export async function broadcastToConnections(data: string): Promise<void> {
+  const connections = await getAllConnections();
+  const results = await Promise.allSettled(
+    connections.map((c) => postToConnection(c.connectionId, data))
+  );
+  getAllSettledValues(results, "broadcastToConnections: Unexpected Error");
 }
 
 export async function handleWebSocketSuccessResponse(
@@ -163,12 +186,7 @@ export async function handleWebSocketSuccessResponse(
 ): Promise<APIGatewayProxyResult> {
   const result = handleSuccessResponse(data, msgId);
 
-  await apigwManagementApi
-    .postToConnection({
-      ConnectionId: connectionId,
-      Data: result.body,
-    })
-    .promise();
+  await postToConnection(connectionId, result.body);
 
   return result;
 }
@@ -179,12 +197,7 @@ export async function handleWebSocketErrorResponse(
   e: unknown
 ): Promise<APIGatewayProxyResult> {
   const result = handleHttpErrorResponse(e, msgId);
-  await apigwManagementApi
-    .postToConnection({
-      ConnectionId: connectionId,
-      Data: result.body,
-    })
-    .promise();
+  await postToConnection(connectionId, result.body);
 
   return result;
 }

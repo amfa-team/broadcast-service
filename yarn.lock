@@ -6705,6 +6705,11 @@ tsutils@^3.17.1:
   dependencies:
     tslib "^1.8.1"
 
+ttab@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/ttab/-/ttab-0.6.1.tgz#72001a333d477a92c49f6cb0e83ae07984c66be5"
+  integrity sha512-9JvkYlhFMrmrgINQUn5ZJqVVtH+BDpGeFrDhlAaiR0/NgB4TfwU9gNv5Vwuel7gWs8wohEmwWiJuWPtV0swwyw==
+
 tunnel-agent@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"

@@ -13,11 +13,13 @@ import {
   createProducer,
   getProducers,
   getProducerMeta,
+  getProducer,
 } from "./resources/producers";
 import {
   createConsumer,
   getConsumer,
   getTransportConsumers,
+  getProducerConsumer,
 } from "./resources/consumers";
 import {
   InitConnectionParams,
@@ -26,6 +28,7 @@ import {
   SendParams,
   ReceiveParams,
   ReceiveInfo,
+  ConsumerInfo,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -121,55 +124,34 @@ export async function send(params: SendParams): Promise<string> {
   return producer.id;
 }
 
-export async function receive(params: ReceiveParams): Promise<ReceiveInfo> {
-  const { transportId, rtpCapabilities } = params;
-  const producers = getProducers();
+export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
+  const { transportId, producerId, rtpCapabilities } = params;
+  // TODO: check sourceTransportId match
+  const producer = getProducer(producerId);
   const selfTransport = getTransport(transportId);
+  const existingConsumer = getProducerConsumer(producer, selfTransport);
 
-  const existingConsumers = getTransportConsumers(transportId);
-  const consumerByProducerId = existingConsumers.reduce((acc, c) => {
-    acc[c.producerId] = c;
-    return acc;
-  }, {} as { [producerId: string]: types.Consumer });
-
-  const tasks: Array<Promise<[types.Consumer, string]>> = [];
-
-  for (const producer of producers) {
-    const { transportId: producerTransportId } = getProducerMeta(producer);
-
-    if (transportId === producerTransportId) {
-      // Do not receive self stream
-      continue;
-    }
-
-    if (!consumerByProducerId[producer.id]) {
-      tasks.push(
-        createConsumer(
-          selfTransport,
-          producer.id,
-          rtpCapabilities
-        ).then((consumer) => [consumer, producer.id])
-      );
-    } else {
-      tasks.push(
-        Promise.resolve([consumerByProducerId[producer.id], producer.id])
-      );
-    }
+  if (existingConsumer !== null) {
+    return {
+      consumerId: existingConsumer.id,
+      producerId: producer.id,
+      kind: producer.kind,
+      rtpParameters: existingConsumer.rtpParameters,
+    };
   }
 
-  const consumers = await Promise.all(tasks);
+  const consumer = await createConsumer(
+    selfTransport,
+    producer.id,
+    rtpCapabilities
+  );
 
-  return consumers.reduce((acc, [consumer, producerUserId]) => {
-    const list = acc[producerUserId] ?? [];
-    list.push({
-      consumerId: consumer.id,
-      producerId: consumer.producerId,
-      kind: consumer.kind,
-      rtpParameters: consumer.rtpParameters,
-    });
-    acc[producerUserId] = list;
-    return acc;
-  }, {} as ReceiveInfo);
+  return {
+    consumerId: consumer.id,
+    producerId: producer.id,
+    kind: producer.kind,
+    rtpParameters: consumer.rtpParameters,
+  };
 }
 
 export async function play(consumerId: string): Promise<void> {

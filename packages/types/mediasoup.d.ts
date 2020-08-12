@@ -1,6 +1,7 @@
 import type { types } from "mediasoup";
 
 export type InitConnectionParams = {
+  type: "send" | "recv";
   sctpCapabilities: types.SctpCapabilities;
 };
 
@@ -29,6 +30,8 @@ export type SendParams = {
 
 export type ReceiveParams = {
   transportId: string;
+  sourceTransportId: string;
+  producerId: string;
   rtpCapabilities: types.RtpCapabilities;
 };
 
