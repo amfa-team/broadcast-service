@@ -1,29 +1,29 @@
 import React, { useDebugValue } from "react";
+import SendStream from "../sdk/stream/SendStream";
+import useSendStreamControls from "../hooks/useSendStreamControls";
 
 type ControlsProps = {
-  audioPaused: boolean;
-  videoPaused: boolean;
-  pause: (audio: boolean, video: boolean) => void;
+  stream: SendStream;
 };
 
 export default function Controls(props: ControlsProps): JSX.Element {
-  useDebugValue(props);
-
+  const {
+    audioPaused,
+    videoPaused,
+    pauseAudio,
+    pauseVideo,
+  } = useSendStreamControls(props.stream);
   const toggleAudio = (): void => {
-    props.pause(!props.audioPaused, props.videoPaused);
+    pauseAudio(!audioPaused);
   };
   const toggleVideo = (): void => {
-    props.pause(props.audioPaused, !props.videoPaused);
+    pauseVideo(!videoPaused);
   };
 
   return (
     <div>
-      <button onClick={toggleAudio}>
-        Mic {props.audioPaused ? "On" : "Off"}
-      </button>
-      <button onClick={toggleVideo}>
-        Cam {props.videoPaused ? "On" : "Off"}
-      </button>
+      <button onClick={toggleAudio}>Mic {audioPaused ? "On" : "Off"}</button>
+      <button onClick={toggleVideo}>Cam {videoPaused ? "On" : "Off"}</button>
     </div>
   );
 }

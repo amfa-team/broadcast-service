@@ -12,4 +12,6 @@ export class PicnicEvent<T> extends Event {
 export type ServerEventMap = {
   "stream:add": PicnicEvent<StreamInfo>;
   "stream:remove": PicnicEvent<string>;
+  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
 };
