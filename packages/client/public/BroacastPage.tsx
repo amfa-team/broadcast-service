@@ -1,5 +1,5 @@
 import React from "react";
-import { Broadcast, useSDK } from "../src";
+import { Broadcast, useSDK, Stage } from "../src";
 import { useParams } from "react-router-dom";
 import { useApi } from "./useApi";
 
@@ -14,5 +14,10 @@ export default function BroadcastPage(): JSX.Element {
     return <div>Loading...</div>;
   }
 
-  return <Broadcast sdk={state.sdk} />;
+  return (
+    <div>
+      <Broadcast sdk={state.sdk} />
+      <Stage sdk={state.sdk} />
+    </div>
+  );
 }
