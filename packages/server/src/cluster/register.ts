@@ -23,7 +23,7 @@ export function getPublicIP(): string {
   return process.env.PUBLIC_IP;
 }
 
-export async function registerServer(): Promise<void> {
+export async function registerServer(): Promise<NodeJS.Timeout> {
   const { api, key } = getClusterApi();
 
   const data = { ip: getPublicIP(), token: getServerToken(), port: 8080 };
@@ -44,9 +44,12 @@ export async function registerServer(): Promise<void> {
           response?.error
       );
     }
+
+    // Ping API
+    return setInterval(registerServer, 60000);
   } catch (e) {
     console.error("Unable to register, retrying in 10s", e);
-    await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => registerServer().then(resolve).catch(reject), 10000);
     });
   }
