@@ -49,6 +49,7 @@ export async function registerServer(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
+    // TODO: handle server restart & check resources sync
     const { data } = await parseHttpAdminRequest(event, createServerDecoder);
     const server = await createServer(data);
 
