@@ -9,7 +9,7 @@ async function startServer(): Promise<void> {
   config();
   await startup();
   await startApi();
-  timeout = await registerServer();
+  timeout = setInterval(registerServer, 60000);
 }
 
 function exit(code: 0 | 1) {
