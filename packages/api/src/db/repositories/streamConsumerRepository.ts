@@ -11,6 +11,11 @@ export async function createStreamConsumer(
   return stream;
 }
 
+export async function getStreamConsumers(): Promise<StreamConsumerInfo[]> {
+  const scanOutput = await dynamoDb.scan({ TableName }).promise();
+  return scanOutput.Items as StreamConsumerInfo[];
+}
+
 export async function findStreamConsumerByTransportId(
   transportId: string
 ): Promise<StreamConsumerInfo[]> {

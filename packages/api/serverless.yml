@@ -23,11 +23,11 @@ functions:
       - http:
           path: /admin/participant
           method: post
-  listParticipants:
-    handler: src/admin/handler.listParticipants
+  topology:
+    handler: src/admin/handler.topology
     events:
       - http:
-          path: /admin/participant
+          path: /admin/topology
           method: get
   registerServer:
     handler: src/admin/handler.registerServer
@@ -35,12 +35,6 @@ functions:
       - http:
           path: /admin/server
           method: post
-  listServers:
-    handler: src/admin/handler.listServers
-    events:
-      - http:
-          path: /admin/server
-          method: get
   sfu_routerCapabilities:
     handler: src/sfu/handler.routerCapabilities
     events:

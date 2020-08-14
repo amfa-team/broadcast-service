@@ -4,6 +4,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import serve from "rollup-plugin-serve";
 import { extensions } from "../rollup.config";
 import replace from "@rollup/plugin-replace";
+import json from "@rollup/plugin-json";
 
 export default [
   {
@@ -28,6 +29,7 @@ export default [
         preferBuiltins: false,
       }),
       commonjs(),
+      json(),
       replace({
         "process.env.NODE_ENV": JSON.stringify("development"),
       }),
