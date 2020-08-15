@@ -5,6 +5,11 @@ export interface Request<T> {
   data: T;
 }
 
+export interface RequestContext {
+  domainName?: string;
+  stage: string;
+}
+
 export interface WsRequest<T> {
   token: string;
   data: T;

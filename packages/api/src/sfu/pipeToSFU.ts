@@ -78,11 +78,26 @@ export async function pipeToSFU(
     try {
       const payload = await postToSFU(path, req.data);
 
-      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
+      return handleWebSocketSuccessResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        payload
+      );
     } catch (e) {
-      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
+      return handleWebSocketErrorResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        e
+      );
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(connectionId, null, e);
+    return handleWebSocketErrorResponse(
+      event.requestContext,
+      connectionId,
+      null,
+      e
+    );
   }
 }
