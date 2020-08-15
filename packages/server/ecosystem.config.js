@@ -3,6 +3,7 @@ module.exports = {
     {
       name: "Broadcast Service Server",
       script: "dist/index.js",
+      cwd: "packages/server",
       instances: 1,
       autorestart: true,
       wait_ready: true,
