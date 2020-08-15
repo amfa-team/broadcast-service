@@ -8,7 +8,7 @@ import Topology from "./Topology";
 export default function App(): JSX.Element {
   return (
     <>
-      <div>
+      <div style={{ margin: 20 }}>
         <nav>
           <li>
             <Link to="/">Home</Link>

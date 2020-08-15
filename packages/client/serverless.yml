@@ -1,0 +1,24 @@
+org: moroine
+app: broadcast-service-test
+service: broadcast-service-test
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-3
+  profile: picnic
+
+plugins:
+  - serverless-finch
+
+custom:
+  client:
+    bucketName: broadcast-service-test
+    distributionFolder: public/
+    indexDocument: index.html
+    errorDocument: index.html
+    manageResources: true
+    objectHeaders:
+      "*.js":
+        - name: Cache-Control
+          value: no-cache

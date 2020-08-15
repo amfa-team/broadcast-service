@@ -211,6 +211,7 @@ export async function handleWebSocketSuccessResponse(
 ): Promise<APIGatewayProxyResult> {
   const result = handleSuccessResponse(data, msgId);
 
+  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
   await postToConnection(requestContext, connectionId, result.body);
 
   return result;
@@ -223,6 +224,8 @@ export async function handleWebSocketErrorResponse(
   e: unknown
 ): Promise<APIGatewayProxyResult> {
   const result = handleHttpErrorResponse(e, msgId);
+
+  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
   await postToConnection(requestContext, connectionId, result.body);
 
   return result;

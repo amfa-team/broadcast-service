@@ -5,11 +5,11 @@ import { useApi } from "./useApi";
 export default function HomePage(): JSX.Element {
   const [loading, setLoading] = useState(false);
   const history = useHistory();
-  const { http: endpoint, secret } = useApi();
+  const { http: endpoint, secret, setSecret } = useApi();
   const createHost = useCallback(async () => {
     setLoading(true);
 
-    const res = await fetch(`${endpoint}/dev/admin/participant`, {
+    const res = await fetch(`${endpoint}/admin/participant`, {
       body: JSON.stringify({ role: "host" }),
       headers: {
         "x-api-key": secret,
@@ -23,7 +23,7 @@ export default function HomePage(): JSX.Element {
   const createGuest = useCallback(async () => {
     setLoading(true);
 
-    const res = await fetch(`${endpoint}/dev/admin/participant`, {
+    const res = await fetch(`${endpoint}/admin/participant`, {
       body: JSON.stringify({ role: "guest" }),
       headers: {
         "x-api-key": secret,
@@ -40,9 +40,26 @@ export default function HomePage(): JSX.Element {
   }
 
   return (
-    <div>
-      <button onClick={createHost}>Create Host</button>
-      <button onClick={createGuest}>Create Guest</button>
+    <div style={{ margin: 20 }}>
+      <div style={{ margin: 20 }}>
+        <button style={{ margin: 5 }} onClick={createHost}>
+          Create Host
+        </button>
+        <button style={{ margin: 5 }} onClick={createGuest}>
+          Create Guest
+        </button>
+      </div>
+      <div style={{ margin: 20 }}>
+        <label>
+          {"API SECRET: "}
+          <input
+            type="text"
+            placeholder="Enter your API SECRET"
+            value={secret}
+            onChange={(e) => setSecret(e.target.value)}
+          />
+        </label>
+      </div>
     </div>
   );
 }

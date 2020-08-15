@@ -8,7 +8,7 @@ export default function Topology(): JSX.Element {
 
   const { http: endpoint, secret } = useApi();
   const refresh = useCallback(async () => {
-    const res = await fetch(`${endpoint}/dev/admin/topology`, {
+    const res = await fetch(`${endpoint}/admin/topology`, {
       headers: {
         "x-api-key": secret,
         "content-type": "application/json",
