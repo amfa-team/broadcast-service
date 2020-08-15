@@ -1,3 +1,4 @@
+import os from "os";
 import { createWorker } from "./resources/workers";
 import { createRouter, getRouter, getRouters } from "./resources/routers";
 import { types } from "mediasoup";
@@ -30,7 +31,7 @@ async function initWorker(): Promise<void> {
 }
 
 export async function startup(): Promise<void> {
-  const workerCount = Number(process.env.WORKER_COUNT ?? 1);
+  const workerCount = Number(process.env.WORKER_COUNT ?? os.cpus().length);
 
   const tasks = [];
 

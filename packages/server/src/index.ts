@@ -10,6 +10,8 @@ async function startServer(): Promise<void> {
   await startup();
   await startApi();
   timeout = setInterval(registerServer, 60000);
+
+  process.send?.("ready");
 }
 
 function exit(code: 0 | 1) {
