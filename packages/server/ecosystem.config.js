@@ -14,7 +14,7 @@ module.exports = {
         NODE_ENV: "production",
         PUBLIC_IP: "15.237.3.235",
         LISTEN_IP: "0.0.0.0",
-        PORT: "80",
+        PORT: "8080",
         CLUSTER_API:
           "https://ej1x2iz1g5.execute-api.eu-west-3.amazonaws.com/production",
       },
