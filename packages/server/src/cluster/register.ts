@@ -26,7 +26,11 @@ export function getPublicIP(): string {
 export async function registerServer(): Promise<void> {
   const { api, key } = getClusterApi();
 
-  const data = { ip: getPublicIP(), token: getServerToken(), port: 8080 };
+  const data = {
+    ip: getPublicIP(),
+    token: getServerToken(),
+    port: Number(process.env.PORT ?? 8080),
+  };
 
   try {
     const res = await fetch(`${api}/admin/server`, {

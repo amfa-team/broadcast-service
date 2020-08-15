@@ -16,7 +16,7 @@ export function startApi(): Promise<Express> {
   bind(app);
 
   return new Promise((resolve, reject) => {
-    app.listen(8080, (err) => {
+    app.listen(Number(process.env.PORT ?? 8080), (err) => {
       if (err) {
         console.error(err);
         reject(err);
