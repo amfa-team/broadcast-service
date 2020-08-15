@@ -28,7 +28,7 @@ module.exports = {
       repo: "git@github.com:amfa-team/picnic-sfu.git",
       path: "/var/www/production",
       "post-deploy":
-        "yarn install && yarn build && cp ../shared/config/.env .env && pm2 reload ecosystem.config.js --env production",
+        "PYTHON=python3 yarn install && yarn server:build && cp ../shared/config/.env packages/server/.env && pm2 reload packages/server/ecosystem.config.js --env production",
     },
   },
 };
