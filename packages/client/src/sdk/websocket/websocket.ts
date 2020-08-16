@@ -30,11 +30,11 @@ export class PicnicWebSocket extends EventTarget {
     this.#ws.addEventListener("close", this.#onClose);
   }
 
-  destroy(): void {
-    this.#ws.close();
+  async destroy(): Promise<void> {
     if (this.#pingID !== null) {
       clearTimeout(this.#pingID);
     }
+    this.#ws.close();
   }
 
   #ping: () => Promise<void> = async () => {
@@ -99,9 +99,16 @@ export class PicnicWebSocket extends EventTarget {
         },
       });
 
-      this.#ws.send(
-        JSON.stringify({ action, data, token: this.#settings.token, msgId })
-      );
+      if (
+        this.#ws.readyState === WebSocket.CLOSING ||
+        this.#ws.readyState === WebSocket.CLOSED
+      ) {
+        reject(new Error("Websocket is closed"));
+      } else {
+        this.#ws.send(
+          JSON.stringify({ action, data, token: this.#settings.token, msgId })
+        );
+      }
     });
   }
 

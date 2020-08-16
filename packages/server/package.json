@@ -20,7 +20,8 @@
   "scripts": {
     "start": "npm run build && node dist/index.js",
     "start:dev": "nodemon",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "deploy": "pm2 deploy production"
   },
   "dependencies": {
     "cors": "^2.8.5",

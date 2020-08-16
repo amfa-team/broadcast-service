@@ -23,7 +23,9 @@ export function useSDK(settings: Settings): SDKState {
       .then(() => setSDKState({ loaded: true, sdk }))
       // TODO: handle error
       .catch(console.error);
-    return (): void => sdk.destroy();
+    return (): void => {
+      sdk.destroy();
+    };
   }, []);
 
   return state;

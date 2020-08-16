@@ -19,6 +19,8 @@ import {
   onRequestNewTransport,
   onCreateStream,
   onCreateConsumerStream,
+  ChangeStreamStateEvent,
+  onChangeStreamState,
 } from "./sfuService";
 
 export async function routerCapabilities(
@@ -318,4 +320,50 @@ export async function playReceive(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   return pipeToSFU([Role.host, Role.guest], "/receive/play", event);
+}
+
+export async function handleOnChangeStreamState(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const connectionId = wsOnlyRoute(event);
+
+  try {
+    const req = await parseWsParticipantRequest<ChangeStreamStateEvent>(
+      event,
+      [Role.host, Role.guest],
+      JsonDecoder.object(
+        {
+          transportId: JsonDecoder.string,
+          producerId: JsonDecoder.string,
+          state: JsonDecoder.isExactly("close"),
+        },
+        "SendDestroyParams"
+      )
+    );
+
+    try {
+      const payload = await onChangeStreamState(event.requestContext, req.data);
+
+      return handleWebSocketSuccessResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        payload
+      );
+    } catch (e) {
+      return handleWebSocketErrorResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        e
+      );
+    }
+  } catch (e) {
+    return handleWebSocketErrorResponse(
+      event.requestContext,
+      connectionId,
+      null,
+      e
+    );
+  }
 }

@@ -5,6 +5,7 @@ import {
   DestroyConnectionParams,
   SendParams,
   ReceiveParams,
+  SendDestroyParams,
 } from "../../../../types";
 import {
   getRouterCapabilities,
@@ -14,6 +15,7 @@ import {
   send,
   receive,
   play,
+  destroySend,
 } from "../../sfu/sfuService";
 import { getServerTopology, cleanup } from "../../sfu/topology";
 import { handleSuccessResponse, handleErrorResponse } from "../../io/io";
@@ -84,6 +86,17 @@ export function bindSceneController(app: Application): void {
       // TODO: validation
       const request: SendParams = req.body;
       const payload = await send(request);
+      handleSuccessResponse(res, payload);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  });
+
+  app.post("/send/destroy", async (req, res) => {
+    try {
+      // TODO: validation
+      const request: SendDestroyParams = req.body;
+      const payload = await destroySend(request);
       handleSuccessResponse(res, payload);
     } catch (error) {
       handleErrorResponse(res, error);

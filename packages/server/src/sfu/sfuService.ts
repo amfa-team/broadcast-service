@@ -23,6 +23,7 @@ import {
   SendParams,
   ReceiveParams,
   ConsumerInfo,
+  SendDestroyParams,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -116,6 +117,12 @@ export async function send(params: SendParams): Promise<string> {
   }
 
   return producer.id;
+}
+
+export async function destroySend(params: SendDestroyParams): Promise<null> {
+  const producer = getProducer(params.producerId);
+  producer.close();
+  return null;
 }
 
 export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {

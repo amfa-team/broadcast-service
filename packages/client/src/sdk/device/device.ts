@@ -11,7 +11,7 @@ export class PicnicDevice {
     this.#ws = ws;
   }
 
-  destroy(): void {
+  async destroy(): Promise<void> {
     // Nothing to destroy
   }
 

@@ -1,6 +1,7 @@
 import { types } from "mediasoup-client";
 import { PicnicTransport } from "../transport/transport";
 import { PicnicEvent } from "../events/event";
+import { PicnicWebSocket } from "../websocket/websocket";
 
 const constraints = {
   audio: true,
@@ -55,20 +56,40 @@ async function createAudioProducer(
 
 export default class SendStream extends EventTarget {
   #transport: PicnicTransport;
+  #ws: PicnicWebSocket;
 
   #userMedia: MediaStream | null = null;
 
   #videoProducer: types.Producer | null = null;
   #audioProducer: types.Producer | null = null;
 
-  constructor(transport: PicnicTransport) {
+  constructor(transport: PicnicTransport, ws: PicnicWebSocket) {
     super();
     this.#transport = transport;
+    this.#ws = ws;
   }
 
-  destroy(): void {
-    this.#audioProducer?.close();
-    this.#videoProducer?.close();
+  async destroy(): Promise<void> {
+    if (this.#audioProducer !== null) {
+      await this.#ws
+        .send("/sfu/send/destroy", {
+          producerId: this.#audioProducer.id,
+          transportId: this.#transport.getId(),
+          state: "close",
+        })
+        .catch(() => null);
+      this.#audioProducer.close();
+    }
+    if (this.#videoProducer !== null) {
+      await this.#ws
+        .send("/sfu/send/destroy", {
+          producerId: this.#videoProducer.id,
+          transportId: this.#transport.getId(),
+          state: "close",
+        })
+        .catch(() => null);
+      this.#videoProducer?.close();
+    }
   }
 
   async load(): Promise<void> {

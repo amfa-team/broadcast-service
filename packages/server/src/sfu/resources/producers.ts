@@ -43,7 +43,6 @@ export async function createProducer(
     producers.delete(producer.id);
   });
 
-  // TODO: unset producer onclose
   producers.set(producer.id, producer);
   producersMeta.set(producer, { transportId: transport.id });
 

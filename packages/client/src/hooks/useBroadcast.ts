@@ -18,7 +18,9 @@ export default function useBroadcast(sdk: Picnic): UseBroadcast {
       setStream(sendStream);
     });
 
-    return (): void => s?.destroy();
+    return (): void => {
+      s?.destroy();
+    };
   }, [sdk]);
 
   const pause = useCallback(

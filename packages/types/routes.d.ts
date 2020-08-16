@@ -40,6 +40,11 @@ export type DestroyConnectionRoute = Route<
 >;
 
 export type CreateSendRoute = Route<"/send/create", SendParams, string>;
+export type DestroySendRoute = Route<
+  "/send/destroy",
+  SendDestroyParams,
+  string
+>;
 
 export type CreateReceiveRoute = Route<
   "/receive/create",
