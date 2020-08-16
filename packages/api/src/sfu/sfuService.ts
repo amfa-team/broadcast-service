@@ -14,6 +14,7 @@ import {
 import {
   deleteStreamConsumerByTransportId,
   createStreamConsumer,
+  findStreamConsumer,
 } from "../db/repositories/streamConsumerRepository";
 import { broadcastToConnections } from "../io/io";
 import { getAllSettledValues } from "../io/promises";
@@ -191,7 +192,7 @@ export async function onChangeStreamState(
   data: ChangeStreamStateEvent
 ): Promise<null> {
   const { state, transportId, producerId } = data;
-  const stream = getStream(transportId, producerId);
+  const stream = await getStream(transportId, producerId);
 
   if (stream === null || state !== "close") {
     return null;
@@ -213,6 +214,27 @@ export async function onChangeStreamState(
   ]);
 
   getAllSettledValues(results, "onChangeStreamState: Unexpected error");
+
+  return null;
+}
+
+export type ChangeConsumerStreamStateEvent = {
+  state: "pause" | "play";
+  transportId: string;
+  consumerId: string;
+};
+
+export async function onChangeConsumerStreamState(
+  data: ChangeConsumerStreamStateEvent
+): Promise<null> {
+  const { state, transportId, consumerId } = data;
+  const streamConsumer = await findStreamConsumer(transportId, consumerId);
+
+  if (streamConsumer === null) {
+    return null;
+  }
+
+  await postToSFU<null>(`/receive/${state}`, { consumerId });
 
   return null;
 }

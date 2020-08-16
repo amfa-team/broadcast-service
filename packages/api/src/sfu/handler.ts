@@ -21,6 +21,8 @@ import {
   onCreateConsumerStream,
   ChangeStreamStateEvent,
   onChangeStreamState,
+  onChangeConsumerStreamState,
+  ChangeConsumerStreamStateEvent,
 } from "./sfuService";
 
 export async function routerCapabilities(
@@ -316,12 +318,6 @@ export async function createReceive(
   }
 }
 
-export async function playReceive(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
-  return pipeToSFU([Role.host, Role.guest], "/receive/play", event);
-}
-
 export async function handleOnChangeStreamState(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
@@ -337,12 +333,61 @@ export async function handleOnChangeStreamState(
           producerId: JsonDecoder.string,
           state: JsonDecoder.isExactly("close"),
         },
-        "SendDestroyParams"
+        "ChangeStreamStateEvent"
       )
     );
 
     try {
       const payload = await onChangeStreamState(event.requestContext, req.data);
+
+      return handleWebSocketSuccessResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        payload
+      );
+    } catch (e) {
+      return handleWebSocketErrorResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        e
+      );
+    }
+  } catch (e) {
+    return handleWebSocketErrorResponse(
+      event.requestContext,
+      connectionId,
+      null,
+      e
+    );
+  }
+}
+
+export async function handleOnChangeConsumerStreamState(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const connectionId = wsOnlyRoute(event);
+
+  try {
+    const req = await parseWsParticipantRequest<ChangeConsumerStreamStateEvent>(
+      event,
+      [Role.host, Role.guest],
+      JsonDecoder.object(
+        {
+          transportId: JsonDecoder.string,
+          consumerId: JsonDecoder.string,
+          state: JsonDecoder.oneOf(
+            [JsonDecoder.isExactly("play"), JsonDecoder.isExactly("pause")],
+            "state"
+          ),
+        },
+        "ChangeConsumerStreamStateEvent"
+      )
+    );
+
+    try {
+      const payload = await onChangeConsumerStreamState(req.data);
 
       return handleWebSocketSuccessResponse(
         event.requestContext,

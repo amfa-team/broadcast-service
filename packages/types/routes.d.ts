@@ -40,11 +40,7 @@ export type DestroyConnectionRoute = Route<
 >;
 
 export type CreateSendRoute = Route<"/send/create", SendParams, string>;
-export type DestroySendRoute = Route<
-  "/send/destroy",
-  SendDestroyParams,
-  string
->;
+export type DestroySendRoute = Route<"/send/destroy", SendDestroyParams, null>;
 
 export type CreateReceiveRoute = Route<
   "/receive/create",
@@ -52,4 +48,13 @@ export type CreateReceiveRoute = Route<
   ConsumerInfo
 >;
 
-export type PlayReceiveRoute = Route<"/receive/play", string, null>;
+export type PlayReceiveRoute = Route<
+  "/receive/play",
+  { consumerId: string },
+  null
+>;
+export type PauseReceiveRoute = Route<
+  "/receive/play",
+  { consumerId: string },
+  null
+>;

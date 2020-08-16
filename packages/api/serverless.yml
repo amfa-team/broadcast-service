@@ -116,11 +116,11 @@ functions:
       - websocket:
           route: /sfu/receive/create
           routeResponseSelectionExpression: $default
-  sfu_playReceive:
-    handler: src/sfu/handler.playReceive
+  sfu_stateReceive:
+    handler: src/sfu/handler.handleOnChangeConsumerStreamState
     events:
       - websocket:
-          route: /sfu/receive/play
+          route: /sfu/receive/state
           routeResponseSelectionExpression: $default
   disconnect:
     handler: src/sfu/handler.disconnect
@@ -196,14 +196,14 @@ resources:
       Properties:
         TableName: consumer-streams
         AttributeDefinitions:
-          - AttributeName: sourceTransportId
-            AttributeType: S
           - AttributeName: transportId
+            AttributeType: S
+          - AttributeName: consumerId
             AttributeType: S
         KeySchema:
-          - AttributeName: sourceTransportId
-            KeyType: HASH
           - AttributeName: transportId
+            KeyType: HASH
+          - AttributeName: consumerId
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1

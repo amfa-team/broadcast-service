@@ -1,5 +1,5 @@
 import React from "react";
-import Controls from "./Controls";
+import SendControls from "./SendControls";
 import Video from "./Video";
 import useBroadcast from "../hooks/useBroadcast";
 import { Picnic } from "../sdk/sdk";
@@ -17,7 +17,7 @@ export default function Broadcast(props: BroadcastProps): JSX.Element {
 
   return (
     <div>
-      <Controls stream={stream} />
+      <SendControls stream={stream} />
       <Video stream={stream.getUserMediaStream()} muted flip />
     </div>
   );

@@ -84,9 +84,9 @@ export class Picnic extends EventTarget implements SDK {
     await this.#device.loadDevice();
     await this.#recvTransport.load();
 
-    this.#ws.addEventListener("stream:add", (event) => {
+    this.#ws.addEventListener("stream:add", async (event) => {
       const { data } = event as ServerEventMap["stream:add"];
-      this.#addStream(data);
+      await this.#addStream(data);
       const evt = new MessageEvent("stream:update", {
         data: this.#recvStreams,
       });
