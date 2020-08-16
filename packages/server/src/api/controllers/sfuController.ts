@@ -119,7 +119,6 @@ export function bindSceneController(app: Application): void {
     try {
       // TODO: validation
       const { consumerId } = req.body;
-      console.log("play", consumerId);
       const payload = await pause(consumerId);
       handleSuccessResponse(res, payload);
     } catch (error) {
@@ -131,7 +130,6 @@ export function bindSceneController(app: Application): void {
     try {
       // TODO: validation
       const { consumerId } = req.body;
-      console.log("pause", consumerId);
       const payload = await play(consumerId);
       handleSuccessResponse(res, payload);
     } catch (error) {

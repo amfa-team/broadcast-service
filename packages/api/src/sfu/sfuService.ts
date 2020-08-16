@@ -229,7 +229,6 @@ export async function onChangeConsumerStreamState(
 ): Promise<null> {
   const { state, transportId, consumerId } = data;
   const streamConsumer = await findStreamConsumer(transportId, consumerId);
-  console.log({ transportId, consumerId, state, streamConsumer });
 
   if (streamConsumer === null) {
     return null;

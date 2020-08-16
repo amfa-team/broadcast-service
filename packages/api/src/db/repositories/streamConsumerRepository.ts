@@ -8,7 +8,6 @@ export async function createStreamConsumer(
   stream: StreamConsumerInfo
 ): Promise<StreamConsumerInfo> {
   await dynamoDb.put({ TableName, Item: stream }).promise();
-  console.warn("create", stream);
   return stream;
 }
 
@@ -66,7 +65,6 @@ export async function deleteStreamConsumer(
   transportId: string,
   consumerId: string
 ): Promise<void> {
-  console.warn("delete", { transportId, consumerId });
   await dynamoDb
     .delete({ TableName, Key: { consumerId, transportId } })
     .promise();
