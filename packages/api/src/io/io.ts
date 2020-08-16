@@ -8,16 +8,11 @@ import {
   Request,
   WsRequest,
   WsParticipantRequest,
+  RequestContext,
 } from "./types";
 import { Role } from "../db/models/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
-
-const apigwManagementApi = new ApiGatewayManagementApi(
-  process.env.IS_OFFLINE
-    ? { apiVersion: "2018-11-29", endpoint: `http://localhost:3001` }
-    : { apiVersion: "2018-11-29" }
-);
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
   const { connectionId } = event.requestContext;
@@ -150,6 +145,9 @@ export function handleSuccessResponse(
 ): APIGatewayProxyResult {
   return {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
     body: JSON.stringify({
       type: "response",
       success: true,
@@ -159,13 +157,32 @@ export function handleSuccessResponse(
   };
 }
 
+let apigwManagementApi: ApiGatewayManagementApi | null = null;
+
+function getApiGatewayManagementApi(
+  requestContext: RequestContext
+): ApiGatewayManagementApi {
+  const { domainName = "", stage } = requestContext;
+
+  if (apigwManagementApi === null) {
+    apigwManagementApi = new ApiGatewayManagementApi(
+      process.env.IS_OFFLINE
+        ? { apiVersion: "2018-11-29", endpoint: `http://localhost:3001` }
+        : { apiVersion: "2018-11-29", endpoint: `${domainName}/${stage}` }
+    );
+  }
+
+  return apigwManagementApi;
+}
+
 export async function postToConnection(
+  requestContext: RequestContext,
   connectionId: string,
   data: string
 ): Promise<void> {
   // TODO: handles 410 Gone error
   // https://medium.com/@lancers/websocket-api-what-does-it-mean-that-disconnect-is-a-best-effort-event-317b7021456f
-  await apigwManagementApi
+  await getApiGatewayManagementApi(requestContext)
     .postToConnection({
       ConnectionId: connectionId,
       Data: data,
@@ -173,33 +190,43 @@ export async function postToConnection(
     .promise();
 }
 
-export async function broadcastToConnections(data: string): Promise<void> {
+export async function broadcastToConnections(
+  requestContext: RequestContext,
+  data: string
+): Promise<void> {
   const connections = await getAllConnections();
   const results = await Promise.allSettled(
-    connections.map((c) => postToConnection(c.connectionId, data))
+    connections.map((c) =>
+      postToConnection(requestContext, c.connectionId, data)
+    )
   );
   getAllSettledValues(results, "broadcastToConnections: Unexpected Error");
 }
 
 export async function handleWebSocketSuccessResponse(
+  requestContext: RequestContext,
   connectionId: string,
   msgId: string,
   data: unknown
 ): Promise<APIGatewayProxyResult> {
   const result = handleSuccessResponse(data, msgId);
 
-  await postToConnection(connectionId, result.body);
+  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
+  await postToConnection(requestContext, connectionId, result.body);
 
   return result;
 }
 
 export async function handleWebSocketErrorResponse(
+  requestContext: RequestContext,
   connectionId: string,
   msgId: string | null,
   e: unknown
 ): Promise<APIGatewayProxyResult> {
   const result = handleHttpErrorResponse(e, msgId);
-  await postToConnection(connectionId, result.body);
+
+  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
+  await postToConnection(requestContext, connectionId, result.body);
 
   return result;
 }

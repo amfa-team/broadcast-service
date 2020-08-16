@@ -26,23 +26,32 @@ export function getPublicIP(): string {
 export async function registerServer(): Promise<void> {
   const { api, key } = getClusterApi();
 
-  const data = { ip: getPublicIP(), token: getServerToken(), port: 8080 };
+  const data = {
+    ip: getPublicIP(),
+    token: getServerToken(),
+    port: Number(process.env.PORT ?? 8080),
+  };
 
-  const res = await fetch(`${api}/admin/server`, {
-    headers: { "x-api-key": key },
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  try {
+    const res = await fetch(`${api}/admin/server`, {
+      headers: { "x-api-key": key },
+      method: "POST",
+      body: JSON.stringify(data),
+    });
 
-  if (!res.ok) {
-  }
-  const response = await res.json().catch(() => null);
-  if (!res.ok || !response?.success) {
-    throw new Error(
-      'Failed to register with statusCode "' +
-        res.status +
-        '" and error ' +
-        response?.error
-    );
+    const response = await res.json().catch(() => null);
+    if (!res.ok || !response?.success) {
+      throw new Error(
+        'Failed to register with statusCode "' +
+          res.status +
+          '" and error ' +
+          response?.error
+      );
+    }
+  } catch (e) {
+    console.error("Unable to register, retrying in 10s", e);
+    await new Promise((resolve, reject) => {
+      setTimeout(() => registerServer().then(resolve).catch(reject), 10000);
+    });
   }
 }

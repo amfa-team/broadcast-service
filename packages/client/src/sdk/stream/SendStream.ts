@@ -1,5 +1,6 @@
 import { types } from "mediasoup-client";
 import { PicnicTransport } from "../transport/transport";
+import { PicnicEvent } from "../events/event";
 
 const constraints = {
   audio: true,
@@ -52,7 +53,7 @@ async function createAudioProducer(
   });
 }
 
-export default class SendStream {
+export default class SendStream extends EventTarget {
   #transport: PicnicTransport;
 
   #userMedia: MediaStream | null = null;
@@ -61,6 +62,7 @@ export default class SendStream {
   #audioProducer: types.Producer | null = null;
 
   constructor(transport: PicnicTransport) {
+    super();
     this.#transport = transport;
   }
 
@@ -74,10 +76,12 @@ export default class SendStream {
 
   pauseAudio(): void {
     this.#audioProducer?.pause();
+    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "audio" }));
   }
 
   resumeAudio(): void {
     this.#audioProducer?.resume();
+    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "audio" }));
   }
 
   isAudioPaused(): boolean {
@@ -86,10 +90,12 @@ export default class SendStream {
 
   pauseVideo(): void {
     this.#videoProducer?.pause();
+    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "video" }));
   }
 
   resumeVideo(): void {
     this.#videoProducer?.resume();
+    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "video" }));
   }
 
   isVideoPaused(): boolean {

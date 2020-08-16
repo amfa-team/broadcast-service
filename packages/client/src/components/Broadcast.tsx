@@ -9,7 +9,7 @@ type BroadcastProps = {
 };
 
 export default function Broadcast(props: BroadcastProps): JSX.Element {
-  const { stream, pause } = useBroadcast(props.sdk);
+  const { stream } = useBroadcast(props.sdk);
 
   if (stream === null) {
     return <div>Please enable Mic/Video</div>;
@@ -17,11 +17,7 @@ export default function Broadcast(props: BroadcastProps): JSX.Element {
 
   return (
     <div>
-      <Controls
-        pause={pause}
-        audioPaused={stream.isAudioPaused()}
-        videoPaused={stream.isVideoPaused()}
-      />
+      <Controls stream={stream} />
       <Video stream={stream.getUserMediaStream()} muted flip />
     </div>
   );

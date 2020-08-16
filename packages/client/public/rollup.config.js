@@ -4,15 +4,35 @@ import commonjs from "@rollup/plugin-commonjs";
 import serve from "rollup-plugin-serve";
 import { extensions } from "../rollup.config";
 import replace from "@rollup/plugin-replace";
+import json from "@rollup/plugin-json";
+import { terser } from "rollup-plugin-terser";
+
+const production = !process.env.ROLLUP_WATCH;
+
+const replacements = production
+  ? {
+      "process.env.NODE_ENV": JSON.stringify("production"),
+      "process.env.WS_API": JSON.stringify(
+        "wss://a7nih2u4i9.execute-api.eu-west-3.amazonaws.com/production"
+      ),
+      "process.env.HTTP_API": JSON.stringify(
+        "https://ej1x2iz1g5.execute-api.eu-west-3.amazonaws.com/production"
+      ),
+    }
+  : {
+      "process.env.NODE_ENV": JSON.stringify("development"),
+      "process.env.WS_API": JSON.stringify(null),
+      "process.env.HTTP_API": JSON.stringify(null),
+    };
 
 export default [
   {
-    input: "public/index.tsx",
+    input: "public/src/index.tsx",
     output: {
       file: "public/dist/index.umd.js",
       format: "umd",
       name: "picnicSDK",
-      sourcemap: true,
+      sourcemap: true, // TODO: remove sourcemap on prod
       globals: {
         react: "React",
         "react-dom": "ReactDOM",
@@ -27,10 +47,9 @@ export default [
         browser: true,
         preferBuiltins: false,
       }),
+      replace(replacements),
       commonjs(),
-      replace({
-        "process.env.NODE_ENV": JSON.stringify("development"),
-      }),
+      json(),
       babel({
         babelHelpers: "bundled",
         extensions,
@@ -41,20 +60,31 @@ export default [
             "@babel/preset-env",
             {
               modules: false,
-              targets: {
-                browsers: "last 2 chrome versions",
-              },
+              targets: production
+                ? {
+                    chrome: 55,
+                    edge: 11,
+                    firefox: 60,
+                    safari: 11,
+                    node: "12.18",
+                  }
+                : {
+                    browsers: "last 2 chrome versions",
+                  },
             },
           ],
         ],
+        plugins: production ? ["@babel/plugin-proposal-class-properties"] : [],
       }),
-      serve({
-        open: true,
-        host: "0.0.0.0",
-        contentBase: ["public"],
-        historyApiFallback: true,
-        port: 4000,
-      }),
+      production
+        ? terser()
+        : serve({
+            open: true,
+            host: "0.0.0.0",
+            contentBase: ["public"],
+            historyApiFallback: true,
+            port: 4000,
+          }),
     ],
   },
 ];

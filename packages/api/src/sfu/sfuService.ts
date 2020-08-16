@@ -22,6 +22,7 @@ import {
   ReceiveParams,
   ConsumerInfo,
 } from "../../../types";
+import { RequestContext } from "../io/types";
 
 interface OnNewConnectionEvent {
   connectionId: string;
@@ -35,6 +36,7 @@ export async function onNewConnection(
 }
 
 export async function closeTransport(
+  requestContext: RequestContext,
   transportId: string | null | void,
   type: "send" | "recv"
 ): Promise<void> {
@@ -47,6 +49,7 @@ export async function closeTransport(
     deleteByTransportId(transportId),
     type === "send"
       ? broadcastToConnections(
+          requestContext,
           JSON.stringify({
             type: "event",
             payload: {
@@ -62,7 +65,10 @@ export async function closeTransport(
   getAllSettledValues(results, "closeTransport: Unexpected error");
 }
 
-export async function onDisconnect(connectionId: string): Promise<void> {
+export async function onDisconnect(
+  requestContext: RequestContext,
+  connectionId: string
+): Promise<void> {
   // TODO: do not destroy directly the transport
   // Try to handle reconnect via a new websocket for 30s?
 
@@ -71,8 +77,8 @@ export async function onDisconnect(connectionId: string): Promise<void> {
   await deleteConnection(connectionId);
 
   const results = await Promise.allSettled([
-    closeTransport(connection?.sendTransportId, "send"),
-    closeTransport(connection?.recvTransportId, "recv"),
+    closeTransport(requestContext, connection?.sendTransportId, "send"),
+    closeTransport(requestContext, connection?.recvTransportId, "recv"),
   ]);
 
   getAllSettledValues(results, "onDisconnect: Unexpected error");
@@ -97,6 +103,7 @@ export async function onRequestNewTransport(
 }
 
 export async function onCreateStream(
+  requestContext: RequestContext,
   connectionId: string,
   data: SendParams
 ): Promise<string> {
@@ -124,6 +131,7 @@ export async function onCreateStream(
   await createStream(stream);
 
   broadcastToConnections(
+    requestContext,
     JSON.stringify({
       type: "event",
       payload: {

@@ -18,8 +18,6 @@ interface SDKEventMap {
   "new-stream": SDKEvent<StreamInfo>;
 }
 
-type StreamState = "initial" | "loading" | "ready";
-
 interface SDK extends EventTarget {
   readonly state: State;
 
@@ -106,6 +104,12 @@ export class Picnic extends EventTarget implements SDK {
 
   #addStream = async (info: StreamInfo): Promise<void> => {
     const { transportId, producerId } = info;
+
+    if (this.#sendTransport?.getId() === transportId) {
+      // ignore self stream
+      return;
+    }
+
     const recvStream =
       this.#recvStreams.get(transportId) ??
       new RecvStream({

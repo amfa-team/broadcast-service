@@ -16,6 +16,10 @@ import {
   handleHttpErrorResponse,
   parseHttpAdminRequest,
 } from "../io/io";
+import { getAllConnections } from "../db/repositories/connectionRepository";
+import { getAllStreams } from "../db/repositories/streamRepository";
+import { getStreamConsumers } from "../db/repositories/streamConsumerRepository";
+import { requestSFU } from "../sfu/pipeToSFU";
 
 export async function registerParticipant(
   event: APIGatewayProxyEvent
@@ -33,13 +37,37 @@ export async function registerParticipant(
   }
 }
 
-export async function listParticipants(
+export async function topology(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
     await parseHttpAdminRequest(event, JsonDecoder.isNull(null));
-    const participants = await getAllParticipants();
-    return handleSuccessResponse(participants);
+    const [
+      participants,
+      servers,
+      connections,
+      streams,
+      streamConsumers,
+      topology,
+    ] = await Promise.all([
+      getAllParticipants(),
+      getAllServers(),
+      getAllConnections(),
+      getAllStreams(),
+      getStreamConsumers(),
+      requestSFU("/topology"),
+    ]);
+
+    return handleSuccessResponse({
+      db: {
+        participants,
+        servers,
+        connections,
+        streams,
+        streamConsumers,
+      },
+      server: topology,
+    });
   } catch (e) {
     return handleHttpErrorResponse(e);
   }
@@ -49,22 +77,11 @@ export async function registerServer(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
+    // TODO: handle server restart & check resources sync
     const { data } = await parseHttpAdminRequest(event, createServerDecoder);
     const server = await createServer(data);
 
     return handleSuccessResponse(server);
-  } catch (e) {
-    return handleHttpErrorResponse(e);
-  }
-}
-
-export async function listServers(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
-  try {
-    await parseHttpAdminRequest(event, JsonDecoder.isNull(null));
-    const servers = await getAllServers();
-    return handleSuccessResponse(servers);
   } catch (e) {
     return handleHttpErrorResponse(e);
   }
