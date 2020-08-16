@@ -4,7 +4,6 @@ import { Picnic } from "../sdk/sdk";
 
 type UseBroadcast = {
   stream: SendStream | null;
-  pause: (audio: boolean, video: boolean) => void;
 };
 
 export default function useBroadcast(sdk: Picnic): UseBroadcast {
@@ -23,21 +22,5 @@ export default function useBroadcast(sdk: Picnic): UseBroadcast {
     };
   }, [sdk]);
 
-  const pause = useCallback(
-    (pauseAudio, pauseVideo) => {
-      if (pauseAudio) {
-        stream?.pauseAudio();
-      } else {
-        stream?.resumeAudio();
-      }
-      if (pauseVideo) {
-        stream?.pauseVideo();
-      } else {
-        stream?.resumeVideo();
-      }
-    },
-    [stream]
-  );
-
-  return { stream, pause };
+  return { stream };
 }

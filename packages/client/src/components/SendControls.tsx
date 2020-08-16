@@ -12,6 +12,9 @@ export default function SendControls(props: ControlsProps): JSX.Element {
     videoPaused,
     pauseAudio,
     pauseVideo,
+    startScreenShare,
+    isScreenShareEnabled,
+    stopScreenShare,
   } = useSendStreamControls(props.stream);
   const toggleAudio = (): void => {
     pauseAudio(!audioPaused);
@@ -19,11 +22,17 @@ export default function SendControls(props: ControlsProps): JSX.Element {
   const toggleVideo = (): void => {
     pauseVideo(!videoPaused);
   };
+  const toggleShare = (): void => {
+    isScreenShareEnabled ? stopScreenShare() : startScreenShare();
+  };
 
   return (
     <div>
       <button onClick={toggleAudio}>Mic {audioPaused ? "On" : "Off"}</button>
       <button onClick={toggleVideo}>Cam {videoPaused ? "On" : "Off"}</button>
+      <button onClick={toggleShare}>
+        {isScreenShareEnabled ? "Stop" : "Start"}Screen Share
+      </button>
     </div>
   );
 }
