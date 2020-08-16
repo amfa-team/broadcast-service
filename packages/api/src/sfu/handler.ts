@@ -65,6 +65,45 @@ export async function routerCapabilities(
   }
 }
 
+export async function ping(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const connectionId = wsOnlyRoute(event);
+
+  try {
+    const req = await parseWsParticipantRequest(
+      event,
+      [Role.host, Role.guest],
+      JsonDecoder.isNull(null)
+    );
+
+    try {
+      const payload = "pong";
+
+      return handleWebSocketSuccessResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        payload
+      );
+    } catch (e) {
+      return handleWebSocketErrorResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        e
+      );
+    }
+  } catch (e) {
+    return handleWebSocketErrorResponse(
+      event.requestContext,
+      connectionId,
+      null,
+      e
+    );
+  }
+}
+
 export async function disconnect(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
