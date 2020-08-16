@@ -120,6 +120,12 @@ functions:
     handler: src/sfu/handler.disconnect
     events:
       - websocket: $disconnect
+  ping:
+    handler: src/sfu/handler.ping
+    events:
+      - websocket:
+          route: /sfu/ping
+          routeResponseSelectionExpression: $default
 
 resources:
   Resources:

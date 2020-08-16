@@ -39,7 +39,7 @@ export class PicnicWebSocket extends EventTarget {
 
   #ping: () => Promise<void> = async () => {
     try {
-      await this.send("ping", null);
+      await this.send("/sfu/ping", null);
     } catch (e) {
       console.error(e);
     }
