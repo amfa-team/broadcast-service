@@ -13,6 +13,7 @@
     "serverless-plugin-monorepo": "^0.9.0",
     "serverless-plugin-typescript": "^1.1.9",
     "serverless-pseudo-parameters": "^2.5.0",
+    "serverless-stage-manager": "^1.0.5",
     "typescript": "^3.9.7"
   },
   "scripts": {

@@ -46,6 +46,7 @@
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-terser": "^6.1.0",
     "serverless-finch": "^2.6.0",
+    "serverless-stage-manager": "^1.0.5",
     "tslib": "^2.0.0",
     "typescript": "^3.9.7"
   },
@@ -53,7 +54,7 @@
     "build": "rollup -c rollup.config.js",
     "start": "rollup -c public/rollup.config.js -w",
     "build:public": "rollup -c public/rollup.config.js",
-    "deploy:public": "yarn build:public && serverless client deploy --stage production --no-confirm",
+    "deploy:public": "yarn build:public && serverless deploy --stage production && serverless client deploy --stage production --no-confirm",
     "serve": "http-server ./example -p 80",
     "prepublishOnly": "yarn build"
   },

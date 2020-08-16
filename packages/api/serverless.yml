@@ -5,6 +5,7 @@ service:
 
 plugins:
   # - serverless-dotenv-plugin
+  - serverless-stage-manager
   - serverless-pseudo-parameters
   - serverless-plugin-monorepo
   - serverless-plugin-typescript
@@ -206,3 +207,6 @@ custom:
       port: 9005
       isMemory: true
       migrate: true
+  stages:
+    - dev
+    - production
