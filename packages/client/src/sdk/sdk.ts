@@ -67,12 +67,12 @@ export class Picnic extends EventTarget implements SDK {
     this.#recvTransport = new PicnicTransport(this.#ws, this.#device, "recv");
   }
 
-  destroy(): void {
-    this.#device.destroy();
-    this.#recvStreams.forEach((s) => this.#removeStream(s.getId()));
-    this.#sendTransport?.destroy();
-    this.#recvTransport?.destroy();
-    this.#ws.destroy();
+  async destroy(): Promise<void> {
+    await this.#device.destroy();
+    await this.#recvStreams.forEach((s) => this.#removeStream(s.getId()));
+    await this.#sendTransport?.destroy();
+    await this.#recvTransport?.destroy();
+    await this.#ws.destroy();
   }
 
   getStreams(): Map<string, RecvStream> {
@@ -147,7 +147,7 @@ export class Picnic extends EventTarget implements SDK {
       this.#sendTransport = new PicnicTransport(this.#ws, this.#device, "send");
       await this.#sendTransport.load();
     }
-    const broadcastStream = new SendStream(this.#sendTransport);
+    const broadcastStream = new SendStream(this.#sendTransport, this.#ws);
 
     await broadcastStream.load();
 

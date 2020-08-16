@@ -98,6 +98,12 @@ functions:
       - websocket:
           route: /sfu/send/create
           routeResponseSelectionExpression: $default
+  sfu_destroySend:
+    handler: src/sfu/handler.handleOnChangeStreamState
+    events:
+      - websocket:
+          route: /sfu/send/destroy
+          routeResponseSelectionExpression: $default
   sfu_getStreams:
     handler: src/sfu/handler.getStreams
     events:

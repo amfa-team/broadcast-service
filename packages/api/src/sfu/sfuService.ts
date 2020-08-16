@@ -8,6 +8,8 @@ import { postToSFU } from "./pipeToSFU";
 import {
   deleteByTransportId,
   createStream,
+  getStream,
+  deleteStream,
 } from "../db/repositories/streamRepository";
 import {
   deleteStreamConsumerByTransportId,
@@ -176,4 +178,41 @@ export async function onCreateConsumerStream(
   await createStreamConsumer(stream);
 
   return payload;
+}
+
+export type ChangeStreamStateEvent = {
+  state: "close";
+  transportId: string;
+  producerId: string;
+};
+
+export async function onChangeStreamState(
+  requestContext: RequestContext,
+  data: ChangeStreamStateEvent
+): Promise<null> {
+  const { state, transportId, producerId } = data;
+  const stream = getStream(transportId, producerId);
+
+  if (stream === null || state !== "close") {
+    return null;
+  }
+
+  const results = await Promise.allSettled([
+    postToSFU<null>("/send/destroy", { transportId, producerId }),
+    deleteStream(transportId, producerId),
+    broadcastToConnections(
+      requestContext,
+      JSON.stringify({
+        type: "event",
+        payload: {
+          type: "stream:remove",
+          data: transportId,
+        },
+      })
+    ),
+  ]);
+
+  getAllSettledValues(results, "onChangeStreamState: Unexpected error");
+
+  return null;
 }

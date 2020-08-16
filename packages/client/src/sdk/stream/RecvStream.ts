@@ -72,7 +72,7 @@ export default class RecvStream {
     this.#sourceTransportId = options.sourceTransportId;
   }
 
-  destroy(): void {
+  async destroy(): Promise<void> {
     // TODO: notify API?
     // Not needed from stream:delete event because sourceTransport closed ==> consumer closed server-side
     this.#audioConsumer?.close();

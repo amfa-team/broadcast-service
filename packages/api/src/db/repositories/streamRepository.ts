@@ -17,6 +17,16 @@ export async function deleteStream(
     .promise();
 }
 
+export async function getStream(
+  transportId: string,
+  producerId: string
+): Promise<StreamInfo | null> {
+  const result = await dynamoDb
+    .get({ TableName, Key: { transportId, producerId } })
+    .promise();
+  return (result.Item ?? null) as StreamInfo | null;
+}
+
 export async function findByTransportId(
   transportId: string
 ): Promise<StreamInfo[]> {

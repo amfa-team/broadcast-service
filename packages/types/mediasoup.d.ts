@@ -28,6 +28,11 @@ export type SendParams = {
   rtpParameters: types.RtpParameters;
 };
 
+export type SendDestroyParams = {
+  transportId: string;
+  producerId: string;
+};
+
 export type ReceiveParams = {
   transportId: string;
   sourceTransportId: string;

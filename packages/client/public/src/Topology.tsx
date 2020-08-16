@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { useApi } from "./useApi";
@@ -16,6 +16,10 @@ export default function Topology(): JSX.Element {
     });
     setTopology(JSON.stringify(await res.json(), null, 2));
   }, [endpoint, secret, history]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return (
     <div>

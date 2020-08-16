@@ -20,7 +20,8 @@ export class PicnicTransport {
     this.#type = type;
   }
 
-  destroy(): void {
+  async destroy(): Promise<void> {
+    // TODO: notify when is user initiated
     this.#transport?.close();
   }
 
