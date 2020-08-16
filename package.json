@@ -27,7 +27,12 @@
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "(cd packages/server; yarn build) && (cd packages/client; yarn build)",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "api:start:db": "cd packages/api; yarn dynamo:start",
+    "api:start": "cd packages/api; yarn start",
+    "server:start": "cd packages/server; yarn start:dev",
+    "client:start": "cd packages/client; yarn start",
+    "all": "ttab yarn api:start:db; ttab yarn api:start; ttab yarn server:start; ttab yarn client:start;"
   },
   "husky": {
     "hooks": {
@@ -38,5 +43,7 @@
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
     "*.{js,css,md}": "prettier --write"
   },
-  "dependencies": {}
+  "optionalDependencies": {
+    "ttab": "^0.6.1"
+  }
 }

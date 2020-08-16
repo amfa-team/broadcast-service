@@ -4,7 +4,6 @@
       // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
       "es2019"
     ],
-    "rootDir": ".",
     "allowJs": false,
     "strict": true,
     "noImplicitAny": true,

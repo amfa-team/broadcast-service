@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { createSDK } from "../sdk/sfuClient";
-import { Settings, SDK } from "../types";
+import { Settings } from "../types";
+import { Picnic } from "../sdk/sdk";
 
 type SDKLoadingState = {
   loaded: false;
@@ -8,7 +8,7 @@ type SDKLoadingState = {
 
 type SDKLoadedState = {
   loaded: true;
-  sdk: SDK;
+  sdk: Picnic;
 };
 
 type SDKState = SDKLoadingState | SDKLoadedState;
@@ -17,7 +17,12 @@ export function useSDK(settings: Settings): SDKState {
   const [state, setSDKState] = useState<SDKState>({ loaded: false });
 
   useEffect(() => {
-    createSDK(settings).then((sdk) => setSDKState({ loaded: true, sdk }));
+    const sdk = new Picnic(settings);
+    sdk
+      .load()
+      .then(() => setSDKState({ loaded: true, sdk }))
+      // TODO: handle error
+      .catch(console.error);
     return (): void => {
       // TODO: handle disconnect
       console.error("should not be un-mounted");

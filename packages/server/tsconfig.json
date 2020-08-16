@@ -7,13 +7,11 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "composite": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "noEmit": false
   },
-  "include": ["src"],
-  "references": []
+  "include": ["src"]
 }

@@ -65,6 +65,12 @@ functions:
       - websocket:
           route: /sfu/send/create
           routeResponseSelectionExpression: $default
+  sfu_getStreams:
+    handler: src/sfu/handler.getStreams
+    events:
+      - websocket:
+          route: /sfu/send/list
+          routeResponseSelectionExpression: $default
   sfu_createReceive:
     handler: src/sfu/handler.createReceive
     events:
@@ -77,10 +83,10 @@ functions:
       - websocket:
           route: /sfu/receive/play
           routeResponseSelectionExpression: $default
-  # disconnect:
-  #   handler: src/handler.disconnect
-  #   events:
-  #     - websocket: $disconnect
+  disconnect:
+    handler: src/sfu/handler.disconnect
+    events:
+      - websocket: $disconnect
 
 resources:
   Resources:
@@ -123,6 +129,40 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    streamTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: streams
+        AttributeDefinitions:
+          - AttributeName: transportId
+            AttributeType: S
+          - AttributeName: producerId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: transportId
+            KeyType: HASH
+          - AttributeName: producerId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    consumerStreamTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: consumer-streams
+        AttributeDefinitions:
+          - AttributeName: sourceTransportId
+            AttributeType: S
+          - AttributeName: transportId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sourceTransportId
+            KeyType: HASH
+          - AttributeName: transportId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
 custom:
   serverless-offline:
@@ -133,4 +173,4 @@ custom:
     start:
       port: 9005
       isMemory: true
-      migration: true
+      migrate: true

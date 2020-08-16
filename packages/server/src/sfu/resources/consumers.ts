@@ -92,3 +92,14 @@ export function getProducerConsumers(
     (consumer) => consumer.producerId === producer.id
   );
 }
+
+export function getProducerConsumer(
+  producer: types.Producer,
+  transport: types.Transport
+): types.Consumer | null {
+  const consumer = getTransportConsumers(transport.id).find(
+    (consumer) => consumer.producerId === producer.id
+  );
+
+  return consumer ?? null;
+}

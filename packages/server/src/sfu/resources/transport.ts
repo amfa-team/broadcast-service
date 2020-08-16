@@ -43,13 +43,19 @@ export async function createTransport(
 }
 
 export function getTransport(transportId: string): types.WebRtcTransport {
-  const transport = transports.get(transportId);
+  const transport = getOptionalTransport(transportId);
 
   if (transport == null) {
     throw new Error("transport not found or deleted");
   }
 
   return transport;
+}
+
+export function getOptionalTransport<T extends boolean>(
+  transportId: string
+): types.WebRtcTransport | null {
+  return transports.get(transportId) ?? null;
 }
 
 export function getTransports(): types.WebRtcTransport[] {
@@ -87,6 +93,10 @@ export async function connectTransport(
   await transport.connect({ dtlsParameters });
 
   return transport;
+}
+
+export function destroyTransport(transportId: string): void {
+  getOptionalTransport(transportId)?.close();
 }
 
 export function getRouterTransports(router: types.Router): types.Transport[] {

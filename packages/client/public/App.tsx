@@ -6,8 +6,8 @@ import { Switch, Route, Link } from "react-router-dom";
 
 export default function App(): JSX.Element {
   const settings = {
-    endpoint: "ws://127.0.0.1:3001",
-    token: "44408f17-5629-4ac5-ab24-6129afb3cd42",
+    endpoint: `ws://${window.location.hostname}:3001`,
+    token: "25ec36e1-8143-49db-9bb0-b828156b41a6",
   };
   const state = useSDK(settings);
 

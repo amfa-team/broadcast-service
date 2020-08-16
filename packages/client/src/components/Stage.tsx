@@ -1,10 +1,10 @@
 import React from "react";
-import Video from "./Video";
 import useRecvStreams from "../hooks/useRecvStreams";
-import { SDK } from "../types";
+import { Picnic } from "../sdk/sdk";
+import FollowStream from "./FollowStream";
 
 type StageProps = {
-  sdk: SDK;
+  sdk: Picnic;
 };
 
 export default function Stage(props: StageProps): JSX.Element {
@@ -12,10 +12,8 @@ export default function Stage(props: StageProps): JSX.Element {
 
   return (
     <div>
-      {Object.values(streams).map((stream) => {
-        return (
-          <Video key={stream.id} stream={stream} muted={false} flip={false} />
-        );
+      {streams.map((stream) => {
+        return <FollowStream key={stream.getId()} stream={stream} />;
       })}
     </div>
   );

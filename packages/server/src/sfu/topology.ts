@@ -1,17 +1,8 @@
 import { types } from "mediasoup";
 import { getWorkerRouter } from "./resources/routers";
-import {
-  getRouterTransports,
-  getTransportMeta,
-  getTransport,
-  getTransports,
-} from "./resources/transport";
+import { getRouterTransports, getTransports } from "./resources/transport";
 import { getWorkers } from "./resources/workers";
-import {
-  getProducer,
-  getProducerMeta,
-  getTransportProducers,
-} from "./resources/producers";
+import { getTransportProducers } from "./resources/producers";
 import {
   getTransportConsumers,
   getProducerConsumers,

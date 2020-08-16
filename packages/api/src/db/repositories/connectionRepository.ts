@@ -1,13 +1,26 @@
 import dynamoDb from "../db";
-import { Connection } from "../models/connection";
+import {
+  CreateConnection,
+  Connection,
+  UpdateConnection,
+} from "../models/connection";
 
 const TableName = "connections";
 
 export async function createConnection(
-  connection: Connection
+  params: CreateConnection
 ): Promise<Connection> {
+  const connection: Connection = {
+    ...params,
+    sendTransportId: null,
+    recvTransportId: null,
+  };
   await dynamoDb.put({ TableName, Item: connection }).promise();
   return connection;
+}
+
+export async function deleteConnection(connectionId: string): Promise<void> {
+  await dynamoDb.delete({ TableName, Key: { connectionId } }).promise();
 }
 
 export async function findByConnectionId(
@@ -22,4 +35,24 @@ export async function findByConnectionId(
 export async function getAllConnections(): Promise<Connection[]> {
   const scanOutput = await dynamoDb.scan({ TableName }).promise();
   return scanOutput.Items as Connection[];
+}
+
+export async function updateConnection(
+  params: UpdateConnection
+): Promise<Connection> {
+  const previousConnection = await findByConnectionId(params.connectionId);
+  if (previousConnection === null) {
+    throw new Error(
+      "connectionRepository.updateConnection: connection not found"
+    );
+  }
+
+  // TODO: Possible edge case where connection is modify between
+  const connection: Connection = {
+    ...previousConnection,
+    ...params,
+  };
+  await dynamoDb.put({ TableName, Item: connection }).promise();
+
+  return connection;
 }
