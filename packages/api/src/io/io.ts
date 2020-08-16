@@ -211,8 +211,11 @@ export async function handleWebSocketSuccessResponse(
 ): Promise<APIGatewayProxyResult> {
   const result = handleSuccessResponse(data, msgId);
 
-  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
-  await postToConnection(requestContext, connectionId, result.body);
+  // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
+  // https://github.com/dherault/serverless-offline/issues/1008
+  if (requestContext.domainName === "localhost") {
+    await postToConnection(requestContext, connectionId, result.body);
+  }
 
   return result;
 }
@@ -225,8 +228,11 @@ export async function handleWebSocketErrorResponse(
 ): Promise<APIGatewayProxyResult> {
   const result = handleHttpErrorResponse(e, msgId);
 
-  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
-  await postToConnection(requestContext, connectionId, result.body);
+  // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
+  // https://github.com/dherault/serverless-offline/issues/1008
+  if (requestContext.domainName === "localhost") {
+    await postToConnection(requestContext, connectionId, result.body);
+  }
 
   return result;
 }
