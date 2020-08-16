@@ -30,6 +30,13 @@ export class PicnicWebSocket extends EventTarget {
     this.#ws.addEventListener("close", this.#onClose);
   }
 
+  destroy(): void {
+    this.#ws.close();
+    if (this.#pingID !== null) {
+      clearTimeout(this.#pingID);
+    }
+  }
+
   #ping: () => Promise<void> = async () => {
     try {
       await this.send("ping", null);

@@ -10,7 +10,5 @@ type FollowStreamProps = {
 export default function FollowStream(props: FollowStreamProps): JSX.Element {
   const { stream } = useFollowStream(props.stream);
 
-  console.log(stream);
-
   return <Video stream={stream} muted={false} flip={false} />;
 }

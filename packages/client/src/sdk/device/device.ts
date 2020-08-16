@@ -11,6 +11,10 @@ export class PicnicDevice {
     this.#ws = ws;
   }
 
+  destroy(): void {
+    // Nothing to destroy
+  }
+
   async loadDevice(): Promise<void> {
     const routerRtpCapabilities = await this.#ws.send<types.RtpCapabilities>(
       "/sfu/router-capabilities",

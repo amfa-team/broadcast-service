@@ -5,6 +5,6 @@ type UseFollowStream = {
 };
 
 export default function useFollowStream(stream: RecvStream): UseFollowStream {
-  // TODO: Watch streams change
+  // TODO: Watch streams change (pause, resume...);
   return { stream: stream.getMediaStream() };
 }

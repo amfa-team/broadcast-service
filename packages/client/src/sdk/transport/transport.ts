@@ -20,6 +20,10 @@ export class PicnicTransport {
     this.#type = type;
   }
 
+  destroy(): void {
+    this.#transport?.close();
+  }
+
   getId(): string {
     if (this.#transport === null) {
       throw new Error("PicnicTransport.getId: transport is not loaded yet");
