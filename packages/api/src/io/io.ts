@@ -13,6 +13,7 @@ import {
 import { Role } from "../db/models/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
+import { onDisconnect } from "../sfu/sfuService";
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
   const { connectionId } = event.requestContext;
@@ -180,14 +181,23 @@ export async function postToConnection(
   connectionId: string,
   data: string
 ): Promise<void> {
-  // TODO: handles 410 Gone error
-  // https://medium.com/@lancers/websocket-api-what-does-it-mean-that-disconnect-is-a-best-effort-event-317b7021456f
-  await getApiGatewayManagementApi(requestContext)
-    .postToConnection({
-      ConnectionId: connectionId,
-      Data: data,
-    })
-    .promise();
+  try {
+    await getApiGatewayManagementApi(requestContext)
+      .postToConnection({
+        ConnectionId: connectionId,
+        Data: data,
+      })
+      .promise();
+  } catch (e) {
+    // 410 Gone error
+    // https://medium.com/@lancers/websocket-api-what-does-it-mean-that-disconnect-is-a-best-effort-event-317b7021456f
+    if (typeof e === "object" && e?.statusCode === 410) {
+      console.warn("io.postToConnection: client gone", connectionId);
+      await onDisconnect(requestContext, connectionId);
+    } else {
+      throw e;
+    }
+  }
 }
 
 export async function broadcastToConnections(
@@ -211,8 +221,11 @@ export async function handleWebSocketSuccessResponse(
 ): Promise<APIGatewayProxyResult> {
   const result = handleSuccessResponse(data, msgId);
 
-  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
-  await postToConnection(requestContext, connectionId, result.body);
+  // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
+  // https://github.com/dherault/serverless-offline/issues/1008
+  if (requestContext.domainName === "localhost") {
+    await postToConnection(requestContext, connectionId, result.body);
+  }
 
   return result;
 }
@@ -225,8 +238,11 @@ export async function handleWebSocketErrorResponse(
 ): Promise<APIGatewayProxyResult> {
   const result = handleHttpErrorResponse(e, msgId);
 
-  // TODO: remove this as it's duplicated in prodcution (websocket offline bug)
-  await postToConnection(requestContext, connectionId, result.body);
+  // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
+  // https://github.com/dherault/serverless-offline/issues/1008
+  if (requestContext.domainName === "localhost") {
+    await postToConnection(requestContext, connectionId, result.body);
+  }
 
   return result;
 }

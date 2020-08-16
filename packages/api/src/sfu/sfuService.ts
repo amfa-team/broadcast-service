@@ -130,7 +130,7 @@ export async function onCreateStream(
   // TODO: Handle connection/transport removed in between
   await createStream(stream);
 
-  broadcastToConnections(
+  await broadcastToConnections(
     requestContext,
     JSON.stringify({
       type: "event",

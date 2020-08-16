@@ -12,6 +12,8 @@ type WsPendingReq = Map<string, PendingReq>;
 export class PicnicWebSocket extends EventTarget {
   #ws: WebSocket;
 
+  #pingID: NodeJS.Timeout | null = null;
+
   #settings: Settings;
 
   #pendingReq: WsPendingReq = new Map();
@@ -28,8 +30,25 @@ export class PicnicWebSocket extends EventTarget {
     this.#ws.addEventListener("close", this.#onClose);
   }
 
+  destroy(): void {
+    this.#ws.close();
+    if (this.#pingID !== null) {
+      clearTimeout(this.#pingID);
+    }
+  }
+
+  #ping: () => Promise<void> = async () => {
+    try {
+      await this.send("/sfu/ping", null);
+    } catch (e) {
+      console.error(e);
+    }
+    this.#pingID = setTimeout(this.#ping, 60 * 1000);
+  };
+
   async load(): Promise<void> {
     if (this.#ws.readyState === WebSocket.OPEN) {
+      this.#ping();
       return;
     }
 
@@ -40,6 +59,7 @@ export class PicnicWebSocket extends EventTarget {
     return new Promise((resolve, reject) => {
       this.#ws.addEventListener("open", () => {
         this.#ws.removeEventListener("error", reject);
+        this.#ping();
         resolve();
       });
       this.#ws.addEventListener("error", reject);

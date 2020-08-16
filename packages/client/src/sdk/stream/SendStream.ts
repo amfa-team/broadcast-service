@@ -66,6 +66,11 @@ export default class SendStream extends EventTarget {
     this.#transport = transport;
   }
 
+  destroy(): void {
+    this.#audioProducer?.close();
+    this.#videoProducer?.close();
+  }
+
   async load(): Promise<void> {
     this.#userMedia = await navigator.mediaDevices.getUserMedia(constraints);
     [this.#videoProducer, this.#audioProducer] = await Promise.all([

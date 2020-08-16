@@ -11,12 +11,14 @@ export default function useBroadcast(sdk: Picnic): UseBroadcast {
   const [stream, setStream] = useState<SendStream | null>(null);
 
   useEffect(() => {
-    // TODO: handle errors
-    sdk.broadcast().then(setStream);
+    // TODO: handle errors like permissions
+    let s: SendStream | null = null;
+    sdk.broadcast().then((sendStream) => {
+      s = sendStream;
+      setStream(sendStream);
+    });
 
-    return (): void => {
-      // TODO: handle unmount
-    };
+    return (): void => s?.destroy();
   }, [sdk]);
 
   const pause = useCallback(

@@ -23,10 +23,7 @@ export function useSDK(settings: Settings): SDKState {
       .then(() => setSDKState({ loaded: true, sdk }))
       // TODO: handle error
       .catch(console.error);
-    return (): void => {
-      // TODO: handle disconnect
-      console.error("should not be un-mounted");
-    };
+    return (): void => sdk.destroy();
   }, []);
 
   return state;

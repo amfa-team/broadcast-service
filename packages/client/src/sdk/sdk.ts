@@ -67,6 +67,14 @@ export class Picnic extends EventTarget implements SDK {
     this.#recvTransport = new PicnicTransport(this.#ws, this.#device, "recv");
   }
 
+  destroy(): void {
+    this.#device.destroy();
+    this.#recvStreams.forEach((s) => this.#removeStream(s.getId()));
+    this.#sendTransport?.destroy();
+    this.#recvTransport?.destroy();
+    this.#ws.destroy();
+  }
+
   getStreams(): Map<string, RecvStream> {
     return this.#recvStreams;
   }
@@ -130,7 +138,7 @@ export class Picnic extends EventTarget implements SDK {
       return;
     }
 
-    recvStream.unload();
+    recvStream.destroy();
     this.#recvStreams.delete(sourceTransportId);
   };
 
