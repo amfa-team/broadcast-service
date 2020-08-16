@@ -1,4 +1,4 @@
-import React, { useDebugValue } from "react";
+import React from "react";
 import SendStream from "../sdk/stream/SendStream";
 import useSendStreamControls from "../hooks/useSendStreamControls";
 
@@ -6,7 +6,7 @@ type ControlsProps = {
   stream: SendStream;
 };
 
-export default function Controls(props: ControlsProps): JSX.Element {
+export default function SendControls(props: ControlsProps): JSX.Element {
   const {
     audioPaused,
     videoPaused,

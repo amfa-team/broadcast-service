@@ -16,6 +16,7 @@ import {
   receive,
   play,
   destroySend,
+  pause,
 } from "../../sfu/sfuService";
 import { getServerTopology, cleanup } from "../../sfu/topology";
 import { handleSuccessResponse, handleErrorResponse } from "../../io/io";
@@ -114,9 +115,23 @@ export function bindSceneController(app: Application): void {
     }
   });
 
+  app.post("/receive/pause", async (req, res) => {
+    try {
+      // TODO: validation
+      const { consumerId } = req.body;
+      console.log("play", consumerId);
+      const payload = await pause(consumerId);
+      handleSuccessResponse(res, payload);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  });
+
   app.post("/receive/play", async (req, res) => {
     try {
+      // TODO: validation
       const { consumerId } = req.body;
+      console.log("pause", consumerId);
       const payload = await play(consumerId);
       handleSuccessResponse(res, payload);
     } catch (error) {

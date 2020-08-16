@@ -24,6 +24,7 @@ import {
   ReceiveParams,
   ConsumerInfo,
   SendDestroyParams,
+  ReceiveDestroyParams,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -158,4 +159,9 @@ export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
 export async function play(consumerId: string): Promise<void> {
   const consumer = getConsumer(consumerId);
   await consumer.resume();
+}
+
+export async function pause(consumerId: string): Promise<void> {
+  const consumer = getConsumer(consumerId);
+  await consumer.pause();
 }

@@ -39,6 +39,7 @@ export async function requestSFU<T>(
       .json()
       .then((body) => body.error)
       .catch(() => "Unknown SFU error");
+    console.error({ path, options });
     throw new Error(`requestSFU: fail with ${err}`);
   }
 

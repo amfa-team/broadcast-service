@@ -8,6 +8,7 @@ export async function createStreamConsumer(
   stream: StreamConsumerInfo
 ): Promise<StreamConsumerInfo> {
   await dynamoDb.put({ TableName, Item: stream }).promise();
+  console.warn("create", stream);
   return stream;
 }
 
@@ -32,15 +33,27 @@ export async function findStreamConsumerByTransportId(
   return result.Items as StreamConsumerInfo[];
 }
 
+export async function findStreamConsumer(
+  transportId: string,
+  consumerId: string
+): Promise<StreamConsumerInfo | null> {
+  const result = await dynamoDb
+    .get({
+      TableName,
+      Key: { transportId, consumerId },
+    })
+    .promise();
+
+  return (result.Item ?? null) as StreamConsumerInfo | null;
+}
+
 export async function deleteStreamConsumerByTransportId(
   transportId: string
 ): Promise<void> {
   const items = await findStreamConsumerByTransportId(transportId);
 
   const results = await Promise.allSettled(
-    items.map((item) =>
-      deleteStreamConsumer(item.sourceTransportId, item.transportId)
-    )
+    items.map((item) => deleteStreamConsumer(item.transportId, item.consumerId))
   );
 
   getAllSettledValues(
@@ -50,10 +63,11 @@ export async function deleteStreamConsumerByTransportId(
 }
 
 export async function deleteStreamConsumer(
-  sourceTransportId: string,
-  transportId: string
+  transportId: string,
+  consumerId: string
 ): Promise<void> {
+  console.warn("delete", { transportId, consumerId });
   await dynamoDb
-    .delete({ TableName, Key: { sourceTransportId, transportId } })
+    .delete({ TableName, Key: { consumerId, transportId } })
     .promise();
 }

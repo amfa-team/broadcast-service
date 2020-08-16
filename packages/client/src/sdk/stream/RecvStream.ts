@@ -3,6 +3,7 @@ import { PicnicTransport } from "../transport/transport";
 import { PicnicDevice } from "../device/device";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { ReceiveParams, ConsumerInfo } from "../../../../types";
+import { PicnicEvent } from "../events/event";
 
 interface RecvStreamOptions {
   ws: PicnicWebSocket;
@@ -13,17 +14,27 @@ interface RecvStreamOptions {
 
 async function resumeConsumer(
   ws: PicnicWebSocket,
+  transport: PicnicTransport,
   consumer: types.Consumer
 ): Promise<void> {
-  await ws.send("/sfu/receive/play", { consumerId: consumer.id });
+  await ws.send("/sfu/receive/state", {
+    state: "play",
+    transportId: transport.getId(),
+    consumerId: consumer.id,
+  });
   consumer.resume();
 }
 
 async function pauseConsumer(
   ws: PicnicWebSocket,
+  transport: PicnicTransport,
   consumer: types.Consumer
 ): Promise<void> {
-  await ws.send("/sfu/receive/pause", { consumerId: consumer.id });
+  await ws.send("/sfu/receive/state", {
+    state: "pause",
+    transportId: transport.getId(),
+    consumerId: consumer.id,
+  });
   consumer.pause();
 }
 
@@ -50,13 +61,10 @@ async function createConsumer(
     rtpParameters: info.rtpParameters,
   });
 
-  // TODO: Do not auto play
-  await resumeConsumer(ws, consumer);
-
   return consumer;
 }
 
-export default class RecvStream {
+export default class RecvStream extends EventTarget {
   #ws: PicnicWebSocket;
   #stream: MediaStream = new MediaStream();
   #transport: PicnicTransport;
@@ -66,6 +74,8 @@ export default class RecvStream {
   #sourceTransportId: string;
 
   constructor(options: RecvStreamOptions) {
+    super();
+
     this.#ws = options.ws;
     this.#transport = options.transport;
     this.#device = options.device;
@@ -111,31 +121,47 @@ export default class RecvStream {
   }
 
   async pauseAudio(): Promise<void> {
-    if (this.#audioConsumer === null) {
-      throw new Error("RecvStream.pauseAudio: require consumer");
+    if (this.#audioConsumer !== null) {
+      await pauseConsumer(this.#ws, this.#transport, this.#audioConsumer);
+      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "audio" }));
     }
-    await pauseConsumer(this.#ws, this.#audioConsumer);
   }
 
   async resumeAudio(): Promise<void> {
-    if (this.#audioConsumer === null) {
-      throw new Error("RecvStream.resumeAudio: require consumer");
+    if (this.#audioConsumer !== null) {
+      await resumeConsumer(this.#ws, this.#transport, this.#audioConsumer);
+      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "audio" }));
     }
-    await resumeConsumer(this.#ws, this.#audioConsumer);
+  }
+
+  isAudioPaused(): boolean {
+    return this.#audioConsumer?.paused ?? true;
   }
 
   async pauseVideo(): Promise<void> {
-    if (this.#videoConsumer === null) {
-      throw new Error("RecvStream.pauseVideo: require consumer");
+    if (this.#videoConsumer !== null) {
+      await pauseConsumer(this.#ws, this.#transport, this.#videoConsumer);
+      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "video" }));
     }
-    await pauseConsumer(this.#ws, this.#videoConsumer);
   }
 
   async resumeVideo(): Promise<void> {
-    if (this.#videoConsumer === null) {
-      throw new Error("RecvStream.resumeVideo: require consumer");
+    if (this.#videoConsumer !== null) {
+      await resumeConsumer(this.#ws, this.#transport, this.#videoConsumer);
+      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "video" }));
     }
-    await resumeConsumer(this.#ws, this.#videoConsumer);
+  }
+
+  isVideoPaused(): boolean {
+    return this.#videoConsumer?.paused ?? true;
+  }
+
+  async resume(): Promise<void> {
+    await Promise.all([this.resumeAudio(), this.resumeVideo()]);
+  }
+
+  async pause(): Promise<void> {
+    await Promise.all([this.pauseAudio(), this.pauseVideo()]);
   }
 
   getMediaStream(): MediaStream {

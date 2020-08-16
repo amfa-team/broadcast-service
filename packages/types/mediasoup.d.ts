@@ -40,6 +40,11 @@ export type ReceiveParams = {
   rtpCapabilities: types.RtpCapabilities;
 };
 
+export type ReceiveDestroyParams = {
+  transportId: string;
+  consumerId: string;
+};
+
 export type ConsumerInfo = {
   consumerId: string;
   producerId: string;

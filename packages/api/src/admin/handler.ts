@@ -55,7 +55,7 @@ export async function topology(
       getAllConnections(),
       getAllStreams(),
       getStreamConsumers(),
-      requestSFU("/topology"),
+      requestSFU("/topology").catch((e) => null),
     ]);
 
     return handleSuccessResponse({
