@@ -7,50 +7,14 @@ import {
   getTransportConsumers,
   getProducerConsumers,
 } from "./resources/consumers";
-
-type ConsumerTopology = {
-  id: string;
-  kind: types.MediaKind;
-  producerId: string;
-  state: {
-    paused: boolean;
-    closed: boolean;
-    type: types.ConsumerType;
-    producerPaused: boolean;
-    currentLayers: types.ConsumerLayers | void;
-  };
-};
-
-type ProducerTopology = {
-  id: string;
-  kind: types.MediaKind;
-  consumers: ConsumerTopology[];
-  state: {
-    paused: boolean;
-    closed: boolean;
-  };
-  stats: types.ProducerStat[];
-};
-
-type TransportTopology = {
-  id: string;
-  producers: ProducerTopology[];
-  consumers: ConsumerTopology[];
-};
-
-type RouterTopology = {
-  id: string;
-  transports: TransportTopology[];
-};
-
-type WorkerTopology = {
-  pid: number;
-  router: RouterTopology;
-};
-
-type ServerTopology = {
-  workers: WorkerTopology[];
-};
+import {
+  ConsumerTopology,
+  ProducerTopology,
+  RouterTopology,
+  TransportTopology,
+  WorkerTopology,
+  ServerTopology,
+} from "../../../types";
 
 function getConsumerTopology(consumer: types.Consumer): ConsumerTopology {
   return {

@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "Broadcast Service Server",
-      script: "packages/server/dist/server/src/index.js",
+      script: "packages/server/dist/src/index.js",
       instances: 1,
       autorestart: true,
       wait_ready: true,

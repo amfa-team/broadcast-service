@@ -111,25 +111,29 @@ export class Picnic extends EventTarget implements SDK {
   }
 
   #addStream = async (info: StreamInfo): Promise<void> => {
-    const { transportId, producerId } = info;
+    try {
+      const { transportId, producerId } = info;
 
-    if (this.#sendTransport?.getId() === transportId) {
-      // ignore self stream
-      return;
+      if (this.#sendTransport?.getId() === transportId) {
+        // ignore self stream
+        return;
+      }
+
+      const recvStream =
+        this.#recvStreams.get(transportId) ??
+        new RecvStream({
+          transport: this.#recvTransport,
+          device: this.#device,
+          ws: this.#ws,
+          sourceTransportId: transportId,
+        });
+
+      this.#recvStreams.set(transportId, recvStream);
+
+      await recvStream.load(producerId);
+    } catch (error) {
+      console.error("Unable to receive stream", { error, info });
     }
-
-    const recvStream =
-      this.#recvStreams.get(transportId) ??
-      new RecvStream({
-        transport: this.#recvTransport,
-        device: this.#device,
-        ws: this.#ws,
-        sourceTransportId: transportId,
-      });
-
-    this.#recvStreams.set(transportId, recvStream);
-
-    await recvStream.load(producerId);
   };
 
   #removeStream = async (sourceTransportId: string): Promise<void> => {
