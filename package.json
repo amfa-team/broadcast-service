@@ -33,7 +33,8 @@
     "server:start": "cd packages/server; yarn start:dev",
     "server:build": "cd packages/server; yarn build",
     "client:start": "cd packages/client; yarn start",
-    "all": "ttab yarn api:start:db; ttab yarn api:start; ttab yarn server:start; ttab yarn client:start;"
+    "all": "ttab yarn api:start:db; ttab yarn api:start; ttab yarn server:start; ttab yarn client:start;",
+    "deploy": "(cd packages/api; yarn deploy) && (cd packages/server; yarn deploy) && (cd packages/client; yarn deploy:public)"
   },
   "husky": {
     "hooks": {
