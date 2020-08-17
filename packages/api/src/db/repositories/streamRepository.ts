@@ -1,7 +1,7 @@
 import dynamoDb from "../db";
 import { StreamInfo } from "../models/stream";
 
-const TableName = "streams";
+const TableName = "broadcast-streams";
 
 export async function createStream(stream: StreamInfo): Promise<StreamInfo> {
   await dynamoDb.put({ TableName, Item: stream }).promise();
