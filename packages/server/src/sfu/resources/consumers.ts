@@ -59,8 +59,13 @@ export async function createConsumer(
   return consumer;
 }
 
-export function getConsumer(consumerId: string): types.Consumer {
+export function getOptionalConsumer(consumerId: string): types.Consumer | null {
   const consumer = consumers.get(consumerId);
+  return consumer ?? null;
+}
+
+export function getConsumer(consumerId: string): types.Consumer {
+  const consumer = getOptionalConsumer(consumerId);
 
   if (!consumer) {
     throw new Error("consumer not found or deleted");
