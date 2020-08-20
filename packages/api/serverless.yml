@@ -138,7 +138,7 @@ resources:
     participantTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: participants
+        TableName: broadcast-participants
         AttributeDefinitions:
           - AttributeName: token
             AttributeType: S
@@ -151,7 +151,7 @@ resources:
     serverTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: servers
+        TableName: broadcast-servers
         AttributeDefinitions:
           - AttributeName: ip
             AttributeType: S
@@ -168,7 +168,7 @@ resources:
     connectionTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: connections
+        TableName: broadcast-connections
         AttributeDefinitions:
           - AttributeName: connectionId
             AttributeType: S
@@ -181,7 +181,7 @@ resources:
     streamTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: streams
+        TableName: broadcast-streams
         AttributeDefinitions:
           - AttributeName: transportId
             AttributeType: S
@@ -198,7 +198,7 @@ resources:
     consumerStreamTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: consumer-streams
+        TableName: broadcast-consumer-streams
         AttributeDefinitions:
           - AttributeName: transportId
             AttributeType: S

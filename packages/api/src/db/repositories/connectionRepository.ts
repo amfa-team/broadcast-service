@@ -5,7 +5,7 @@ import {
   UpdateConnection,
 } from "../models/connection";
 
-const TableName = "connections";
+const TableName = "broadcast-connections";
 
 export async function createConnection(
   params: CreateConnection

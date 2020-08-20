@@ -1,7 +1,7 @@
 import { Server } from "../models/server";
 import dynamoDb from "../db";
 
-const TableName = "servers";
+const TableName = "broadcast-servers";
 
 export async function createServer(server: Server): Promise<Server> {
   // TODO: Use TTL to detect unexpected die to recover

@@ -117,6 +117,8 @@ export default class RecvStream extends EventTarget {
       this.#videoConsumer = consumer;
     }
 
+    console.log(consumer);
+
     this.#stream.addTrack(consumer.track);
   }
 

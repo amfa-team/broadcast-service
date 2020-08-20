@@ -25,7 +25,7 @@ module.exports = {
     production: {
       user: "ubuntu",
       host: "15.237.3.235",
-      ref: "origin/feature/free-resources",
+      ref: "origin/feature/screen-share",
       repo: "git@github.com:amfa-team/picnic-sfu.git",
       path: "/var/www/production",
       "post-deploy":

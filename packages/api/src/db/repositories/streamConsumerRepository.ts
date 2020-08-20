@@ -2,7 +2,7 @@ import dynamoDb from "../db";
 import { StreamConsumerInfo } from "../models/streamConsumer";
 import { getAllSettledValues } from "../../io/promises";
 
-const TableName = "consumer-streams";
+const TableName = "broadcast-consumer-streams";
 
 export async function createStreamConsumer(
   stream: StreamConsumerInfo
