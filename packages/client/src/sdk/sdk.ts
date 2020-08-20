@@ -87,18 +87,10 @@ export class Picnic extends EventTarget implements SDK {
     this.#ws.addEventListener("stream:add", async (event) => {
       const { data } = event as ServerEventMap["stream:add"];
       await this.#addStream(data);
-      const evt = new MessageEvent("stream:update", {
-        data: this.#recvStreams,
-      });
-      this.dispatchEvent(evt);
     });
     this.#ws.addEventListener("stream:remove", (event) => {
       const { data } = event as ServerEventMap["stream:remove"];
       this.#removeStream(data);
-      const evt = new MessageEvent("stream:update", {
-        data: this.#recvStreams,
-      });
-      this.dispatchEvent(evt);
     });
     const infos = await this.#ws.send<StreamInfo[]>("/sfu/send/list", null);
     const tasks = [];
@@ -131,6 +123,14 @@ export class Picnic extends EventTarget implements SDK {
       this.#recvStreams.set(transportId, recvStream);
 
       await recvStream.load(producerId);
+
+      // Might not be ready if only one of audio/video track is loaded
+      if (recvStream.isReady()) {
+        const evt = new MessageEvent("stream:update", {
+          data: this.#recvStreams,
+        });
+        this.dispatchEvent(evt);
+      }
     } catch (error) {
       console.error("Unable to receive stream", { error, info });
     }
@@ -144,6 +144,10 @@ export class Picnic extends EventTarget implements SDK {
 
     recvStream.destroy();
     this.#recvStreams.delete(sourceTransportId);
+    const evt = new MessageEvent("stream:update", {
+      data: this.#recvStreams,
+    });
+    this.dispatchEvent(evt);
   };
 
   async broadcast(): Promise<SendStream> {

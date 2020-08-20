@@ -9,7 +9,9 @@ async function startServer(): Promise<void> {
   config();
   await startup();
   await startApi();
-  registerServer();
+  registerServer().then(() => {
+    console.log("Registered");
+  });
   timeout = setInterval(registerServer, 60000);
 
   process.send?.("ready");
