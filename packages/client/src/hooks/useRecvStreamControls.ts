@@ -36,9 +36,9 @@ export default function useRecvStreamControls(
   const pauseAudio = useCallback(
     (pause) => {
       if (pause) {
-        stream?.pauseAudio();
+        stream.pauseAudio();
       } else {
-        stream?.resumeAudio();
+        stream.resumeAudio();
       }
     },
     [stream]
@@ -46,9 +46,9 @@ export default function useRecvStreamControls(
   const pauseVideo = useCallback(
     (pause) => {
       if (pause) {
-        stream?.pauseVideo();
+        stream.pauseVideo();
       } else {
-        stream?.resumeVideo();
+        stream.resumeVideo();
       }
     },
     [stream]

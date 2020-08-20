@@ -15,6 +15,7 @@ import {
   createConsumer,
   getConsumer,
   getProducerConsumer,
+  getOptionalConsumer,
 } from "./resources/consumers";
 import {
   InitConnectionParams,
@@ -24,7 +25,6 @@ import {
   ReceiveParams,
   ConsumerInfo,
   SendDestroyParams,
-  ReceiveDestroyParams,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -162,6 +162,7 @@ export async function play(consumerId: string): Promise<void> {
 }
 
 export async function pause(consumerId: string): Promise<void> {
-  const consumer = getConsumer(consumerId);
-  await consumer.pause();
+  // Use optional consumer because on close we might request pause on already closed consumer
+  const consumer = getOptionalConsumer(consumerId);
+  await consumer?.pause();
 }

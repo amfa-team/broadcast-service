@@ -85,7 +85,7 @@ export class PicnicWebSocket extends EventTarget {
       timeout = setTimeout(() => {
         clear();
         reject("Request timeout");
-      }, 10000);
+      }, 60000);
 
       this.#pendingReq.set(msgId, {
         resolve: (payload) => {

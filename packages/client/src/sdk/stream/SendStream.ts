@@ -45,6 +45,7 @@ async function createVideoProducer(
   const track = mediaStream.getVideoTracks()[0] ?? null;
 
   if (track === null) {
+    // TODO: Handle this case, as it will cause the RecvStream to never being ready
     return null;
   }
 
@@ -74,6 +75,7 @@ async function createAudioProducer(
   const track = mediaStream.getAudioTracks()[0] ?? null;
 
   if (track === null) {
+    // TODO: Handle this case, as it will cause the RecvStream to never being ready
     return null;
   }
 
@@ -100,7 +102,7 @@ export default class SendStream extends EventTarget {
     this.#ws = ws;
   }
 
-  async destroy(): Promise<void> {
+  #destroyAudioProducer = async (): Promise<void> => {
     if (this.#audioProducer !== null) {
       await this.#ws
         .send("/sfu/send/destroy", {
@@ -111,6 +113,9 @@ export default class SendStream extends EventTarget {
         .catch(() => null);
       this.#audioProducer.close();
     }
+  };
+
+  #destroyVideoProducer = async (): Promise<void> => {
     if (this.#videoProducer !== null) {
       await this.#ws
         .send("/sfu/send/destroy", {
@@ -121,6 +126,13 @@ export default class SendStream extends EventTarget {
         .catch(() => null);
       this.#videoProducer?.close();
     }
+  };
+
+  async destroy(): Promise<void> {
+    await Promise.all([
+      this.#destroyAudioProducer(),
+      this.#destroyVideoProducer(),
+    ]);
   }
 
   async load(): Promise<void> {

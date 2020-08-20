@@ -6,7 +6,8 @@ type UseFollowStream = {
 };
 
 export default function useFollowStream(stream: RecvStream): UseFollowStream {
-  // TODO: Watch streams change (pause, resume...);
+  const media = stream.getMediaStream();
+
   useEffect(() => {
     stream.resume();
     return () => {
@@ -14,5 +15,5 @@ export default function useFollowStream(stream: RecvStream): UseFollowStream {
     };
   }, [stream]);
 
-  return { stream: stream.getMediaStream() };
+  return { stream: media };
 }
