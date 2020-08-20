@@ -8,6 +8,7 @@ import {
 import {
   createServer,
   getAllServers,
+  getServer,
 } from "../db/repositories/serverRepository";
 import { createParticipantDecoder } from "../db/models/participant";
 import { createServerDecoder } from "../db/models/server";
@@ -15,6 +16,7 @@ import {
   handleSuccessResponse,
   handleHttpErrorResponse,
   parseHttpAdminRequest,
+  broadcastToConnections,
 } from "../io/io";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllStreams } from "../db/repositories/streamRepository";
@@ -55,7 +57,7 @@ export async function topology(
       getAllConnections(),
       getAllStreams(),
       getStreamConsumers(),
-      requestSFU("/topology").catch((e) => null),
+      requestSFU("/topology").catch(() => null),
     ]);
 
     return handleSuccessResponse({
@@ -77,12 +79,31 @@ export async function registerServer(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
-    // TODO: handle server restart & check resources sync
+    // TODO: check resources sync
     const { data } = await parseHttpAdminRequest(event, createServerDecoder);
-    const server = await createServer(data);
+    const [existingServer, server] = await Promise.all([
+      getServer(data),
+      createServer(data),
+    ]);
+
+    // TODO: recreate client side properly
+    // This is to ensure we're able to recover from Server failure restart
+    if (existingServer !== null && existingServer.token !== data.token) {
+      console.error("Server restarted, trigger client restart");
+      await broadcastToConnections(
+        event.requestContext,
+        JSON.stringify({
+          type: "cmd",
+          payload: {
+            fn: "reload",
+          },
+        })
+      );
+    }
 
     return handleSuccessResponse(server);
   } catch (e) {
+    console.error(e);
     return handleHttpErrorResponse(e);
   }
 }

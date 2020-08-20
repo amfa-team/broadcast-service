@@ -9,6 +9,14 @@ export async function createServer(server: Server): Promise<Server> {
   return server;
 }
 
+export async function getServer({
+  ip,
+  port,
+}: Pick<Server, "ip" | "port">): Promise<Server | null> {
+  const result = await dynamoDb.get({ TableName, Key: { ip, port } }).promise();
+  return (result.Item ?? null) as Server | null;
+}
+
 export async function getServers(): Promise<Server[]> {
   const result = await dynamoDb.scan({ TableName }).promise();
 

@@ -135,6 +135,13 @@ export class PicnicWebSocket extends EventTarget {
       const event = new PicnicEvent(msg.payload.type, msg.payload.data);
       this.dispatchEvent(event);
     }
+
+    if (msg.type === "cmd") {
+      if (msg.payload.fn === "reload") {
+        // Last resort command to trigger a reload
+        window.location.reload();
+      }
+    }
   };
 
   #onClose = (event: CloseEvent): void => {

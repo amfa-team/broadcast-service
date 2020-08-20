@@ -155,9 +155,13 @@ resources:
         AttributeDefinitions:
           - AttributeName: ip
             AttributeType: S
+          - AttributeName: port
+            AttributeType: N
         KeySchema:
           - AttributeName: ip
             KeyType: HASH
+          - AttributeName: port
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
