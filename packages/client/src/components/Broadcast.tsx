@@ -20,7 +20,7 @@ export default function Broadcast(props: BroadcastProps): JSX.Element {
   return (
     <div>
       <SendControls stream={stream} />
-      <Video stream={media} muted flip />
+      <Video stream={media} muted flip={!stream.isScreenShareEnabled()} />
     </div>
   );
 }
