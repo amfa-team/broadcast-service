@@ -1,4 +1,4 @@
-name: Deploy Serverless API
+name: Deploy Staging
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key
-        run: echo ${{ secrets.SSH_KEY }} > ~/.ssh/id_rsa
+        run: echo -e "${SSH_KEY//_/\\n}" > ~/.ssh/id_rsa
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
       - name: Start SSH Agent
