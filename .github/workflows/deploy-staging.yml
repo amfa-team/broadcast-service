@@ -16,7 +16,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deploy-staging-
+            ${{ runner.os }}-
       - run: yarn install
   deploy-api:
     runs-on: ubuntu-latest
@@ -29,7 +32,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deploy-staging-
+            ${{ runner.os }}-
       - run: yarn install
       - name: serverless deploy
         working-directory: ./packages/api
@@ -48,7 +54,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deploy-staging-
+            ${{ runner.os }}-
       - run: yarn install
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
@@ -65,7 +74,7 @@ jobs:
           CLUSTER_API: ${{ secrets.STAGING_CLUSTER_API }}
           CLUSTER_SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
           PUBLIC_IP: "15.236.169.203"
-      - run: "scp -i ~/.ssh/picnic server-env ubuntu@15.236.169.203:~/server-env"
+      - run: "scp -i ~/.ssh/picnic -o 'StrictHostKeyChecking=no' server-env ubuntu@15.236.169.203:~/server-env"
         name: upload env vars
         working-directory: ./packages/server
       - name: pm2 deploy
@@ -82,7 +91,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deploy-staging-
+            ${{ runner.os }}-
       - run: yarn install
       - name: build public website
         working-directory: ./packages/client
@@ -111,7 +123,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deploy-staging-
+            ${{ runner.os }}-
       - run: yarn install
       - name: publish sdk
         working-directory: ./packages/client

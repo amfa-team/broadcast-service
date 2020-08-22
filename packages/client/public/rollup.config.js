@@ -13,8 +13,8 @@ const replacements = {
   "process.env.NODE_ENV": JSON.stringify(
     production ? "production" : "development"
   ),
-  "process.env.WS_API": JSON.stringify(process.env.WS_API ?? null),
-  "process.env.HTTP_API": JSON.stringify(process.env.HTTP_API ?? null),
+  "process.env.WS_API": JSON.stringify(process.env.WS_API || null),
+  "process.env.HTTP_API": JSON.stringify(process.env.HTTP_API || null),
 };
 
 export default [
