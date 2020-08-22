@@ -38,7 +38,7 @@ jobs:
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key
-        run: echo -e "${SSH_KEY//_/\\n}" > ~/.ssh/picnic && chmod 600 ~/.ssh/picnic
+        run: echo $SSH_KEY > ~/.ssh/picnic && chmod 600 ~/.ssh/picnic
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
       - name: pm2 deploy
