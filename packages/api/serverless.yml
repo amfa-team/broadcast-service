@@ -21,7 +21,7 @@ provider:
   profile: picnic # aws credential profile name
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   environment:
-    SECRET: ${param:secret, 'super-SECRET'}
+    SECRET: ${env:SECRET, 'super-SECRET'}
     CONNECTION_TABLE: "${self:service.name}-${self:provider.stage}-connection"
     PARTICIPANT_TABLE: "${self:service.name}-${self:provider.stage}-participants"
     SERVER_TABLE: "${self:service.name}-${self:provider.stage}-server"
