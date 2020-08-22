@@ -41,10 +41,8 @@ jobs:
         run: echo -e "${SSH_KEY//_/\\n}" > ~/.ssh/id_rsa
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
-      - name: Start SSH Agent
-        run: eval "$(ssh-agent -s)"
       - name: Register Key
-        run: ssh-add ~/.ssh/id_rsa
+        run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
       - name: serverless deploy
         working-directory: ./packages/api
         run: yarn deploy:staging
