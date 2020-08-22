@@ -2,7 +2,7 @@ import { v4 as uuid } from "uuid";
 import { CreateParticipant, Participant } from "../models/participant";
 import dynamoDb from "../db";
 
-const TableName = "broadcast-participants";
+const TableName = process.env.PARTICIPANT_TABLE ?? "";
 
 export async function createParticipant(
   params: CreateParticipant
