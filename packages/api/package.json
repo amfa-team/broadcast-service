@@ -20,9 +20,7 @@
   "scripts": {
     "start": "serverless offline --useWebsocket --host=0.0.0.0",
     "build": "tsc -b",
-    "sls": "serverless",
-    "deploy": "serverless deploy --stage production",
-    "deploy:staging": "serverless deploy --stage staging",
+    "serverless": "serverless",
     "dynamo:install": "serverless dynamodb install",
     "dynamo:start": "serverless dynamodb start",
     "dynamo:migrate": "serverless dynamodb migrate"

@@ -1,6 +1,6 @@
 {
   "name": "@amfa-team/picnic-sfu",
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "main": "index.js",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
@@ -22,7 +22,8 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "semantic-release": "^17.1.1"
   },
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -34,8 +35,7 @@
     "server:build": "cd packages/server; yarn build",
     "client:start": "cd packages/client; yarn start",
     "all": "ttab yarn api:start:db; ttab yarn api:start; ttab yarn server:start; ttab yarn client:start;",
-    "deploy": "(cd packages/api; yarn deploy) && (cd packages/server; yarn deploy) && (cd packages/client; yarn deploy:public)",
-    "deploy:staging": "(cd packages/api; yarn deploy:staging) && (cd packages/server; yarn deploy:staging)"
+    "semantic-release": "semantic-release"
   },
   "husky": {
     "hooks": {
@@ -48,5 +48,8 @@
   },
   "optionalDependencies": {
     "ttab": "^0.6.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
