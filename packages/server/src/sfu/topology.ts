@@ -7,7 +7,7 @@ import {
   getTransportConsumers,
   getProducerConsumers,
 } from "./resources/consumers";
-import {
+import type {
   ConsumerTopology,
   ProducerTopology,
   RouterTopology,

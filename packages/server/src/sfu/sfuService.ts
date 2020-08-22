@@ -17,7 +17,7 @@ import {
   getProducerConsumer,
   getOptionalConsumer,
 } from "./resources/consumers";
-import {
+import type {
   InitConnectionParams,
   ConnectionInfo,
   ConnectParams,
