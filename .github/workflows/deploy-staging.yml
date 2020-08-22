@@ -43,4 +43,4 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
       - name: pm2 deploy
         working-directory: ./packages/server
-        run: yarn deploy:staging
+        run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/picnic && yarn deploy:staging
