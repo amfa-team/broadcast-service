@@ -6,6 +6,7 @@
   "types": "src/handler.ts",
   "license": "SEE LICENSE IN LICENSE.md",
   "devDependencies": {
+    "serverless": "^1.79.0",
     "serverless-dotenv-plugin": "^3.0.0",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.5.0",
@@ -21,6 +22,7 @@
     "build": "tsc -b",
     "sls": "serverless",
     "deploy": "serverless deploy --stage production",
+    "deploy:staging": "serverless deploy --stage staging",
     "dynamo:install": "serverless dynamodb install",
     "dynamo:start": "serverless dynamodb start",
     "dynamo:migrate": "serverless dynamodb migrate"
