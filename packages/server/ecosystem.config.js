@@ -35,6 +35,8 @@ module.exports = {
       host: "15.237.3.235",
       ref: "origin/master",
       repo: "git@github.com:amfa-team/picnic-sfu.git",
+      key: "~/.ssh/picnic",
+      ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"],
       path: "/var/www/production",
       "post-deploy":
         "PYTHON=python3 yarn install && yarn server:build && cp ../shared/config/.env .env && pm2 reload packages/server/ecosystem.config.js --env production",
@@ -44,6 +46,8 @@ module.exports = {
       host: "15.236.169.203",
       ref: "origin/develop",
       repo: "git@github.com:amfa-team/picnic-sfu.git",
+      key: "~/.ssh/picnic",
+      ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"],
       path: "/var/www/staging",
       "post-deploy":
         "PYTHON=python3 yarn install && yarn server:build && cp ../shared/config/.env .env && pm2 reload packages/server/ecosystem.config.js --env staging",
