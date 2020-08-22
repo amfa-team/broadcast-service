@@ -41,6 +41,8 @@ jobs:
         run: echo $SSH_KEY > ~/.ssh/picnic && chmod 600 ~/.ssh/picnic
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
+      - name: Check SSH key
+        run: echo ~/.ssh/picnic
       - name: pm2 deploy
         working-directory: ./packages/server
         run: yarn deploy:staging
