@@ -46,6 +46,7 @@
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-terser": "^6.1.0",
     "semantic-release": "^17.1.1",
+    "semantic-release-slack-bot": "^1.6.2",
     "serverless": "^1.79.0",
     "serverless-finch": "^2.6.0",
     "serverless-stage-manager": "^1.0.5",

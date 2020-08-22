@@ -9,6 +9,8 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@commitlint/cli": "^9.1.2",
+    "@commitlint/config-conventional": "^9.1.2",
     "@typescript-eslint/eslint-plugin": "^3.7.0",
     "@typescript-eslint/parser": "^3.5.0",
     "eslint": "^7.4.0",
@@ -22,8 +24,8 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
-    "typescript": "^3.9.6",
-    "semantic-release": "^17.1.1"
+    "semantic-release": "^17.1.1",
+    "typescript": "^3.9.6"
   },
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -39,7 +41,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "[[ -n $HUSKY_BYPASS ]] || commitlint --config ./config/commitlint.config.js -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
