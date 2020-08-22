@@ -21,7 +21,8 @@
     "start": "npm run build && node dist/index.js",
     "start:dev": "nodemon",
     "build": "tsc -b",
-    "deploy": "pm2 deploy production"
+    "deploy": "pm2 deploy production",
+    "deploy:staging": "pm2 deploy staging"
   },
   "dependencies": {
     "cors": "^2.8.5",
