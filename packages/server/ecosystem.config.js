@@ -30,7 +30,7 @@ module.exports = {
       ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"],
       path: "/var/www/production",
       "post-deploy":
-        "PYTHON=python3 yarn install && yarn server:build && cp ~/server-env .env && pm2 reload packages/server/ecosystem.config.js --env staging",
+        "echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc && PYTHON=python3 yarn install && yarn server:build && cp ~/server-env .env && pm2 reload packages/server/ecosystem.config.js --env staging",
     },
     staging: {
       user: "ubuntu",
@@ -41,7 +41,7 @@ module.exports = {
       ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"],
       path: "/var/www/staging",
       "post-deploy":
-        "PYTHON=python3 yarn install && yarn server:build && cp ~/server-env .env && pm2 reload packages/server/ecosystem.config.js --env staging",
+        "echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc && PYTHON=python3 yarn install && yarn server:build && cp ~/server-env .env && pm2 reload packages/server/ecosystem.config.js --env staging",
     },
   },
 };
