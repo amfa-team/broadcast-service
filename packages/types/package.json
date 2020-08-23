@@ -11,8 +11,8 @@
     "build": "tsc -b"
   },
   "dependencies": {
-    "mediasoup": "^3.6.9",
-    "mediasoup-client": "^3.6.11"
+    "mediasoup": "^3.6.16",
+    "mediasoup-client": "^3.6.12"
   },
   "publishConfig": {
     "access": "restricted",
