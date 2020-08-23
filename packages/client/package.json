@@ -54,7 +54,9 @@
     "typescript": "^4.0.2"
   },
   "scripts": {
-    "build": "rollup -c rollup.config.js",
+    "build:ts": "tsc --project tsconfig.declarations.json",
+    "build:js": "rollup -c rollup.config.js",
+    "build": "yarn build:js && yarn build:ts",
     "start": "rollup -c public/rollup.config.js -w",
     "build:public": "rollup -c public/rollup.config.js",
     "serverless": "serverless",

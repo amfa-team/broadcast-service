@@ -2,9 +2,6 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "sourceMap": true,
-    "declaration": true,
-    "declarationDir": "dist",
-    "declarationMap": true,
     "moduleResolution": "node",
     "target": "ES6",
     "lib": [
