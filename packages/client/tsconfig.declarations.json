@@ -1,9 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist",
     "moduleResolution": "node",
-    "target": "ES6",
+    "target": "ES2015",
     "lib": [
       // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
       "es2019",
