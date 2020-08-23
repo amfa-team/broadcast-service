@@ -73,8 +73,8 @@ jobs:
         env:
           CLUSTER_API: ${{ secrets.PRODUCTION_CLUSTER_API }}
           CLUSTER_SECRET: ${{ secrets.PRODUCTION_CLUSTER_SECRET }}
-          PUBLIC_IP: "15.236.169.203"
-      - run: "scp -i ~/.ssh/picnic -o 'StrictHostKeyChecking=no' server-env ubuntu@15.236.169.203:~/server-env"
+          PUBLIC_IP: "15.237.3.235"
+      - run: "scp -i ~/.ssh/picnic -o 'StrictHostKeyChecking=no' server-env ubuntu@15.237.3.235:~/server-env"
         name: upload env vars
         working-directory: ./packages/server
       - name: pm2 deploy
