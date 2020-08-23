@@ -39,7 +39,7 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      dir: "dist",
+      file: "dist/index.module.js",
       name: "nugit-core-service",
       format: "es",
       sourcemap: true,
