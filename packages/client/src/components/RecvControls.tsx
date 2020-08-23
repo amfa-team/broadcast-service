@@ -22,8 +22,8 @@ export default function RecvControls(props: ControlsProps): JSX.Element {
 
   return (
     <div>
-      <button onClick={toggleAudio}>Mic {audioPaused ? "On" : "Off"}</button>
-      <button onClick={toggleVideo}>Cam {videoPaused ? "On" : "Off"}</button>
+      <button onClick={toggleAudio}>Audio {audioPaused ? "On" : "Off"}</button>
+      <button onClick={toggleVideo}>Video {videoPaused ? "On" : "Off"}</button>
     </div>
   );
 }
