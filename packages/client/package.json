@@ -1,6 +1,6 @@
 {
   "name": "@amfa-team/picnic-sdk",
-  "version": "0.2.0-alpha.6",
+  "version": "0.2.0-beta.1",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
   "main": "dist/index.js",
@@ -45,6 +45,9 @@
     "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-terser": "^6.1.0",
+    "semantic-release": "^17.1.1",
+    "semantic-release-slack-bot": "^1.6.2",
+    "serverless": "^1.79.0",
     "serverless-finch": "^2.6.0",
     "serverless-stage-manager": "^1.0.5",
     "tslib": "^2.0.0",
@@ -54,8 +57,9 @@
     "build": "rollup -c rollup.config.js",
     "start": "rollup -c public/rollup.config.js -w",
     "build:public": "rollup -c public/rollup.config.js",
-    "deploy:public": "yarn build:public && serverless deploy --stage production && serverless client deploy --stage production --no-confirm",
+    "serverless": "serverless",
     "serve": "http-server ./example -p 80",
+    "semantic-release": "semantic-release",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {

@@ -9,21 +9,13 @@ import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
 
-const replacements = production
-  ? {
-      "process.env.NODE_ENV": JSON.stringify("production"),
-      "process.env.WS_API": JSON.stringify(
-        "wss://a7nih2u4i9.execute-api.eu-west-3.amazonaws.com/production"
-      ),
-      "process.env.HTTP_API": JSON.stringify(
-        "https://ej1x2iz1g5.execute-api.eu-west-3.amazonaws.com/production"
-      ),
-    }
-  : {
-      "process.env.NODE_ENV": JSON.stringify("development"),
-      "process.env.WS_API": JSON.stringify(null),
-      "process.env.HTTP_API": JSON.stringify(null),
-    };
+const replacements = {
+  "process.env.NODE_ENV": JSON.stringify(
+    production ? "production" : "development"
+  ),
+  "process.env.WS_API": JSON.stringify(process.env.WS_API || null),
+  "process.env.HTTP_API": JSON.stringify(process.env.HTTP_API || null),
+};
 
 export default [
   {

@@ -1,6 +1,6 @@
 {
   "name": "@amfa-team/picnic-sfu",
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "main": "index.js",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
@@ -9,6 +9,8 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@commitlint/cli": "^9.1.2",
+    "@commitlint/config-conventional": "^9.1.2",
     "@typescript-eslint/eslint-plugin": "^3.7.0",
     "@typescript-eslint/parser": "^3.5.0",
     "eslint": "^7.4.0",
@@ -22,6 +24,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
+    "semantic-release": "^17.1.1",
     "typescript": "^3.9.6"
   },
   "scripts": {
@@ -34,11 +37,12 @@
     "server:build": "cd packages/server; yarn build",
     "client:start": "cd packages/client; yarn start",
     "all": "ttab yarn api:start:db; ttab yarn api:start; ttab yarn server:start; ttab yarn client:start;",
-    "deploy": "(cd packages/api; yarn deploy) && (cd packages/server; yarn deploy) && (cd packages/client; yarn deploy:public)"
+    "semantic-release": "semantic-release"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "[[ -n $HUSKY_BYPASS ]] || commitlint --config ./config/commitlint.config.js -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
@@ -47,5 +51,8 @@
   },
   "optionalDependencies": {
     "ttab": "^0.6.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }

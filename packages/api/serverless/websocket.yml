@@ -1,0 +1,58 @@
+sfu_routerCapabilities:
+  handler: src/sfu/handler.routerCapabilities
+  events:
+    - websocket:
+        route: /sfu/router-capabilities
+        routeResponseSelectionExpression: $default
+sfu_initConnect:
+  handler: src/sfu/handler.initConnect
+  events:
+    - websocket:
+        route: /sfu/connect/init
+        routeResponseSelectionExpression: $default
+sfu_createConnect:
+  handler: src/sfu/handler.createConnect
+  events:
+    - websocket:
+        route: /sfu/connect/create
+        routeResponseSelectionExpression: $default
+sfu_createSend:
+  handler: src/sfu/handler.createSend
+  events:
+    - websocket:
+        route: /sfu/send/create
+        routeResponseSelectionExpression: $default
+sfu_destroySend:
+  handler: src/sfu/handler.handleOnChangeStreamState
+  events:
+    - websocket:
+        route: /sfu/send/destroy
+        routeResponseSelectionExpression: $default
+sfu_getStreams:
+  handler: src/sfu/handler.getStreams
+  events:
+    - websocket:
+        route: /sfu/send/list
+        routeResponseSelectionExpression: $default
+sfu_createReceive:
+  handler: src/sfu/handler.createReceive
+  events:
+    - websocket:
+        route: /sfu/receive/create
+        routeResponseSelectionExpression: $default
+sfu_stateReceive:
+  handler: src/sfu/handler.handleOnChangeConsumerStreamState
+  events:
+    - websocket:
+        route: /sfu/receive/state
+        routeResponseSelectionExpression: $default
+disconnect:
+  handler: src/sfu/handler.disconnect
+  events:
+    - websocket: $disconnect
+ping:
+  handler: src/sfu/handler.ping
+  events:
+    - websocket:
+        route: /sfu/ping
+        routeResponseSelectionExpression: $default

@@ -16,11 +16,17 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
+  stage: ${opt:stage}
   region: eu-west-3
   profile: picnic # aws credential profile name
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   environment:
-    SECRET: ${param:secret, 'super-SECRET'}
+    SECRET: ${env:SECRET, 'super-SECRET'}
+    CONNECTION_TABLE: "${self:service.name}-${self:provider.stage}-connection"
+    PARTICIPANT_TABLE: "${self:service.name}-${self:provider.stage}-participants"
+    SERVER_TABLE: "${self:service.name}-${self:provider.stage}-server"
+    STREAM_TABLE: "${self:service.name}-${self:provider.stage}-stream"
+    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-stream-consumer"
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
@@ -31,187 +37,16 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:*"
+      Resource: "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service.name}-${self:provider.stage}-*"
 package:
   individually: true
 
 functions:
-  registerParticipant:
-    handler: src/admin/handler.registerParticipant
-    events:
-      - http:
-          path: /admin/participant
-          method: post
-          cors:
-            origin: "*" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: false
-  topology:
-    handler: src/admin/handler.topology
-    events:
-      - http:
-          path: /admin/topology
-          method: get
-          cors:
-            origin: "*" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: false
-  registerServer:
-    handler: src/admin/handler.registerServer
-    events:
-      - http:
-          path: /admin/server
-          method: post
-  sfu_routerCapabilities:
-    handler: src/sfu/handler.routerCapabilities
-    events:
-      - websocket:
-          route: /sfu/router-capabilities
-          routeResponseSelectionExpression: $default
-  sfu_initConnect:
-    handler: src/sfu/handler.initConnect
-    events:
-      - websocket:
-          route: /sfu/connect/init
-          routeResponseSelectionExpression: $default
-  sfu_createConnect:
-    handler: src/sfu/handler.createConnect
-    events:
-      - websocket:
-          route: /sfu/connect/create
-          routeResponseSelectionExpression: $default
-  sfu_createSend:
-    handler: src/sfu/handler.createSend
-    events:
-      - websocket:
-          route: /sfu/send/create
-          routeResponseSelectionExpression: $default
-  sfu_destroySend:
-    handler: src/sfu/handler.handleOnChangeStreamState
-    events:
-      - websocket:
-          route: /sfu/send/destroy
-          routeResponseSelectionExpression: $default
-  sfu_getStreams:
-    handler: src/sfu/handler.getStreams
-    events:
-      - websocket:
-          route: /sfu/send/list
-          routeResponseSelectionExpression: $default
-  sfu_createReceive:
-    handler: src/sfu/handler.createReceive
-    events:
-      - websocket:
-          route: /sfu/receive/create
-          routeResponseSelectionExpression: $default
-  sfu_stateReceive:
-    handler: src/sfu/handler.handleOnChangeConsumerStreamState
-    events:
-      - websocket:
-          route: /sfu/receive/state
-          routeResponseSelectionExpression: $default
-  disconnect:
-    handler: src/sfu/handler.disconnect
-    events:
-      - websocket: $disconnect
-  ping:
-    handler: src/sfu/handler.ping
-    events:
-      - websocket:
-          route: /sfu/ping
-          routeResponseSelectionExpression: $default
+  - ${file(./serverless/adminRoutes.yml)}
+  - ${file(./serverless/websocket.yml)}
 
 resources:
-  Resources:
-    participantTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: broadcast-participants
-        AttributeDefinitions:
-          - AttributeName: token
-            AttributeType: S
-        KeySchema:
-          - AttributeName: token
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    serverTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: broadcast-servers
-        AttributeDefinitions:
-          - AttributeName: ip
-            AttributeType: S
-          - AttributeName: port
-            AttributeType: N
-        KeySchema:
-          - AttributeName: ip
-            KeyType: HASH
-          - AttributeName: port
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    connectionTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: broadcast-connections
-        AttributeDefinitions:
-          - AttributeName: connectionId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: connectionId
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    streamTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: broadcast-streams
-        AttributeDefinitions:
-          - AttributeName: transportId
-            AttributeType: S
-          - AttributeName: producerId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: transportId
-            KeyType: HASH
-          - AttributeName: producerId
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    consumerStreamTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: broadcast-consumer-streams
-        AttributeDefinitions:
-          - AttributeName: transportId
-            AttributeType: S
-          - AttributeName: consumerId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: transportId
-            KeyType: HASH
-          - AttributeName: consumerId
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+  Resources: ${file(./serverless/resources.yml)}
 
 custom:
   serverless-offline:
@@ -226,3 +61,4 @@ custom:
   stages:
     - dev
     - production
+    - staging

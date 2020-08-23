@@ -7,6 +7,7 @@ provider:
   runtime: nodejs12.x
   region: eu-west-3
   profile: picnic
+  stage: ${opt:stage}
 
 plugins:
   - serverless-stage-manager
@@ -14,7 +15,7 @@ plugins:
 
 custom:
   client:
-    bucketName: broadcast-service-test
+    bucketName: "broadcast-service-test-${opt:stage}"
     distributionFolder: public/
     indexDocument: index.html
     errorDocument: index.html
@@ -27,6 +28,7 @@ custom:
           value: "text/js"
   stages:
     - production
+    - staging
 
 resources:
   Resources:

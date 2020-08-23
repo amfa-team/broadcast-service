@@ -1,5 +1,5 @@
 import { Application } from "express";
-import {
+import type {
   InitConnectionParams,
   ConnectParams,
   DestroyConnectionParams,
