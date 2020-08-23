@@ -11,7 +11,8 @@ plugins:
   - serverless-plugin-typescript
   - serverless-plugin-include-dependencies
   - serverless-dynamodb-local
-  - serverless-offline
+  # - serverless-offline
+  - "@amfa-team/serverless-offline"
 
 provider:
   name: aws
@@ -51,6 +52,8 @@ resources:
 custom:
   serverless-offline:
     useChildProcesses: true
+    webSocketHardTimeout: 300
+    webSocketIdleTimeout: 120
   dynamodb:
     stages:
       - dev
