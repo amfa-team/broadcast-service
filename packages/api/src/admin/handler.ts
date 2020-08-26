@@ -21,7 +21,7 @@ import {
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllStreams } from "../db/repositories/streamRepository";
 import { getStreamConsumers } from "../db/repositories/streamConsumerRepository";
-import { requestSFU } from "../sfu/pipeToSFU";
+import { requestServer } from "../sfu/serverService";
 
 export async function registerParticipant(
   event: APIGatewayProxyEvent
@@ -57,7 +57,7 @@ export async function topology(
       getAllConnections(),
       getAllStreams(),
       getStreamConsumers(),
-      requestSFU("/topology").catch(() => null),
+      requestServer("/topology").catch(() => null),
     ]);
 
     return handleSuccessResponse({

@@ -20,5 +20,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - run: yarn lint

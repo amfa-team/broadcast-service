@@ -26,7 +26,7 @@ provider:
     PARTICIPANT_TABLE: "${self:service.name}-${self:provider.stage}-participants"
     SERVER_TABLE: "${self:service.name}-${self:provider.stage}-server"
     STREAM_TABLE: "${self:service.name}-${self:provider.stage}-stream"
-    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-stream-consumer"
+    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-consumer"
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
@@ -51,6 +51,8 @@ resources:
 custom:
   serverless-offline:
     useChildProcesses: true
+    webSocketHardTimeout: 300
+    webSocketIdleTimeout: 120
   dynamodb:
     stages:
       - dev

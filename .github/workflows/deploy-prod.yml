@@ -20,6 +20,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deploy-production-
             ${{ runner.os }}-
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
   deploy-api:
     runs-on: ubuntu-latest
@@ -36,6 +37,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deploy-production-
             ${{ runner.os }}-
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: serverless deploy
         working-directory: ./packages/api
@@ -58,6 +60,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deploy-production-
             ${{ runner.os }}-
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
@@ -109,6 +112,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deploy-production-
             ${{ runner.os }}-
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: build public website
         working-directory: ./packages/client
@@ -147,6 +151,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deploy-production-
             ${{ runner.os }}-
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: publish sdk
         working-directory: ./packages/client
