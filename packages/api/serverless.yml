@@ -11,8 +11,7 @@ plugins:
   - serverless-plugin-typescript
   - serverless-plugin-include-dependencies
   - serverless-dynamodb-local
-  # - serverless-offline
-  - "@amfa-team/serverless-offline"
+  - serverless-offline
 
 provider:
   name: aws
