@@ -18,7 +18,7 @@ export async function getParticipant(
   token: string
 ): Promise<Participant | null> {
   const doc = await participantModel.get(token);
-  return doc?.toJSON() ?? (null as Participant | null);
+  return (doc?.toJSON() ?? null) as Participant | null;
 }
 
 export async function getAllParticipants(): Promise<Participant[]> {

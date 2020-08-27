@@ -18,7 +18,7 @@ export async function getStream(
   producerId: string
 ): Promise<StreamInfo | null> {
   const doc = await streamModel.get({ transportId, producerId });
-  return doc?.toJSON() ?? (null as StreamInfo | null);
+  return (doc?.toJSON() ?? null) as StreamInfo | null;
 }
 
 export async function findStreamByTransportId(

@@ -24,7 +24,7 @@ export async function getConnection({
   connectionId,
 }: ConnectionKey): Promise<Connection | null> {
   const doc = await connectionModel.get({ connectionId });
-  return doc?.toJSON() ?? (null as Connection | null);
+  return (doc?.toJSON() ?? null) as Connection | null;
 }
 
 export async function getConnectionsByToken({

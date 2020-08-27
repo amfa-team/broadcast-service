@@ -17,7 +17,7 @@ export async function getRecvTransport({
   transportId,
 }: RecvTransportKey): Promise<RecvTransport | null> {
   const doc = await recvTransportModel.get({ transportId });
-  return doc?.toJSON() ?? (null as RecvTransport | null);
+  return (doc?.toJSON() ?? null) as RecvTransport | null;
 }
 
 export async function getAllRecvTransport(): Promise<RecvTransport[]> {

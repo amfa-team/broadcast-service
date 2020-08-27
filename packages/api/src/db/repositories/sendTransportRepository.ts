@@ -26,7 +26,7 @@ export async function getSendTransport({
   transportId,
 }: SendTransportKey): Promise<SendTransport | null> {
   const doc = await sendTransportModel.get({ transportId });
-  return doc?.toJSON() ?? (null as SendTransport | null);
+  return (doc?.toJSON() ?? null) as SendTransport | null;
 }
 
 export async function patchSendTransport(

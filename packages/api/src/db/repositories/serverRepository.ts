@@ -16,7 +16,7 @@ export async function getServer({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const key: any = { ip, port };
   const doc = await serverModel.get(key);
-  return doc?.toJSON() ?? (null as Server | null);
+  return (doc?.toJSON() ?? null) as Server | null;
 }
 
 export async function getAllServers(): Promise<Server[]> {

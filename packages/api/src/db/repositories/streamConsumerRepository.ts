@@ -58,7 +58,7 @@ export async function getStreamConsumer(
 ): Promise<StreamConsumerInfo | null> {
   try {
     const result = await streamConsumerModel.get({ transportId, consumerId });
-    return result?.toJSON() ?? (null as StreamConsumerInfo | null);
+    return (result?.toJSON() ?? null) as StreamConsumerInfo | null;
   } catch (e) {
     console.error(e);
     throw new Error("getStreamConsumer: failed");

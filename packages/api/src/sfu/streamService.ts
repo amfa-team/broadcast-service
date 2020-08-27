@@ -11,7 +11,6 @@ import { broadcastToConnections } from "../io/io";
 import { RequestContext } from "../io/types";
 import { JsonDecoder } from "ts.data.json";
 import { getAllSettledValues } from "../io/promises";
-import { deleteStreamConsumerByTransportId } from "../db/repositories/streamConsumerRepository";
 import { closeConsumerOf } from "./streamConsumerService";
 
 type CreateStreamEvent = {
