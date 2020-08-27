@@ -1,11 +1,15 @@
-import type { ConnectionInfo, Routes, ConsumerInfo } from "../../../types";
+import type { Routes, ConsumerInfo } from "../../../types";
 import { getConnection } from "../db/repositories/connectionRepository";
 import { postToServer } from "./serverService";
 import { JsonDecoder } from "ts.data.json";
 import {
   createStreamConsumer,
-  findStreamConsumer,
+  getStreamConsumer,
+  deleteStreamConsumer,
+  deleteStreamConsumerByTransportId,
+  deleteStreamConsumerBySoourceTransportId,
 } from "../db/repositories/streamConsumerRepository";
+import { getStream } from "../db/repositories/streamRepository";
 
 type CreateStreamConsumerEvent = {
   connectionId: string;
@@ -29,11 +33,18 @@ export async function onCreateStreamConsumer(
 ): Promise<ConsumerInfo> {
   const { connectionId, data } = event;
 
-  const connection = await getConnection({ connectionId });
+  const [connection, stream] = await Promise.all([
+    getConnection({ connectionId }),
+    getStream(data.sourceTransportId, data.producerId),
+  ]);
+
   if (connection === null || connection.recvTransportId === null) {
     throw new Error(
       "onCreateStreamConsumer: connection or recvTransportId does not exists"
     );
+  }
+  if (stream === null) {
+    throw new Error("onCreateStreamConsumer: stream does not exists");
   }
 
   const payload: ConsumerInfo = await postToServer("/receive/create", {
@@ -85,7 +96,8 @@ export async function onChangeStreamConsumerState(
   const {
     data: { state, transportId, consumerId },
   } = event;
-  const streamConsumer = await findStreamConsumer(transportId, consumerId);
+
+  const streamConsumer = await getStreamConsumer(transportId, consumerId);
 
   if (streamConsumer === null) {
     return null;
@@ -99,4 +111,31 @@ export async function onChangeStreamConsumerState(
   }
 
   return null;
+}
+
+interface CloseConsumerParams {
+  transportId: string;
+  consumerId: string | null;
+  destroy: false;
+}
+
+export async function closeConsumer(
+  params: CloseConsumerParams
+): Promise<void> {
+  if (params.consumerId === null) {
+    await deleteStreamConsumerByTransportId(params.transportId);
+  } else {
+    await deleteStreamConsumer(params.transportId, params.consumerId);
+  }
+}
+
+interface CloseConsumerOfParams {
+  sourceTransportId: string;
+  destroy: false;
+}
+
+export async function closeConsumerOf(
+  params: CloseConsumerOfParams
+): Promise<void> {
+  await deleteStreamConsumerBySoourceTransportId(params.sourceTransportId);
 }

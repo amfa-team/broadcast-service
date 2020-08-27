@@ -1,10 +1,14 @@
 import { postToServer } from "./serverService";
 import type { ConnectionInfo, Routes } from "../../../types";
-import { deleteRecvTransport } from "../db/repositories/recvTransportRepository";
+import {
+  deleteRecvTransport,
+  createRecvTransport,
+} from "../db/repositories/recvTransportRepository";
 import { RequestContext } from "../io/types";
-import { deleteStreamConsumerByTransportId } from "../db/repositories/streamConsumerRepository";
 import { getAllSettledValues } from "../io/promises";
 import { patchConnection } from "../db/repositories/connectionRepository";
+import { closeConsumer } from "./streamConsumerService";
+import { Connection } from "../db/types/connection";
 
 interface InitRecvTransportEvent {
   connectionId: string;
@@ -23,10 +27,13 @@ export async function onInitRecvTransport(
   const connectionInfo = await postToServer("/connect/init", data);
 
   // TODO: Handle connection removed in between
-  await patchConnection({
-    connectionId,
-    recvTransportId: connectionInfo.transportId,
-  });
+  await Promise.all([
+    patchConnection({
+      connectionId,
+      recvTransportId: connectionInfo.transportId,
+    }),
+    createRecvTransport({ transportId: connectionInfo.transportId }),
+  ]);
 
   return connectionInfo;
 }
@@ -51,16 +58,17 @@ interface OnRecvTransportCloseEvent {
 export async function onRecvTransportClose(
   event: OnRecvTransportCloseEvent
 ): Promise<void> {
-  await closeRecvTransportClose(event);
+  await closeRecvTransport({ ...event, skipConnectionPatch: false });
 }
 
 interface CloseRecvTransportParams {
   connectionId: string;
   transportId: string | null;
   requestContext: RequestContext;
+  skipConnectionPatch: boolean;
 }
 
-export async function closeRecvTransportClose(
+export async function closeRecvTransport(
   params: CloseRecvTransportParams
 ): Promise<void> {
   if (params.transportId == null) {
@@ -78,8 +86,21 @@ export async function closeRecvTransportClose(
     }),
     deleteRecvTransport({ transportId: params.transportId }),
     // No need to destroy mediasoup consumer as it will be done automatically when closing transport
-    deleteStreamConsumerByTransportId(params.transportId),
+    closeConsumer({
+      transportId: params.transportId,
+      destroy: false,
+      consumerId: null,
+    }),
+    params.skipConnectionPatch
+      ? Promise.resolve(null)
+      : patchConnection({
+          connectionId: params.connectionId,
+          recvTransportId: null,
+        }),
   ]);
 
-  getAllSettledValues(results, "closeRecvTransportClose: Unexpected error");
+  getAllSettledValues<void | null | Connection>(
+    results,
+    "closeRecvTransportClose: Unexpected error"
+  );
 }

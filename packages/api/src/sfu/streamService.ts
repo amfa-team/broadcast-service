@@ -5,11 +5,14 @@ import {
   createStream,
   getStream,
   deleteStream,
+  deleteStreamByTransportId,
 } from "../db/repositories/streamRepository";
 import { broadcastToConnections } from "../io/io";
 import { RequestContext } from "../io/types";
 import { JsonDecoder } from "ts.data.json";
 import { getAllSettledValues } from "../io/promises";
+import { deleteStreamConsumerByTransportId } from "../db/repositories/streamConsumerRepository";
+import { closeConsumerOf } from "./streamConsumerService";
 
 type CreateStreamEvent = {
   connectionId: string;
@@ -127,4 +130,31 @@ export async function onChangeStreamState(
   getAllSettledValues(results, "onChangeStreamState: Unexpected error");
 
   return null;
+}
+
+interface CloseStreamParams {
+  transportId: string;
+  // Specific producer Id not supported yet
+  producerId: null;
+  destroy: false;
+  requestContext: RequestContext;
+}
+
+export async function closeStream(params: CloseStreamParams): Promise<void> {
+  const results = await Promise.allSettled([
+    deleteStreamByTransportId(params.transportId),
+    closeConsumerOf({ sourceTransportId: params.transportId, destroy: false }),
+    broadcastToConnections(
+      params.requestContext,
+      JSON.stringify({
+        type: "event",
+        payload: {
+          type: "stream:remove",
+          data: params.transportId,
+        },
+      })
+    ),
+  ]);
+
+  getAllSettledValues(results, "closeStream: Unexpected error");
 }

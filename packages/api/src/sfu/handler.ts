@@ -1,7 +1,7 @@
 import "source-map-support/register";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { JsonDecoder } from "ts.data.json";
-import { Role } from "../db/models/participant";
+import { Role } from "../db/types/participant";
 import {
   parseWsParticipantRequest,
   handleWebSocketSuccessResponse,
@@ -48,6 +48,7 @@ export async function routerCapabilities(
 
     try {
       const payload = await onConnect({
+        requestContext: event.requestContext,
         connectionId,
         token: req.token,
       });
