@@ -16,6 +16,7 @@
   "typescript.validate.enable": true,
   "javascript.validate.enable": true,
   "cSpell.words": [
+    "dynamoose",
     "mediasoup"
   ]
 }
