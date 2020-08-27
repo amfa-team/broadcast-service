@@ -10,7 +10,7 @@ import {
   WsParticipantRequest,
   RequestContext,
 } from "./types";
-import { Role } from "../db/models/participant";
+import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
 import { onDisconnect } from "../sfu/connectionService";

@@ -1,25 +1,26 @@
-import dynamoDb from "../db";
-import { RecvTransportKey, RecvTransport } from "../models/recvTransport";
-
-const TableName = process.env.RECV_TRANSPORT_TABLE ?? "";
+import { RecvTransportKey, RecvTransport } from "../types/recvTransport";
+import { recvTransportModel } from "../schema";
 
 export async function createRecvTransport(
   transport: RecvTransport
 ): Promise<void> {
-  await dynamoDb.put({ TableName, Item: transport }).promise();
+  await recvTransportModel.create(transport);
 }
 
 export async function deleteRecvTransport({
   transportId,
 }: RecvTransportKey): Promise<void> {
-  await dynamoDb.delete({ TableName, Key: { transportId } }).promise();
+  await recvTransportModel.delete({ transportId });
 }
 
 export async function getRecvTransport({
   transportId,
 }: RecvTransportKey): Promise<RecvTransport | null> {
-  const result = await dynamoDb
-    .get({ TableName, Key: { transportId } })
-    .promise();
-  return (result?.Item ?? null) as RecvTransport | null;
+  const doc = await recvTransportModel.get({ transportId });
+  return doc?.toJSON() ?? (null as RecvTransport | null);
+}
+
+export async function getAllRecvTransport(): Promise<RecvTransport[]> {
+  const results: unknown = await recvTransportModel.scan().exec();
+  return results as RecvTransport[];
 }

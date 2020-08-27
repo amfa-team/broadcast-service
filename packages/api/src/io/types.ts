@@ -1,4 +1,4 @@
-import { Participant } from "../db/models/participant";
+import { Participant } from "../db/types/participant";
 
 export interface Request<T> {
   token: string;

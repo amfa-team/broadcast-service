@@ -1,49 +1,39 @@
-import dynamoDb from "../db";
-import { StreamInfo } from "../models/stream";
-
-const TableName = process.env.STREAM_TABLE ?? "";
+import { StreamInfo } from "../types/stream";
+import { streamModel } from "../schema";
 
 export async function createStream(stream: StreamInfo): Promise<StreamInfo> {
-  await dynamoDb.put({ TableName, Item: stream }).promise();
-  return stream;
+  const doc = await streamModel.create(stream);
+  return doc.toJSON() as StreamInfo;
 }
 
 export async function deleteStream(
   transportId: string,
   producerId: string
 ): Promise<void> {
-  await dynamoDb
-    .delete({ TableName, Key: { transportId, producerId } })
-    .promise();
+  await streamModel.delete({ transportId, producerId });
 }
 
 export async function getStream(
   transportId: string,
   producerId: string
 ): Promise<StreamInfo | null> {
-  const result = await dynamoDb
-    .get({ TableName, Key: { transportId, producerId } })
-    .promise();
-  return (result.Item ?? null) as StreamInfo | null;
+  const doc = await streamModel.get({ transportId, producerId });
+  return doc?.toJSON() ?? (null as StreamInfo | null);
 }
 
-export async function findByTransportId(
+export async function findStreamByTransportId(
   transportId: string
 ): Promise<StreamInfo[]> {
-  const result = await dynamoDb
-    .scan({
-      TableName,
-      FilterExpression: "transportId = :id",
-      ExpressionAttributeValues: {
-        ":id": transportId,
-      },
-    })
-    .promise();
-  return result?.Items as StreamInfo[];
+  const results: unknown = await streamModel
+    .scan({ transportId: { eq: transportId } })
+    .exec();
+  return results as StreamInfo[];
 }
 
-export async function deleteByTransportId(transportId: string): Promise<void> {
-  const items = await findByTransportId(transportId);
+export async function deleteStreamByTransportId(
+  transportId: string
+): Promise<void> {
+  const items = await findStreamByTransportId(transportId);
 
   await Promise.all(
     items.map((item) => deleteStream(item.transportId, item.producerId))
@@ -51,10 +41,6 @@ export async function deleteByTransportId(transportId: string): Promise<void> {
 }
 
 export async function getAllStreams(): Promise<StreamInfo[]> {
-  const scanOutput = await dynamoDb.scan({ TableName }).promise();
-  return scanOutput.Items as StreamInfo[];
-}
-
-export async function deleteConnection(connectionId: string): Promise<void> {
-  await dynamoDb.delete({ TableName, Key: { connectionId } }).promise();
+  const results: unknown = await streamModel.scan().exec();
+  return results as StreamInfo[];
 }

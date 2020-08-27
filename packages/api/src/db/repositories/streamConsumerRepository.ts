@@ -1,49 +1,68 @@
-import dynamoDb from "../db";
-import { StreamConsumerInfo } from "../models/streamConsumer";
+import { StreamConsumerInfo } from "../types/streamConsumer";
 import { getAllSettledValues } from "../../io/promises";
-
-const TableName = process.env.STREAM_CONSUMER_TABLE ?? "";
+import { streamConsumerModel } from "../schema";
 
 export async function createStreamConsumer(
   stream: StreamConsumerInfo
 ): Promise<StreamConsumerInfo> {
-  await dynamoDb.put({ TableName, Item: stream }).promise();
-  return stream;
+  try {
+    const doc = await streamConsumerModel.create(stream);
+    return doc.toJSON() as StreamConsumerInfo;
+  } catch (e) {
+    console.error(e, stream);
+    throw new Error("createStreamConsumer: failed");
+  }
 }
 
-export async function getStreamConsumers(): Promise<StreamConsumerInfo[]> {
-  const scanOutput = await dynamoDb.scan({ TableName }).promise();
-  return scanOutput.Items as StreamConsumerInfo[];
+export async function getAllStreamConsumers(): Promise<StreamConsumerInfo[]> {
+  try {
+    const results: unknown = await streamConsumerModel.scan().exec();
+    return results as StreamConsumerInfo[];
+  } catch (e) {
+    console.error(e);
+    throw new Error("getAllStreamConsumers: failed");
+  }
 }
 
 export async function findStreamConsumerByTransportId(
   transportId: string
 ): Promise<StreamConsumerInfo[]> {
-  const result = await dynamoDb
-    .scan({
-      TableName,
-      FilterExpression: "transportId = :id",
-      ExpressionAttributeValues: {
-        ":id": transportId,
-      },
-    })
-    .promise();
-
-  return result.Items as StreamConsumerInfo[];
+  try {
+    const results: unknown = await streamConsumerModel
+      .scan({ transportId: { eq: transportId } })
+      .exec();
+    return results as StreamConsumerInfo[];
+  } catch (e) {
+    console.error(e);
+    throw new Error("findStreamConsumerByTransportId: failed");
+  }
 }
 
-export async function findStreamConsumer(
+export async function findStreamConsumerBySourceTransportId(
+  sourceTransportId: string
+): Promise<StreamConsumerInfo[]> {
+  try {
+    const results: unknown = await streamConsumerModel
+      .scan({ sourceTransportId: { eq: sourceTransportId } })
+      .exec();
+    return results as StreamConsumerInfo[];
+  } catch (e) {
+    console.error(e);
+    throw new Error("findStreamConsumerBySourceTransportId: failed");
+  }
+}
+
+export async function getStreamConsumer(
   transportId: string,
   consumerId: string
 ): Promise<StreamConsumerInfo | null> {
-  const result = await dynamoDb
-    .get({
-      TableName,
-      Key: { transportId, consumerId },
-    })
-    .promise();
-
-  return (result.Item ?? null) as StreamConsumerInfo | null;
+  try {
+    const result = await streamConsumerModel.get({ transportId, consumerId });
+    return result?.toJSON() ?? (null as StreamConsumerInfo | null);
+  } catch (e) {
+    console.error(e);
+    throw new Error("getStreamConsumer: failed");
+  }
 }
 
 export async function deleteStreamConsumerByTransportId(
@@ -61,11 +80,29 @@ export async function deleteStreamConsumerByTransportId(
   );
 }
 
+export async function deleteStreamConsumerBySoourceTransportId(
+  sourceTransportId: string
+): Promise<void> {
+  const items = await findStreamConsumerBySourceTransportId(sourceTransportId);
+
+  const results = await Promise.allSettled(
+    items.map((item) => deleteStreamConsumer(item.transportId, item.consumerId))
+  );
+
+  getAllSettledValues(
+    results,
+    "deleteStreamConsumerBySoourceTransportId: Unexpected Error"
+  );
+}
+
 export async function deleteStreamConsumer(
   transportId: string,
   consumerId: string
 ): Promise<void> {
-  await dynamoDb
-    .delete({ TableName, Key: { consumerId, transportId } })
-    .promise();
+  try {
+    await streamConsumerModel.delete({ consumerId, transportId });
+  } catch (e) {
+    console.error(e);
+    throw new Error("deleteStreamConsumer: failed");
+  }
 }

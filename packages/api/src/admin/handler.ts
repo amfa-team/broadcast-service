@@ -10,8 +10,8 @@ import {
   getAllServers,
   getServer,
 } from "../db/repositories/serverRepository";
-import { createParticipantDecoder } from "../db/models/participant";
-import { createServerDecoder } from "../db/models/server";
+import { createParticipantDecoder } from "../db/types/participant";
+import { createServerDecoder } from "../db/types/server";
 import {
   handleSuccessResponse,
   handleHttpErrorResponse,
@@ -19,8 +19,10 @@ import {
   broadcastToConnections,
 } from "../io/io";
 import { getAllConnections } from "../db/repositories/connectionRepository";
+import { getAllSendTransport } from "../db/repositories/sendTransportRepository";
+import { getAllRecvTransport } from "../db/repositories/recvTransportRepository";
 import { getAllStreams } from "../db/repositories/streamRepository";
-import { getStreamConsumers } from "../db/repositories/streamConsumerRepository";
+import { getAllStreamConsumers } from "../db/repositories/streamConsumerRepository";
 import { requestServer } from "../sfu/serverService";
 
 export async function registerParticipant(
@@ -48,6 +50,8 @@ export async function topology(
       participants,
       servers,
       connections,
+      sendTransports,
+      recvTransports,
       streams,
       streamConsumers,
       topology,
@@ -55,8 +59,10 @@ export async function topology(
       getAllParticipants(),
       getAllServers(),
       getAllConnections(),
+      getAllSendTransport(),
+      getAllRecvTransport(),
       getAllStreams(),
-      getStreamConsumers(),
+      getAllStreamConsumers(),
       requestServer("/topology").catch(() => null),
     ]);
 
@@ -65,6 +71,8 @@ export async function topology(
         participants,
         servers,
         connections,
+        sendTransports,
+        recvTransports,
         streams,
         streamConsumers,
       },
@@ -86,8 +94,8 @@ export async function registerServer(
       createServer(data),
     ]);
 
-    // TODO: recreate client side properly
-    // This is to ensure we're able to recover from Server failure restart
+    // // TODO: recreate client side properly
+    // // This is to ensure we're able to recover from Server failure restart
     if (existingServer !== null && existingServer.token !== data.token) {
       console.error("Server restarted, trigger client restart");
       await broadcastToConnections(
@@ -103,7 +111,6 @@ export async function registerServer(
 
     return handleSuccessResponse(server);
   } catch (e) {
-    console.error(e);
     return handleHttpErrorResponse(e);
   }
 }
