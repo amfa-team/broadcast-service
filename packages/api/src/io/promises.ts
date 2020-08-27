@@ -2,7 +2,7 @@ export function getAllSettledValues<T>(
   results: PromiseSettledResult<T>[],
   errorMessage: string
 ): T[] {
-  let hasError = false;
+  const errorIndexes = [];
   const values = [];
 
   for (let i = 0; i < results.length; i += 1) {
@@ -11,12 +11,12 @@ export function getAllSettledValues<T>(
       values.push(result.value);
     } else {
       console.error(result.reason);
-      hasError = true;
+      errorIndexes.push(i);
     }
   }
 
-  if (hasError) {
-    throw new Error(errorMessage);
+  if (errorIndexes.length > 0) {
+    throw new Error(`${errorMessage} at indexes [${errorIndexes.join(", ")}]`);
   }
 
   return values;
