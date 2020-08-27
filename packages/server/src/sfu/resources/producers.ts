@@ -53,8 +53,13 @@ export function getProducers(): types.Producer[] {
   return [...producers.values()];
 }
 
-export function getProducer(producerId: string): types.Producer {
+export function getOptionalProducer(producerId: string): null | types.Producer {
   const producer = producers.get(producerId);
+  return producer ?? null;
+}
+
+export function getProducer(producerId: string): types.Producer {
+  const producer = getOptionalProducer(producerId);
 
   if (!producer) {
     throw new Error("producer not found or deleted");

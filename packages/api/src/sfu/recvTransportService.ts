@@ -68,7 +68,14 @@ export async function closeRecvTransportClose(
   }
 
   const results = await Promise.allSettled([
-    await postToServer("/connect/destroy", { transportId: params.transportId }),
+    // Keep mediasoup resources for 30s as we might have pending requests
+    // We don't want to have mediasoup in sync, as API is the source of trust
+    // So we don't want to have mediasoup resources removed before API side (hello concurrency hell)
+    // Moreover this could help in future to cancel destroy in case of reconnect
+    postToServer("/connect/destroy", {
+      transportId: params.transportId,
+      delay: 30000,
+    }),
     deleteRecvTransport({ transportId: params.transportId }),
     // No need to destroy mediasoup consumer as it will be done automatically when closing transport
     deleteStreamConsumerByTransportId(params.transportId),

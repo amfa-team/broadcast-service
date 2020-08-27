@@ -32,7 +32,7 @@ export function handleErrorResponse(res: Response, e: unknown): Response {
     });
   }
 
-  console.log(e);
+  console.error(e);
 
   return res.status(500).json({
     success: false,

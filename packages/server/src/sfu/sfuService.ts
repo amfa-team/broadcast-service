@@ -10,7 +10,11 @@ import {
   getTransport,
   getTransportUsage,
 } from "./resources/transport";
-import { createProducer, getProducer } from "./resources/producers";
+import {
+  createProducer,
+  getProducer,
+  getOptionalProducer,
+} from "./resources/producers";
 import {
   createConsumer,
   getConsumer,
@@ -25,6 +29,7 @@ import type {
   ReceiveParams,
   ConsumerInfo,
   SendDestroyParams,
+  DestroyConnectionParams,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -95,8 +100,8 @@ export async function connect(params: ConnectParams): Promise<void> {
   await connectTransport(params.transportId, params.dtlsParameters);
 }
 
-export function disconnect(transportId: string): void {
-  destroyTransport(transportId);
+export function disconnect(params: DestroyConnectionParams): void {
+  setTimeout(() => destroyTransport(params.transportId), params.delay);
 }
 
 export async function send(params: SendParams): Promise<string> {
@@ -121,8 +126,11 @@ export async function send(params: SendParams): Promise<string> {
 }
 
 export async function destroySend(params: SendDestroyParams): Promise<null> {
-  const producer = getProducer(params.producerId);
-  producer.close();
+  const { producerId, delay } = params;
+  setTimeout(() => {
+    const producer = getOptionalProducer(producerId);
+    producer?.close();
+  }, delay);
   return null;
 }
 

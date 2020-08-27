@@ -74,8 +74,8 @@ export function bindSceneController(app: Application): void {
   app.post("/connect/destroy", async (req, res) => {
     try {
       // TODO: validation
-      const { transportId }: DestroyConnectionParams = req.body;
-      const payload = disconnect(transportId);
+      const params: DestroyConnectionParams = req.body;
+      const payload = disconnect(params);
       handleSuccessResponse(res, payload);
     } catch (error) {
       handleErrorResponse(res, error);
