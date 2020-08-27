@@ -223,7 +223,7 @@ export async function handleWebSocketSuccessResponse(
 
   // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
   // https://github.com/dherault/serverless-offline/issues/1008
-  if (requestContext.domainName === "localhost") {
+  if (process.env.IS_OFFLINE) {
     await postToConnection(requestContext, connectionId, result.body);
   }
 
