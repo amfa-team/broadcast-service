@@ -12,7 +12,12 @@ import {
 } from "../io/io";
 import type { SendParams, ReceiveParams } from "../../../types";
 import { getAllStreams } from "../db/repositories/streamRepository";
-import { onConnect, onDisconnect, onPing } from "./connectionService";
+import {
+  onConnect,
+  onDisconnect,
+  onPing,
+  onRefreshConnection,
+} from "./connectionService";
 import {
   onInitSendTransport,
   onConnectSendTransport,
@@ -49,6 +54,48 @@ export async function routerCapabilities(
     try {
       const payload = await onConnect({
         requestContext: event.requestContext,
+        connectionId,
+        token: req.token,
+      });
+
+      return handleWebSocketSuccessResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        payload
+      );
+    } catch (e) {
+      return handleWebSocketErrorResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        e
+      );
+    }
+  } catch (e) {
+    return handleWebSocketErrorResponse(
+      event.requestContext,
+      connectionId,
+      null,
+      e
+    );
+  }
+}
+
+export async function refreshConnection(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const connectionId = wsOnlyRoute(event);
+
+  try {
+    const req = await parseWsParticipantRequest(
+      event,
+      [Role.host, Role.guest],
+      JsonDecoder.isNull(null)
+    );
+
+    try {
+      const payload = await onRefreshConnection({
         connectionId,
         token: req.token,
       });
