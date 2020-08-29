@@ -1,10 +1,10 @@
 import fetch, { RequestInit } from "node-fetch";
-import { getServers } from "../db/repositories/serverRepository";
-import { Server } from "../db/models/server";
+import { getAllServers } from "../db/repositories/serverRepository";
+import { Server } from "../db/types/server";
 import type { Routes } from "../../../types";
 
 async function getDestServer(): Promise<Server> {
-  const servers = await getServers();
+  const servers = await getAllServers();
   if (servers.length === 0) {
     throw new Error("No registered server");
   }
@@ -31,7 +31,6 @@ export async function requestServer<P extends keyof Routes>(
       .json()
       .then((body) => body.error)
       .catch(() => "Unknown SFU error");
-    console.error({ path, options });
     throw new Error(`requestSFU: fail with ${err}`);
   }
 

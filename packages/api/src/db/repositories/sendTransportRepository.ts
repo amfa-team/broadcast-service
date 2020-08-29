@@ -1,49 +1,43 @@
-import dynamoDb from "../db";
 import {
   SendTransportKey,
   SendTransport,
   PatchSendTransport,
-} from "../models/sendTransport";
-
-const TableName = process.env.SEND_TRANSPORT_TABLE ?? "";
+} from "../types/sendTransport";
+import { sendTransportModel } from "../schema";
 
 export async function createSendTransport(
-  transport: SendTransport
+  transport: SendTransportKey
 ): Promise<void> {
-  await dynamoDb.put({ TableName, Item: transport }).promise();
+  await sendTransportModel.create(transport);
 }
 
 export async function deleteSendTransport({
   transportId,
 }: SendTransportKey): Promise<void> {
-  await dynamoDb.delete({ TableName, Key: { transportId } }).promise();
+  try {
+    await sendTransportModel.delete({ transportId });
+  } catch (e) {
+    console.error(e);
+    throw new Error("deleteSendTransport: failed");
+  }
 }
 
 export async function getSendTransport({
   transportId,
 }: SendTransportKey): Promise<SendTransport | null> {
-  const result = await dynamoDb
-    .get({ TableName, Key: { transportId } })
-    .promise();
-  return (result?.Item ?? null) as SendTransport | null;
+  const doc = await sendTransportModel.get({ transportId });
+  return (doc?.toJSON() ?? null) as SendTransport | null;
 }
 
 export async function patchSendTransport(
   params: PatchSendTransport
 ): Promise<SendTransport> {
-  const previous = await getSendTransport(params);
-  if (previous === null) {
-    throw new Error(
-      "sendTransportRepository.patchSendTransport: transport not found"
-    );
-  }
+  const { transportId, ...rest } = params;
+  const doc = await sendTransportModel.update({ transportId }, rest);
+  return doc.toJSON() as SendTransport;
+}
 
-  // TODO: Possible edge case where sendTransport is modify between
-  const current: SendTransport = {
-    ...previous,
-    ...params,
-  };
-  await dynamoDb.put({ TableName, Item: current }).promise();
-
-  return current;
+export async function getAllSendTransport(): Promise<SendTransport[]> {
+  const results: unknown = await sendTransportModel.scan().exec();
+  return results as SendTransport[];
 }

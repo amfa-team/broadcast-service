@@ -79,6 +79,22 @@ export class Picnic extends EventTarget implements SDK {
     return this.#recvStreams;
   }
 
+  #updateStreams = async (): Promise<void> => {
+    const removedEvents: Array<ServerEventMap["stream:remove"]["data"]> = [];
+    const watchRemoved = (event: Event) => {
+      const { data } = event as ServerEventMap["stream:remove"];
+      removedEvents.push(data);
+    };
+    this.#ws.addEventListener("stream:remove", watchRemoved);
+
+    const infos = await this.#ws.send<StreamInfo[]>("/sfu/send/list", null);
+    await Promise.all(infos.map(this.#addStream));
+    this.#ws.removeEventListener("stream:remove", watchRemoved);
+
+    // replay received remove events
+    await Promise.all(removedEvents.map(this.#removeStream));
+  };
+
   async load(): Promise<void> {
     await this.#ws.load();
     await this.#device.loadDevice();
@@ -92,14 +108,8 @@ export class Picnic extends EventTarget implements SDK {
       const { data } = event as ServerEventMap["stream:remove"];
       this.#removeStream(data);
     });
-    const infos = await this.#ws.send<StreamInfo[]>("/sfu/send/list", null);
-    const tasks = [];
 
-    for (let i = 0; i < infos.length; i += 1) {
-      tasks.push(this.#addStream(infos[i]));
-    }
-
-    await Promise.all(infos.map(this.#addStream));
+    await this.#updateStreams();
   }
 
   #addStream = async (info: StreamInfo): Promise<void> => {

@@ -1,10 +1,14 @@
 import { postToServer } from "./serverService";
 import type { ConnectionInfo, Routes } from "../../../types";
 import { patchConnection } from "../db/repositories/connectionRepository";
-import { deleteSendTransport } from "../db/repositories/sendTransportRepository";
-import { broadcastToConnections } from "../io/io";
+import {
+  deleteSendTransport,
+  createSendTransport,
+} from "../db/repositories/sendTransportRepository";
 import { RequestContext } from "../io/types";
 import { getAllSettledValues } from "../io/promises";
+import { closeStream } from "./streamService";
+import { Connection } from "../db/types/connection";
 
 interface InitSendTransportEvent {
   connectionId: string;
@@ -23,10 +27,13 @@ export async function onInitSendTransport(
   const connectionInfo = await postToServer("/connect/init", data);
 
   // TODO: Handle connection removed in between
-  await patchConnection({
-    connectionId,
-    sendTransportId: connectionInfo.transportId,
-  });
+  await Promise.all([
+    patchConnection({
+      connectionId,
+      sendTransportId: connectionInfo.transportId,
+    }),
+    createSendTransport({ transportId: connectionInfo.transportId }),
+  ]);
 
   return connectionInfo;
 }
@@ -51,13 +58,14 @@ interface OnSendTransportCloseEvent {
 export async function onSendTransportClose(
   event: OnSendTransportCloseEvent
 ): Promise<void> {
-  await closeSendTransport(event);
+  await closeSendTransport({ ...event, skipConnectionPatch: false });
 }
 
 interface CloseSendTransportParams {
   connectionId: string;
   transportId: string | null;
   requestContext: RequestContext;
+  skipConnectionPatch: boolean;
 }
 
 export async function closeSendTransport(
@@ -68,19 +76,31 @@ export async function closeSendTransport(
   }
 
   const results = await Promise.allSettled([
-    await postToServer("/connect/destroy", { transportId: params.transportId }),
+    // Keep mediasoup resources for 30s as we might have pending requests
+    // We don't want to have mediasoup in sync, as API is the source of trust
+    // So we don't want to have mediasoup resources removed before API side (hello concurrency hell)
+    // Moreover this could help in future to cancel destroy in case of reconnect
+    postToServer("/connect/destroy", {
+      transportId: params.transportId,
+      delay: 30000,
+    }),
     deleteSendTransport({ transportId: params.transportId }),
-    broadcastToConnections(
-      params.requestContext,
-      JSON.stringify({
-        type: "event",
-        payload: {
-          type: "stream:remove",
-          data: params.transportId,
-        },
-      })
-    ),
+    closeStream({
+      transportId: params.transportId,
+      producerId: null,
+      destroy: false,
+      requestContext: params.requestContext,
+    }),
+    params.skipConnectionPatch
+      ? Promise.resolve(null)
+      : patchConnection({
+          connectionId: params.connectionId,
+          sendTransportId: null,
+        }),
   ]);
 
-  getAllSettledValues(results, "closeSendTransport: Unexpected error");
+  getAllSettledValues<void | null | Connection>(
+    results,
+    "closeSendTransport: Unexpected error"
+  );
 }

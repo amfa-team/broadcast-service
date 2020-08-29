@@ -10,7 +10,7 @@ import {
   WsParticipantRequest,
   RequestContext,
 } from "./types";
-import { Role } from "../db/models/participant";
+import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
 import { onDisconnect } from "../sfu/connectionService";
@@ -223,7 +223,7 @@ export async function handleWebSocketSuccessResponse(
 
   // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
   // https://github.com/dherault/serverless-offline/issues/1008
-  if (requestContext.domainName === "localhost") {
+  if (process.env.IS_OFFLINE) {
     await postToConnection(requestContext, connectionId, result.body);
   }
 

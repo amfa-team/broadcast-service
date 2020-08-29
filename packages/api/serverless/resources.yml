@@ -75,3 +75,29 @@ streamConsumerTable:
     ProvisionedThroughput:
       ReadCapacityUnits: 5
       WriteCapacityUnits: 5
+participantSendTransport:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: ${self:provider.environment.SEND_TRANSPORT_TABLE}
+    AttributeDefinitions:
+      - AttributeName: transportId
+        AttributeType: S
+    KeySchema:
+      - AttributeName: transportId
+        KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 5
+      WriteCapacityUnits: 5
+participantRecvTransport:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: ${self:provider.environment.RECV_TRANSPORT_TABLE}
+    AttributeDefinitions:
+      - AttributeName: transportId
+        AttributeType: S
+    KeySchema:
+      - AttributeName: transportId
+        KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 5
+      WriteCapacityUnits: 5
