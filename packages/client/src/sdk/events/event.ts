@@ -15,4 +15,9 @@ export type ServerEventMap = {
   "media:change": PicnicEvent<null>;
   "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
   "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
+  "stream:quality": PicnicEvent<StreamInfo>;
+};
+
+export type RecvStreamEventMap = {
+  quality: PicnicEvent<{ kind: "audio" | "video"; score: number }>;
 };

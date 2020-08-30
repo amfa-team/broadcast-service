@@ -2,10 +2,12 @@ import { types } from "mediasoup-client";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { PicnicDevice } from "../device/device";
 import { ConnectionInfo, ConnectParams, SendParams } from "../../../../types";
+import { PicnicEvent } from "../events/event";
+import { TransportState } from "../../types";
 
 type TransportType = "send" | "recv";
 
-export class PicnicTransport {
+export class PicnicTransport extends EventTarget {
   #ws: PicnicWebSocket;
 
   #device: PicnicDevice;
@@ -14,11 +16,25 @@ export class PicnicTransport {
 
   #transport: types.Transport | null = null;
 
+  #state: TransportState = "initial";
+
   constructor(ws: PicnicWebSocket, device: PicnicDevice, type: TransportType) {
+    super();
+
     this.#ws = ws;
     this.#device = device;
     this.#type = type;
   }
+
+  getState(): TransportState {
+    return this.#state;
+  }
+
+  #setState = (state: TransportState): void => {
+    this.#state = state;
+    const evt = new PicnicEvent("state:change", state);
+    this.dispatchEvent(evt);
+  };
 
   async destroy(): Promise<void> {
     // TODO: notify when is user initiated
@@ -34,32 +50,48 @@ export class PicnicTransport {
   }
 
   async load(): Promise<void> {
-    const {
-      transportId,
-      iceParameters,
-      iceCandidates,
-      dtlsParameters,
-      sctpParameters,
-    } = await this.#ws.send<ConnectionInfo>(
-      "/sfu/connect/init",
-      this.#device.getInitConnectionParams(this.#type)
-    );
+    this.#setState("creating");
 
-    const params = {
-      id: transportId,
-      iceParameters,
-      iceCandidates: iceCandidates as types.IceCandidate[],
-      dtlsParameters,
-      sctpParameters,
-      iceServers: [],
-    };
+    try {
+      const {
+        transportId,
+        iceParameters,
+        iceCandidates,
+        dtlsParameters,
+        sctpParameters,
+      } = await this.#ws.send<ConnectionInfo>(
+        "/sfu/connect/init",
+        this.#device.getInitConnectionParams(this.#type)
+      );
 
-    this.#transport = this.#device.createMediasoupTransport(this.#type, params);
+      const params = {
+        id: transportId,
+        iceParameters,
+        iceCandidates: iceCandidates as types.IceCandidate[],
+        dtlsParameters,
+        sctpParameters,
+        iceServers: [],
+      };
 
-    this.#transport.on("connect", this.#onConnect);
-    this.#transport.on("connectionstatechange", this.#onConnectionStateChange);
-    if (this.#type === "send") {
-      this.#transport.on("produce", this.#onProduce);
+      this.#transport = this.#device.createMediasoupTransport(
+        this.#type,
+        params
+      );
+
+      this.#transport.on("connect", this.#onConnect);
+      this.#transport.on(
+        "connectionstatechange",
+        this.#onConnectionStateChange
+      );
+      if (this.#type === "send") {
+        this.#transport.on("produce", this.#onProduce);
+      }
+
+      this.#setState("connected");
+    } catch (e) {
+      console.error("PicnicTransport.load: fail", e);
+      this.#setState("error");
+      throw new Error("PicnicTransport.load: fail");
     }
   }
 
@@ -104,7 +136,15 @@ export class PicnicTransport {
   };
 
   #onConnectionStateChange = (e: unknown): void => {
-    console.warn("transport connection changed", e);
+    if (e === "disconnected") {
+      this.#setState("disconnected");
+    } else if (e === "connected") {
+      this.#setState("connected");
+    } else if (e === "connecting") {
+      this.#setState("connecting");
+    } else {
+      console.warn("transport connection changes", e);
+    }
   };
 
   #onProduce = async (

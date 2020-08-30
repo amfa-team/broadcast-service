@@ -140,6 +140,10 @@ export const streamSchema = new Schema({
     required: true,
     enum: ["audio", "video"],
   },
+  score: {
+    type: Number,
+    required: true,
+  },
 });
 
 export const streamModel = model<StreamDocument>(

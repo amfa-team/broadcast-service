@@ -1,14 +1,30 @@
 import { Device, types } from "mediasoup-client";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { InitConnectionParams } from "../../../../types";
+import { DeviceState } from "../../types";
+import { PicnicEvent } from "../events/event";
 
-export class PicnicDevice {
+export class PicnicDevice extends EventTarget {
+  #state: DeviceState = "initial";
+
   #device: types.Device = new Device();
 
   #ws: PicnicWebSocket;
 
   constructor(ws: PicnicWebSocket) {
+    super();
+
     this.#ws = ws;
+  }
+
+  getState(): DeviceState {
+    return this.#state;
+  }
+
+  setState(state: DeviceState): void {
+    this.#state = state;
+    const event = new PicnicEvent("state:change", this.getState());
+    this.dispatchEvent(event);
   }
 
   async destroy(): Promise<void> {
@@ -16,12 +32,20 @@ export class PicnicDevice {
   }
 
   async loadDevice(): Promise<void> {
-    const routerRtpCapabilities = await this.#ws.send<types.RtpCapabilities>(
-      "/sfu/router-capabilities",
-      null
-    );
+    this.setState("loading");
+    try {
+      const routerRtpCapabilities = await this.#ws.send<types.RtpCapabilities>(
+        "/sfu/router-capabilities",
+        null
+      );
 
-    await this.#device.load({ routerRtpCapabilities });
+      await this.#device.load({ routerRtpCapabilities });
+      this.setState("ready");
+    } catch (e) {
+      console.error("PicnicDevice.loadDevice: fail", e);
+      this.setState("error");
+      throw new Error("PicnicDevice.loadDevice: fail");
+    }
   }
 
   #ensureIsLoaded = (): void => {

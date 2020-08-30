@@ -45,6 +45,7 @@ package:
 
 functions:
   - ${file(./serverless/adminRoutes.yml)}
+  - ${file(./serverless/eventRoutes.yml)}
   - ${file(./serverless/websocket.yml)}
 
 resources:
@@ -53,8 +54,6 @@ resources:
 custom:
   serverless-offline:
     useChildProcesses: true
-    webSocketHardTimeout: 300
-    webSocketIdleTimeout: 120
   dynamodb:
     stages:
       - dev

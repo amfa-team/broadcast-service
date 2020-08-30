@@ -1,4 +1,4 @@
-import type { Routes } from "../../../types";
+import type { Routes, StreamInfo } from "../../../types";
 import { getConnection } from "../db/repositories/connectionRepository";
 import { postToServer } from "./serverService";
 import {
@@ -6,6 +6,7 @@ import {
   getStream,
   deleteStream,
   deleteStreamByTransportId,
+  patchStream,
 } from "../db/repositories/streamRepository";
 import { broadcastToConnections } from "../io/io";
 import { RequestContext } from "../io/types";
@@ -56,6 +57,7 @@ export async function onCreateStream(
     transportId: connection.sendTransportId,
     producerId: producerId,
     kind: data.kind,
+    score: 0,
   };
 
   // TODO: Handle connection/transport removed in between
@@ -156,4 +158,52 @@ export async function closeStream(params: CloseStreamParams): Promise<void> {
   ]);
 
   getAllSettledValues(results, "closeStream: Unexpected error");
+}
+
+interface ScoreChangeEvent {
+  transportId: string;
+  producerId: string;
+  requestContext: RequestContext;
+  score: number;
+}
+
+export async function onScoreChange(event: ScoreChangeEvent): Promise<void> {
+  const { transportId, producerId, score, requestContext } = event;
+
+  const stream = await getStream(transportId, producerId);
+
+  if (stream === null) {
+    // Ignore, this is probably happening on close
+    console.log("Not found wesh", {
+      transportId,
+      producerId,
+      score,
+      requestContext,
+    });
+    return;
+  }
+
+  const results = await Promise.allSettled([
+    patchStream({ transportId, producerId, score }),
+    broadcastToConnections(
+      requestContext,
+      JSON.stringify({
+        type: "event",
+        payload: {
+          type: "stream:quality",
+          data: {
+            transportId,
+            producerId,
+            kind: stream.kind,
+            score,
+          },
+        },
+      })
+    ),
+  ]);
+
+  getAllSettledValues<void | StreamInfo>(
+    results,
+    "onScoreChange: Unexpected error"
+  );
 }
