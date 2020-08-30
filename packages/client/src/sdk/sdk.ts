@@ -130,7 +130,7 @@ export class Picnic extends EventTarget {
 
       this.#recvStreams.set(transportId, recvStream);
 
-      await recvStream.load(producerId, info.score);
+      await recvStream.load(producerId);
 
       // Might not be ready if only one of audio/video track is loaded
       if (recvStream.isReady()) {

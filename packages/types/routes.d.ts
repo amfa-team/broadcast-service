@@ -7,6 +7,8 @@ import {
   ReceiveParams,
   SendParams,
   ConsumerInfo,
+  ConsumerState,
+  ProducerState,
 } from "./mediasoup";
 
 export type Route<I, O> = {
@@ -25,11 +27,17 @@ export type Routes = {
 
   "/send/create": Route<SendParams, string>;
 
-  "/send/score": Route<{ producerId: string }, number>;
+  "/send/state": Route<{ producerId: string }, ProducerState>;
+
+  "/send/play": Route<{ producerId: string }, null>;
+
+  "/send/pause": Route<{ producerId: string }, null>;
 
   "/send/destroy": Route<SendDestroyParams, null>;
 
   "/receive/create": Route<ReceiveParams, ConsumerInfo>;
+
+  "/receive/state": Route<{ consumerId: string }, ConsumerState>;
 
   "/receive/play": Route<{ consumerId: string }, null>;
 

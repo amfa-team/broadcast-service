@@ -28,11 +28,11 @@ sfu_createSend:
     - websocket:
         route: /sfu/send/create
         routeResponseSelectionExpression: $default
-sfu_destroySend:
+sfu_stateSend:
   handler: src/sfu/handler.handleOnChangeStreamState
   events:
     - websocket:
-        route: /sfu/send/destroy
+        route: /sfu/send/state
         routeResponseSelectionExpression: $default
 sfu_getStreams:
   handler: src/sfu/handler.getStreams
@@ -51,6 +51,12 @@ sfu_stateReceive:
   events:
     - websocket:
         route: /sfu/receive/state
+        routeResponseSelectionExpression: $default
+sfu_getStateReceive:
+  handler: src/sfu/handler.handleGetConsumerStreamState
+  events:
+    - websocket:
+        route: /sfu/receive/state/get
         routeResponseSelectionExpression: $default
 disconnect:
   handler: src/sfu/handler.disconnect

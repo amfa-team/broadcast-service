@@ -55,4 +55,14 @@ export type ConsumerInfo = {
   rtpParameters: types.RtpParameters;
 };
 
-export type ReceiveInfo = { [producerId: string]: ConsumerInfo[] };
+export type ConsumerState = {
+  score: number;
+  producerScore: number;
+  paused: boolean;
+  producerPaused: boolean;
+};
+
+export type ProducerState = {
+  score: number;
+  paused: boolean;
+};

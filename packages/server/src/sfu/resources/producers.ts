@@ -1,5 +1,6 @@
 import { types } from "mediasoup";
 import { requestApi } from "../../io/api";
+import { ProducerState } from "../../../../types";
 
 type ProducerMeta = {
   transportId: string;
@@ -18,30 +19,23 @@ export async function createProducer(
     rtpParameters,
   });
 
-  const onScoreChange = () => {
-    requestApi("/event/producer/score/change", {
+  const onStateChange = () => {
+    requestApi("/event/producer/state/change", {
       transportId: transport.id,
       producerId: producer.id,
-      score: getProducerScore(producer),
+      state: getProducerState(producer),
     }).catch((e) => {
-      console.error("Producer.onScoreChange: fail", e);
+      console.error("Producer.onStateChange: fail", e);
     });
   };
 
   // Set Producer events.
-  producer.on("score", onScoreChange);
-
-  producer.on("videoorientationchange", (videoOrientation) => {
-    console.log(
-      'producer "videoorientationchange" event [producerId:%s, videoOrientation:%o]',
-      producer.id,
-      videoOrientation
-    );
-  });
+  producer.on("score", onStateChange);
+  producer.observer.on("resume", onStateChange);
+  producer.observer.on("pause", onStateChange);
 
   producer.on("transportclose", () => {
     producer.close();
-    console.log("transport closed so producer closed");
   });
 
   producer.observer.on("close", () => {
@@ -60,6 +54,13 @@ export function getProducerScore(producer: types.Producer): number {
   return score.length === 0
     ? 0
     : score.reduce((acc: number, s) => acc + s.score, 0) / score.length;
+}
+
+export function getProducerState(producer: types.Producer): ProducerState {
+  return {
+    paused: producer.paused,
+    score: getProducerScore(producer),
+  };
 }
 
 export function getProducers(): types.Producer[] {

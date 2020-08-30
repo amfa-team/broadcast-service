@@ -18,7 +18,10 @@ import {
   play,
   destroySend,
   pause,
-  sendScore,
+  receiveState,
+  sendState,
+  sendPlay,
+  sendPause,
 } from "../../sfu/sfuService";
 import { getServerTopology, cleanup } from "../../sfu/topology";
 import { handleSuccessResponse, handleErrorResponse } from "../../io/io";
@@ -95,11 +98,33 @@ export function bindSceneController(app: Application): void {
     }
   });
 
-  app.post("/send/score", async (req, res) => {
+  app.post("/send/state", async (req, res) => {
     try {
       // TODO: validation
-      const request: Routes["/send/score"]["in"] = req.body;
-      const payload = await sendScore(request);
+      const request: Routes["/send/state"]["in"] = req.body;
+      const payload = await sendState(request);
+      handleSuccessResponse(res, payload);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  });
+
+  app.post("/send/pause", async (req, res) => {
+    try {
+      // TODO: validation
+      const { producerId } = req.body;
+      const payload = await sendPause(producerId);
+      handleSuccessResponse(res, payload);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  });
+
+  app.post("/send/play", async (req, res) => {
+    try {
+      // TODO: validation
+      const { producerId } = req.body;
+      const payload = await sendPlay(producerId);
       handleSuccessResponse(res, payload);
     } catch (error) {
       handleErrorResponse(res, error);
@@ -122,6 +147,17 @@ export function bindSceneController(app: Application): void {
       // TODO: validation
       const request: ReceiveParams = req.body;
       const payload = await receive(request);
+      handleSuccessResponse(res, payload);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  });
+
+  app.post("/receive/state", async (req, res) => {
+    try {
+      // TODO: validation
+      const request: Routes["/receive/state"]["in"] = req.body;
+      const payload = await receiveState(request);
       handleSuccessResponse(res, payload);
     } catch (error) {
       handleErrorResponse(res, error);

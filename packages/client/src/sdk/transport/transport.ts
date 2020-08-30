@@ -167,10 +167,7 @@ export class PicnicTransport extends EventTarget {
         rtpParameters,
       };
 
-      const { producerId } = await this.#ws.send<{
-        producerId: string;
-        score: number;
-      }>("/sfu/send/create", req);
+      const producerId = await this.#ws.send<string>("/sfu/send/create", req);
 
       callback({ id: producerId });
     } catch (error) {

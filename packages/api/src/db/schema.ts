@@ -172,6 +172,14 @@ export const streamConsumerSchema = new Schema({
     type: String,
     required: true,
   },
+  score: {
+    type: Number,
+    required: true,
+  },
+  producerScore: {
+    type: Number,
+    required: true,
+  },
 });
 
 export const streamConsumerModel = model<StreamConsumerDocument>(

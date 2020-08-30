@@ -37,6 +37,7 @@ import {
   onCreateStreamConsumer,
   decodeChangeStreamConsumerStateData,
   onChangeStreamConsumerState,
+  getStreamConsumerState,
 } from "./streamConsumerService";
 
 export async function routerCapabilities(
@@ -455,6 +456,51 @@ export async function handleOnChangeConsumerStreamState(
       const payload = await onChangeStreamConsumerState({
         data: req.data,
       });
+
+      return handleWebSocketSuccessResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        payload
+      );
+    } catch (e) {
+      return handleWebSocketErrorResponse(
+        event.requestContext,
+        connectionId,
+        req.msgId,
+        e
+      );
+    }
+  } catch (e) {
+    return handleWebSocketErrorResponse(
+      event.requestContext,
+      connectionId,
+      null,
+      e
+    );
+  }
+}
+
+export async function handleGetConsumerStreamState(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const connectionId = wsOnlyRoute(event);
+
+  try {
+    const req = await parseWsParticipantRequest(
+      event,
+      [Role.host, Role.guest],
+      JsonDecoder.object(
+        {
+          consumerId: JsonDecoder.string,
+          transportId: JsonDecoder.string,
+        },
+        "ConsumerKey"
+      )
+    );
+
+    try {
+      const payload = await getStreamConsumerState(req.data);
 
       return handleWebSocketSuccessResponse(
         event.requestContext,
