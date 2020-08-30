@@ -32,7 +32,7 @@ export type WebSocketState =
   | "closed"
   | "disconnected";
 
-export type DeviceState = "initial" | "loading" | "ready" | "closed" | "error";
+export type DeviceState = "initial" | "loading" | "ready" | "error";
 
 export type TransportState =
   | "initial"

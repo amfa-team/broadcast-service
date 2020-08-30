@@ -86,6 +86,8 @@ export class PicnicTransport extends EventTarget {
       if (this.#type === "send") {
         this.#transport.on("produce", this.#onProduce);
       }
+
+      this.#setState("connected");
     } catch (e) {
       console.error("PicnicTransport.load: fail", e);
       this.#setState("error");

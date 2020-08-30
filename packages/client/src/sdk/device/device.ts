@@ -22,8 +22,8 @@ export class PicnicDevice extends EventTarget {
   }
 
   setState(state: DeviceState): void {
-    const event = new PicnicEvent("state:change", this.getState());
     this.#state = state;
+    const event = new PicnicEvent("state:change", this.getState());
     this.dispatchEvent(event);
   }
 
@@ -41,6 +41,7 @@ export class PicnicDevice extends EventTarget {
       );
 
       await this.#device.load({ routerRtpCapabilities });
+      this.setState("ready");
     } catch (e) {
       console.error("PicnicDevice.loadDevice: fail", e);
       this.setState("error");

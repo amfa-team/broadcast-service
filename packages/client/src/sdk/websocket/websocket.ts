@@ -97,8 +97,8 @@ export class PicnicWebSocket extends EventTarget {
   }
 
   setState(state: WebSocketState): void {
-    const event = new PicnicEvent("state:change", this.getState());
     this.#state = state;
+    const event = new PicnicEvent("state:change", this.getState());
     this.dispatchEvent(event);
   }
 
