@@ -2,10 +2,50 @@ import { types } from "mediasoup-client";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { PicnicDevice } from "../device/device";
 import { ConnectionInfo, ConnectParams, SendParams } from "../../../../types";
+import { PicnicEvent } from "../events/event";
 
 type TransportType = "send" | "recv";
 
-export class PicnicTransport {
+type TransportState =
+  | "init"
+  | "creating"
+  | "connecting"
+  | "connected"
+  | "disconnected";
+
+type EventMap = {
+  "state:change": PicnicEvent<TransportState>;
+};
+
+interface TransportEventTarget extends EventTarget {
+  getState(): TransportState;
+
+  addEventListener<K extends keyof EventMap>(
+    type: K,
+    listener: (this: MessagePort, ev: EventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+
+  removeEventListener<K extends keyof EventMap>(
+    type: K,
+    listener: (this: MessagePort, ev: EventMap[K]) => void,
+    options?: boolean | EventListenerOptions
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions
+  ): void;
+}
+
+export class PicnicTransport
+  extends EventTarget
+  implements TransportEventTarget {
   #ws: PicnicWebSocket;
 
   #device: PicnicDevice;
@@ -14,11 +54,27 @@ export class PicnicTransport {
 
   #transport: types.Transport | null = null;
 
+  #state: TransportState = "init";
+
   constructor(ws: PicnicWebSocket, device: PicnicDevice, type: TransportType) {
+    super();
+
     this.#ws = ws;
     this.#device = device;
     this.#type = type;
   }
+
+  getState(): TransportState {
+    return this.#state;
+  }
+
+  #setState = (state: TransportState): void => {
+    this.#state = state;
+    const evt = new MessageEvent("state:change", {
+      data: state,
+    });
+    this.dispatchEvent(evt);
+  };
 
   async destroy(): Promise<void> {
     // TODO: notify when is user initiated
@@ -34,6 +90,8 @@ export class PicnicTransport {
   }
 
   async load(): Promise<void> {
+    this.#setState("creating");
+
     const {
       transportId,
       iceParameters,
@@ -104,7 +162,15 @@ export class PicnicTransport {
   };
 
   #onConnectionStateChange = (e: unknown): void => {
-    console.warn("transport connection changed", e);
+    if (e === "disconnected") {
+      this.#setState("disconnected");
+    } else if (e === "connected") {
+      this.#setState("connected");
+    } else if (e === "connecting") {
+      this.#setState("connecting");
+    } else {
+      console.warn("transport connection changes", e);
+    }
   };
 
   #onProduce = async (

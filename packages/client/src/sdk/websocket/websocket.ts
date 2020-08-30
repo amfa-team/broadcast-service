@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { Settings } from "../../types";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, ServerEventMap } from "../events/event";
 
 type PendingReq = {
   resolve: (payload: unknown) => void;
@@ -59,7 +59,33 @@ async function sendToWs<T>(
   });
 }
 
-export class PicnicWebSocket extends EventTarget {
+interface PicnicWebSocketEventTarget extends EventTarget {
+  addEventListener<K extends keyof ServerEventMap>(
+    type: K,
+    listener: (ev: ServerEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+
+  removeEventListener<K extends keyof ServerEventMap>(
+    type: K,
+    listener: (ev: ServerEventMap[K]) => void,
+    options?: boolean | EventListenerOptions
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions
+  ): void;
+}
+
+export class PicnicWebSocket
+  extends EventTarget
+  implements PicnicWebSocketEventTarget {
   #ws: WebSocket;
 
   #pingID: NodeJS.Timeout | null = null;

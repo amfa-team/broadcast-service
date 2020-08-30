@@ -3,7 +3,7 @@ import { PicnicTransport } from "../transport/transport";
 import { PicnicDevice } from "../device/device";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { ReceiveParams, ConsumerInfo } from "../../../../types";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, ServerEventMap } from "../events/event";
 
 interface RecvStreamOptions {
   ws: PicnicWebSocket;
@@ -71,6 +71,8 @@ export default class RecvStream extends EventTarget {
   #device: PicnicDevice;
   #audioConsumer: types.Consumer | null = null;
   #videoConsumer: types.Consumer | null = null;
+  #audioQuality = 0;
+  #videoQuality = 0;
   #sourceTransportId: string;
 
   constructor(options: RecvStreamOptions) {
@@ -80,6 +82,7 @@ export default class RecvStream extends EventTarget {
     this.#transport = options.transport;
     this.#device = options.device;
     this.#sourceTransportId = options.sourceTransportId;
+    this.#ws.addEventListener("stream:quality", this.#onQualityChange as any);
   }
 
   async destroy(): Promise<void> {
@@ -87,13 +90,32 @@ export default class RecvStream extends EventTarget {
     // Not needed from stream:delete event because sourceTransport closed ==> consumer closed server-side
     this.#audioConsumer?.close();
     this.#videoConsumer?.close();
+    this.#ws.removeEventListener(
+      "stream:quality",
+      this.#onQualityChange as any
+    );
   }
+
+  #onQualityChange = (event: ServerEventMap["stream:quality"]): void => {
+    const { score, producerId } = event.data;
+
+    if (this.#audioConsumer?.producerId === producerId) {
+      this.#audioQuality = score;
+      const evt = new PicnicEvent("quality", { kind: "audio", score });
+      this.dispatchEvent(evt);
+    }
+    if (this.#videoConsumer?.producerId === producerId) {
+      this.#videoQuality = score;
+      const evt = new PicnicEvent("quality", { kind: "video", score });
+      this.dispatchEvent(evt);
+    }
+  };
 
   getId(): string {
     return this.#sourceTransportId;
   }
 
-  async load(producerId: string): Promise<void> {
+  async load(producerId: string, score: number): Promise<void> {
     if (this.#videoConsumer?.producerId === producerId) {
       return;
     }
@@ -112,9 +134,11 @@ export default class RecvStream extends EventTarget {
     if (consumer.kind === "audio") {
       // TODO: If already exists (multiple audio per host)
       this.#audioConsumer = consumer;
+      this.#audioQuality = score;
     } else {
       // TODO: If already exists (multiple video per host)
       this.#videoConsumer = consumer;
+      this.#videoQuality = score;
     }
 
     this.#stream.addTrack(consumer.track);
@@ -142,6 +166,10 @@ export default class RecvStream extends EventTarget {
     return this.#audioConsumer?.paused ?? true;
   }
 
+  getAudioQuality(): number {
+    return this.#audioQuality;
+  }
+
   async pauseVideo(): Promise<void> {
     if (this.#videoConsumer !== null) {
       await pauseConsumer(this.#ws, this.#transport, this.#videoConsumer);
@@ -158,6 +186,10 @@ export default class RecvStream extends EventTarget {
 
   isVideoPaused(): boolean {
     return this.#videoConsumer?.paused ?? true;
+  }
+
+  getVideoQuality(): number {
+    return this.#videoQuality;
   }
 
   async resume(): Promise<void> {

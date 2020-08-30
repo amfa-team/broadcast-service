@@ -5,17 +5,13 @@ import { PicnicDevice } from "./device/device";
 import SendStream from "./stream/SendStream";
 import { PicnicTransport } from "./transport/transport";
 import RecvStream from "./stream/RecvStream";
-import { ServerEventMap } from "./events/event";
-
-interface SDKEvent<T> extends Event {
-  data: T;
-}
+import { ServerEventMap, PicnicEvent } from "./events/event";
 
 type State = "initial" | "loading" | "ready";
 
 interface SDKEventMap {
-  state: SDKEvent<State>;
-  "new-stream": SDKEvent<StreamInfo>;
+  state: PicnicEvent<State>;
+  "new-stream": PicnicEvent<StreamInfo>;
 }
 
 interface SDK extends EventTarget {
@@ -132,7 +128,7 @@ export class Picnic extends EventTarget implements SDK {
 
       this.#recvStreams.set(transportId, recvStream);
 
-      await recvStream.load(producerId);
+      await recvStream.load(producerId, info.score);
 
       // Might not be ready if only one of audio/video track is loaded
       if (recvStream.isReady()) {
