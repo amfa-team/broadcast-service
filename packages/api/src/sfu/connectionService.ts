@@ -30,6 +30,33 @@ export async function onConnect(
   return routerCapabilities;
 }
 
+interface RefreshConnectionEvent {
+  connectionId: string;
+  token: string;
+}
+
+// Refresh is done with a new connection to overcome AWS 2hours hard limit
+export async function onRefreshConnection(
+  event: RefreshConnectionEvent
+): Promise<boolean> {
+  const { connectionId, token } = event;
+  const connections = await getConnectionsByToken({ token });
+
+  if (connections.length !== 1) {
+    // We expect to have only one connection
+    return false;
+  }
+
+  const oldConnection = connections[0];
+
+  await Promise.allSettled([
+    createConnection({ ...oldConnection, connectionId }),
+    deleteConnection({ connectionId: oldConnection.connectionId }),
+  ]);
+
+  return true;
+}
+
 async function removeOldConnections(event: ConnectEvent): Promise<void> {
   const { connectionId, token, requestContext } = event;
   const connections = await getConnectionsByToken({ token });
