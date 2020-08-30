@@ -20,6 +20,7 @@ export type ConnectParams = {
 
 export interface DestroyConnectionParams {
   transportId: string;
+  delay: number;
 }
 
 export type SendParams = {
@@ -31,6 +32,7 @@ export type SendParams = {
 export type SendDestroyParams = {
   transportId: string;
   producerId: string;
+  delay: number;
 };
 
 export type ReceiveParams = {
@@ -43,6 +45,7 @@ export type ReceiveParams = {
 export type ReceiveDestroyParams = {
   transportId: string;
   consumerId: string;
+  delay: number;
 };
 
 export type ConsumerInfo = {

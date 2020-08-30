@@ -1,9 +1,12 @@
 import { JsonDecoder } from "ts.data.json";
 
-export interface Server {
+export interface ServerKey {
   ip: string;
-  token: string;
   port: number;
+}
+
+export interface Server extends ServerKey {
+  token: string;
 }
 
 export const createServerDecoder = JsonDecoder.object<Server>(

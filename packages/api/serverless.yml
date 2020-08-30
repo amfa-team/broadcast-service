@@ -26,7 +26,9 @@ provider:
     PARTICIPANT_TABLE: "${self:service.name}-${self:provider.stage}-participants"
     SERVER_TABLE: "${self:service.name}-${self:provider.stage}-server"
     STREAM_TABLE: "${self:service.name}-${self:provider.stage}-stream"
-    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-stream-consumer"
+    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-consumer"
+    SEND_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-send-transport"
+    RECV_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-recv-transport"
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
@@ -43,6 +45,7 @@ package:
 
 functions:
   - ${file(./serverless/adminRoutes.yml)}
+  - ${file(./serverless/eventRoutes.yml)}
   - ${file(./serverless/websocket.yml)}
 
 resources:

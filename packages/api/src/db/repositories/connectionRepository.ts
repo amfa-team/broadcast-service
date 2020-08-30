@@ -1,58 +1,57 @@
-import dynamoDb from "../db";
 import {
   CreateConnection,
   Connection,
-  UpdateConnection,
-} from "../models/connection";
-
-const TableName = process.env.CONNECTION_TABLE ?? "";
+  ConnectionKey,
+  PatchConnection,
+} from "../types/connection";
+import { connectionModel } from "../schema";
 
 export async function createConnection(
-  params: CreateConnection
+  data: CreateConnection
 ): Promise<Connection> {
-  const connection: Connection = {
-    ...params,
-    sendTransportId: null,
-    recvTransportId: null,
-  };
-  await dynamoDb.put({ TableName, Item: connection }).promise();
-  return connection;
+  const connection = new connectionModel(data);
+  await connection.save();
+  return connection.toJSON() as Connection;
 }
 
-export async function deleteConnection(connectionId: string): Promise<void> {
-  await dynamoDb.delete({ TableName, Key: { connectionId } }).promise();
+export async function deleteConnection({
+  connectionId,
+}: ConnectionKey): Promise<void> {
+  await connectionModel.delete({ connectionId });
 }
 
-export async function findByConnectionId(
-  connectionId: string
-): Promise<Connection | null> {
-  const result = await dynamoDb
-    .get({ TableName, Key: { connectionId } })
-    .promise();
-  return (result?.Item ?? null) as Connection | null;
+export async function getConnection({
+  connectionId,
+}: ConnectionKey): Promise<Connection | null> {
+  const doc = await connectionModel.get({ connectionId });
+  return (doc?.toJSON() ?? null) as Connection | null;
+}
+
+export async function getConnectionsByToken({
+  token,
+}: Pick<Connection, "token">): Promise<Connection[]> {
+  // TODO: Add index to use query instead
+  // TODO: fix typing
+  const results: unknown = await connectionModel
+    .scan({ token: { eq: token } })
+    .exec();
+  return results as Connection[];
 }
 
 export async function getAllConnections(): Promise<Connection[]> {
-  const scanOutput = await dynamoDb.scan({ TableName }).promise();
-  return scanOutput.Items as Connection[];
+  const results: unknown = await connectionModel.scan().exec();
+  return results as Connection[];
 }
 
-export async function updateConnection(
-  params: UpdateConnection
+export async function patchConnection(
+  params: PatchConnection
 ): Promise<Connection> {
-  const previousConnection = await findByConnectionId(params.connectionId);
-  if (previousConnection === null) {
-    throw new Error(
-      "connectionRepository.updateConnection: connection not found"
-    );
+  const { connectionId, ...rest } = params;
+  try {
+    const doc = await connectionModel.update({ connectionId }, rest);
+    return doc.toJSON() as Connection;
+  } catch (e) {
+    console.error(e, params);
+    throw new Error("patchConnection: fail");
   }
-
-  // TODO: Possible edge case where connection is modify between
-  const connection: Connection = {
-    ...previousConnection,
-    ...params,
-  };
-  await dynamoDb.put({ TableName, Item: connection }).promise();
-
-  return connection;
 }

@@ -1,4 +1,5 @@
 import { types } from "mediasoup";
+import { requestApi } from "../../io/api";
 
 type ProducerMeta = {
   transportId: string;
@@ -18,13 +19,19 @@ export async function createProducer(
   });
 
   // Set Producer events.
-  // producer.on("score", (score) => {
-  //   console.log(
-  //     'producer "score" event [producerId:%s, score:%o]',
-  //     producer.id,
-  //     score
-  //   );
-  // });
+  producer.on("score", () => {
+    const { score } = producer;
+    requestApi("/event/producer/score/change", {
+      transportId: transport.id,
+      producerId: producer.id,
+      score:
+        score.length === 0
+          ? 0
+          : score.reduce((acc: number, s) => acc + s.score, 0) / score.length,
+    }).catch((e) => {
+      console.error("Producer.onScoreChange: fail", e);
+    });
+  });
 
   producer.on("videoorientationchange", (videoOrientation) => {
     console.log(
@@ -53,8 +60,13 @@ export function getProducers(): types.Producer[] {
   return [...producers.values()];
 }
 
-export function getProducer(producerId: string): types.Producer {
+export function getOptionalProducer(producerId: string): null | types.Producer {
   const producer = producers.get(producerId);
+  return producer ?? null;
+}
+
+export function getProducer(producerId: string): types.Producer {
+  const producer = getOptionalProducer(producerId);
 
   if (!producer) {
     throw new Error("producer not found or deleted");

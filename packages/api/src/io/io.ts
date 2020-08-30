@@ -10,10 +10,10 @@ import {
   WsParticipantRequest,
   RequestContext,
 } from "./types";
-import { Role } from "../db/models/participant";
+import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
-import { onDisconnect } from "../sfu/sfuService";
+import { onDisconnect } from "../sfu/connectionService";
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
   const { connectionId } = event.requestContext;
@@ -193,7 +193,7 @@ export async function postToConnection(
     // https://medium.com/@lancers/websocket-api-what-does-it-mean-that-disconnect-is-a-best-effort-event-317b7021456f
     if (typeof e === "object" && e?.statusCode === 410) {
       console.warn("io.postToConnection: client gone", connectionId);
-      await onDisconnect(requestContext, connectionId);
+      await onDisconnect({ requestContext, connectionId });
     } else {
       throw e;
     }
@@ -223,7 +223,7 @@ export async function handleWebSocketSuccessResponse(
 
   // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
   // https://github.com/dherault/serverless-offline/issues/1008
-  if (requestContext.domainName === "localhost") {
+  if (process.env.IS_OFFLINE) {
     await postToConnection(requestContext, connectionId, result.body);
   }
 

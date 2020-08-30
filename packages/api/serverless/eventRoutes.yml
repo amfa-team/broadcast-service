@@ -1,0 +1,6 @@
+scoreChangeEvent:
+  handler: src/sfu/eventHandler.scoreChange
+  events:
+    - http:
+        path: /event/producer/score/change
+        method: post

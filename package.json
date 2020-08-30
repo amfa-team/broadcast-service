@@ -11,8 +11,8 @@
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",
     "@commitlint/config-conventional": "^9.1.2",
-    "@typescript-eslint/eslint-plugin": "^3.9.1",
-    "@typescript-eslint/parser": "^3.9.1",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard-with-typescript": "^18.0.2",
@@ -22,8 +22,8 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.20.6",
     "husky": "^4.2.5",
-    "lint-staged": "^10.2.11",
-    "prettier": "^2.0.5",
+    "lint-staged": "^10.2.13",
+    "prettier": "^2.1.1",
     "semantic-release": "^17.1.1",
     "typescript": "^4.0.2"
   },
@@ -50,7 +50,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "optionalDependencies": {
-    "ttab": "^0.6.1"
+    "ttab": "^0.7.0"
   },
   "publishConfig": {
     "access": "restricted"

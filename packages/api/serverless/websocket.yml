@@ -10,6 +10,12 @@ sfu_initConnect:
     - websocket:
         route: /sfu/connect/init
         routeResponseSelectionExpression: $default
+sfu_refreshConnection:
+  handler: src/sfu/handler.refreshConnection
+  events:
+    - websocket:
+        route: /sfu/refresh
+        routeResponseSelectionExpression: $default
 sfu_createConnect:
   handler: src/sfu/handler.createConnect
   events:

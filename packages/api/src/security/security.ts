@@ -1,6 +1,6 @@
-import { findByToken } from "../db/repositories/participantRepository";
+import { getParticipant } from "../db/repositories/participantRepository";
 import { ForbiddenError } from "../io/exceptions";
-import { Participant, Role } from "../db/models/participant";
+import { Participant, Role } from "../db/types/participant";
 import { WithToken } from "../io/types";
 
 export function authAdmin({ token }: WithToken): void {
@@ -17,7 +17,7 @@ export async function authParticipant(
   { token }: WithToken,
   roles: Role[]
 ): Promise<Participant> {
-  const participant = await findByToken(token);
+  const participant = await getParticipant(token);
 
   if (participant == null) {
     throw new ForbiddenError();

@@ -9,52 +9,27 @@ import {
   ConsumerInfo,
 } from "./mediasoup";
 
-export type Route<P extends string, I, O> = {
-  path: P;
+export type Route<I, O> = {
   in: I;
   out: O;
 };
 
-export type RouterCapabilitiesRoute = Route<
-  "/router-capabilities",
-  null,
-  types.RtpCapabilities
->;
+export type Routes = {
+  "/router-capabilities": Route<null, types.RtpCapabilities>;
 
-export type InitConnectionRoute = Route<
-  "/connect/init",
-  InitConnectionParams,
-  ConnectionInfo
->;
+  "/connect/init": Route<InitConnectionParams, ConnectionInfo>;
 
-export type CreateConnectionRoute = Route<
-  "/connect/create",
-  ConnectParams,
-  null
->;
+  "/connect/create": Route<ConnectParams, null>;
 
-export type DestroyConnectionRoute = Route<
-  "/connect/destroy",
-  DestroyConnectionParams,
-  null
->;
+  "/connect/destroy": Route<DestroyConnectionParams, null>;
 
-export type CreateSendRoute = Route<"/send/create", SendParams, string>;
-export type DestroySendRoute = Route<"/send/destroy", SendDestroyParams, null>;
+  "/send/create": Route<SendParams, string>;
 
-export type CreateReceiveRoute = Route<
-  "/receive/create",
-  ReceiveParams,
-  ConsumerInfo
->;
+  "/send/destroy": Route<SendDestroyParams, null>;
 
-export type PlayReceiveRoute = Route<
-  "/receive/play",
-  { consumerId: string },
-  null
->;
-export type PauseReceiveRoute = Route<
-  "/receive/play",
-  { consumerId: string },
-  null
->;
+  "/receive/create": Route<ReceiveParams, ConsumerInfo>;
+
+  "/receive/play": Route<{ consumerId: string }, null>;
+
+  "/receive/pause": Route<{ consumerId: string }, null>;
+};
