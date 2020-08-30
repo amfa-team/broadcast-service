@@ -1,4 +1,4 @@
-import { StreamInfo } from "../types/stream";
+import { StreamInfo, PatchStream } from "../types/stream";
 import { streamModel } from "../schema";
 
 export async function createStream(stream: StreamInfo): Promise<StreamInfo> {
@@ -43,4 +43,11 @@ export async function deleteStreamByTransportId(
 export async function getAllStreams(): Promise<StreamInfo[]> {
   const results: unknown = await streamModel.scan().exec();
   return results as StreamInfo[];
+}
+
+export async function patchStream(params: PatchStream): Promise<StreamInfo> {
+  const { transportId, producerId, ...rest } = params;
+  console.log({ transportId, producerId, rest });
+  const doc = await streamModel.update({ transportId, producerId }, rest);
+  return doc.toJSON() as StreamInfo;
 }
