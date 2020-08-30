@@ -1,19 +1,5 @@
-import fetch from "node-fetch";
 import { getServerToken } from "../security/security";
-
-function getClusterApi() {
-  if (!process.env.CLUSTER_API) {
-    throw new Error("Missing CLUSTER_API env-vars");
-  }
-  if (!process.env.CLUSTER_SECRET) {
-    throw new Error("Missing CLUSTER_SECRET env-vars");
-  }
-
-  return {
-    api: process.env.CLUSTER_API,
-    key: process.env.CLUSTER_SECRET,
-  };
-}
+import { requestApi } from "../io/api";
 
 export function getPublicIP(): string {
   if (!process.env.PUBLIC_IP) {
@@ -24,8 +10,6 @@ export function getPublicIP(): string {
 }
 
 export async function registerServer(): Promise<void> {
-  const { api, key } = getClusterApi();
-
   const data = {
     ip: getPublicIP(),
     token: getServerToken(),
@@ -33,21 +17,7 @@ export async function registerServer(): Promise<void> {
   };
 
   try {
-    const res = await fetch(`${api}/admin/server`, {
-      headers: { "x-api-key": key },
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-
-    const response = await res.json().catch(() => null);
-    if (!res.ok || !response?.success) {
-      throw new Error(
-        'Failed to register with statusCode "' +
-          res.status +
-          '" and error ' +
-          response?.error
-      );
-    }
+    await requestApi("/admin/server", data);
   } catch (e) {
     console.error("Unable to register, retrying in 10s", e);
     await new Promise((resolve, reject) => {
