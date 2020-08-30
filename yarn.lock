@@ -2314,7 +2314,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.14.tgz#24a0b5959f16ac141aeb0c5b3cd7a15b7c64cbce"
   integrity sha512-syUgf67ZQpaJj01/tRTknkMNoBBLWJOBODF0Zm4NrXmiSuxjymFrxnTu1QVYRubhVkRcZLYZG8STTwJRdVm/WQ==
 
-"@types/node@>= 8", "@types/node@^14.0.27", "@types/node@^14.6.0":
+"@types/node@>= 8", "@types/node@^14.0.27":
   version "14.6.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.0.tgz#7d4411bf5157339337d7cff864d9ff45f177b499"
   integrity sha512-mikldZQitV94akrc4sCcSjtJfsTKt4p+e/s0AGscVA6XArQ9kFclP+ZiYUMnq987rc6QlYxXv/EivqlfSLxpKA==
@@ -2323,6 +2323,11 @@
   version "13.13.15"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.15.tgz#fe1cc3aa465a3ea6858b793fd380b66c39919766"
   integrity sha512-kwbcs0jySLxzLsa2nWUAGOd/s21WU1jebrEdtzhsj1D4Yps1EOuyI1Qcu+FD56dL7NRNIJtDDjcqIG22NwkgLw==
+
+"@types/node@^14.6.1", "@types/node@^14.6.2":
+  version "14.6.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.2.tgz#264b44c5a28dfa80198fc2f7b6d3c8a054b9491f"
+  integrity sha512-onlIwbaeqvZyniGPfdw/TEhKIh79pz66L1q06WUQqJLnAb6wbjvOtepLYTGHTqzdXgBYIE3ZdmqHDGsRsbBz7A==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -8940,6 +8945,22 @@ mediasoup@^3.6.16:
   integrity sha512-tzbmtjBnwCjezsnmgxHrQA/dssAahsa3pvFt3zD2jK5WC3/yY9W0Ymrztzrsk/bU7ksBI5TRGboq5zlrlZWhuA==
   dependencies:
     "@types/node" "^14.0.27"
+    awaitqueue "^2.2.3"
+    debug "^4.1.1"
+    h264-profile-level-id "^1.0.1"
+    netstring "^0.3.0"
+    random-number "^0.0.9"
+    supports-color "^7.1.0"
+    uuid "^8.3.0"
+  optionalDependencies:
+    clang-tools-prebuilt "^0.1.4"
+
+mediasoup@^3.6.18:
+  version "3.6.18"
+  resolved "https://registry.yarnpkg.com/mediasoup/-/mediasoup-3.6.18.tgz#07e8910c51268836fd4434e94eaa8a37c5c79695"
+  integrity sha512-YTNJsesiDfiwD1aE37znZ9WHNZR1BKxpNesIFCNjmDjjEA25+b5ER7dCi7CpRDp9s1GEA+yUapcE2R1uLJSMBA==
+  dependencies:
+    "@types/node" "^14.6.1"
     awaitqueue "^2.2.3"
     debug "^4.1.1"
     h264-profile-level-id "^1.0.1"
