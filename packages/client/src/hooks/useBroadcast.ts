@@ -10,7 +10,6 @@ type UseBroadcast = {
 };
 
 function getBroadcastInfo(state: SDKState): string | null {
-  debugger;
   if (state.sendTransport === "connected") {
     return null;
   }

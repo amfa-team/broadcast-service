@@ -10,7 +10,6 @@ export function useSDKState(sdk: Picnic | null): SDKState {
   useEffect(() => {
     const listener = () => {
       setSDKState(sdk?.getState() ?? initialState);
-      debugger;
     };
     sdk?.addEventListener("state:change", listener);
     return (): void => {
