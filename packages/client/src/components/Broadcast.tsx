@@ -10,16 +10,17 @@ type BroadcastProps = {
 };
 
 export default function Broadcast(props: BroadcastProps): JSX.Element {
-  const { stream } = useBroadcast(props.sdk);
+  const { stream, info } = useBroadcast(props.sdk);
   const { media } = useBroadcastMedia(stream);
 
   if (stream === null) {
-    return <div>Please enable Mic/Video</div>;
+    return <div>{info}</div>;
   }
 
   return (
     <div>
       <SendControls stream={stream} />
+      {info !== null ? <div>{info}</div> : null}
       <Video stream={media} muted flip={!stream.isScreenShareEnabled()} />
     </div>
   );

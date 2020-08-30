@@ -25,8 +25,26 @@ export type Settings = {
   token: string;
 };
 
-export interface SDK {
-  token: string;
-  ws: WebSocket;
-  device: types.Device;
-}
+export type WebSocketState =
+  | "initial"
+  | "connecting"
+  | "connected"
+  | "closed"
+  | "disconnected";
+
+export type DeviceState = "initial" | "loading" | "ready" | "closed" | "error";
+
+export type TransportState =
+  | "initial"
+  | "creating"
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
+
+export type SDKState = {
+  websocket: WebSocketState;
+  device: DeviceState;
+  recvTransport: TransportState;
+  sendTransport: TransportState;
+};

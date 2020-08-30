@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
-import { Settings } from "../../types";
-import { PicnicEvent, ServerEventMap } from "../events/event";
+import { Settings, WebSocketState } from "../../types";
+import { PicnicEvent } from "../events/event";
 
 type PendingReq = {
   resolve: (payload: unknown) => void;
@@ -59,34 +59,10 @@ async function sendToWs<T>(
   });
 }
 
-interface PicnicWebSocketEventTarget extends EventTarget {
-  addEventListener<K extends keyof ServerEventMap>(
-    type: K,
-    listener: (ev: ServerEventMap[K]) => void,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-
-  removeEventListener<K extends keyof ServerEventMap>(
-    type: K,
-    listener: (ev: ServerEventMap[K]) => void,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-}
-
-export class PicnicWebSocket
-  extends EventTarget
-  implements PicnicWebSocketEventTarget {
+export class PicnicWebSocket extends EventTarget {
   #ws: WebSocket;
+
+  #state: WebSocketState = "initial";
 
   #pingID: NodeJS.Timeout | null = null;
 
@@ -115,6 +91,16 @@ export class PicnicWebSocket
       REFRESH_INTERVAL_MINUTES * 60 * 1000
     );
   };
+
+  getState(): WebSocketState {
+    return this.#state;
+  }
+
+  setState(state: WebSocketState): void {
+    const event = new PicnicEvent("state:change", this.getState());
+    this.#state = state;
+    this.dispatchEvent(event);
+  }
 
   async refresh(): Promise<void> {
     const ws = new WebSocket(this.#settings.endpoint);
@@ -195,16 +181,22 @@ export class PicnicWebSocket
 
   async load(): Promise<void> {
     if (this.#ws.readyState === WebSocket.OPEN) {
+      this.setState("connected");
       this.#ping();
+      this.#scheduleRefresh();
       return;
     }
 
     if (this.#ws.readyState !== WebSocket.CONNECTING) {
+      this.setState("disconnected");
       throw new Error("PicnicWebSocket.load: Unable to connect");
     }
 
+    this.setState("connecting");
+
     return new Promise((resolve, reject) => {
       this.#ws.addEventListener("open", () => {
+        this.setState("connected");
         this.#ws.removeEventListener("error", reject);
         this.#ping();
         this.#scheduleRefresh();
@@ -260,6 +252,7 @@ export class PicnicWebSocket
   };
 
   #onClose = (event: CloseEvent): void => {
+    this.setState("closed");
     console.warn("PicnicWebSocket.onClose:", {
       code: event.code,
       wasClean: event.wasClean,
