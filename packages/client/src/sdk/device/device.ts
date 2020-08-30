@@ -28,7 +28,6 @@ export class PicnicDevice extends EventTarget {
   }
 
   async destroy(): Promise<void> {
-    this.setState("closed");
     // Nothing to destroy
   }
 
