@@ -46,7 +46,7 @@ export async function onCreateStream(
     );
   }
 
-  const producerId: string = await postToServer("/send/create", {
+  const producerId = await postToServer("/send/create", {
     ...data,
     // Force transportId for security reasons
     transportId: connection.sendTransportId,
@@ -63,15 +63,26 @@ export async function onCreateStream(
   // TODO: Handle connection/transport removed in between
   await createStream(stream);
 
-  await broadcastToConnections(
-    requestContext,
-    JSON.stringify({
-      type: "event",
-      payload: {
-        type: "stream:add",
-        data: stream,
-      },
-    })
+  // We're forced to get score after, because event might eventually happen in between
+  const score = await postToServer("/send/score", { producerId });
+
+  const results = await Promise.allSettled([
+    patchStream({ ...stream, score }),
+    broadcastToConnections(
+      requestContext,
+      JSON.stringify({
+        type: "event",
+        payload: {
+          type: "stream:add",
+          data: { ...stream, score },
+        },
+      })
+    ),
+  ]);
+
+  getAllSettledValues<StreamInfo | void>(
+    results,
+    "onCreateStream: Unexpected error"
   );
 
   return producerId;
@@ -167,20 +178,13 @@ interface ScoreChangeEvent {
   score: number;
 }
 
-export async function onScoreChange(event: ScoreChangeEvent): Promise<void> {
+export async function onScoreChange(event: ScoreChangeEvent): Promise<boolean> {
   const { transportId, producerId, score, requestContext } = event;
 
   const stream = await getStream(transportId, producerId);
 
   if (stream === null) {
-    // Ignore, this is probably happening on close
-    console.log("Not found wesh", {
-      transportId,
-      producerId,
-      score,
-      requestContext,
-    });
-    return;
+    return false;
   }
 
   const results = await Promise.allSettled([
@@ -206,4 +210,6 @@ export async function onScoreChange(event: ScoreChangeEvent): Promise<void> {
     results,
     "onScoreChange: Unexpected error"
   );
+
+  return true;
 }

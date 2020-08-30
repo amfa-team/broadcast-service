@@ -25,6 +25,8 @@ export type Routes = {
 
   "/send/create": Route<SendParams, string>;
 
+  "/send/score": Route<{ producerId: string }, number>;
+
   "/send/destroy": Route<SendDestroyParams, null>;
 
   "/receive/create": Route<ReceiveParams, ConsumerInfo>;

@@ -152,7 +152,7 @@ export class PicnicTransport extends EventTarget {
       kind,
       rtpParameters,
     }: { kind: types.MediaKind; rtpParameters: types.RtpParameters },
-    callback: (p: { id: number }) => void,
+    callback: (p: { id: string }) => void,
     errback: (e: Error) => void
   ): Promise<void> => {
     try {
@@ -167,7 +167,10 @@ export class PicnicTransport extends EventTarget {
         rtpParameters,
       };
 
-      const producerId = await this.#ws.send<number>("/sfu/send/create", req);
+      const { producerId } = await this.#ws.send<{
+        producerId: string;
+        score: number;
+      }>("/sfu/send/create", req);
 
       callback({ id: producerId });
     } catch (error) {

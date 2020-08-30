@@ -14,6 +14,7 @@ import {
   createProducer,
   getProducer,
   getOptionalProducer,
+  getProducerScore,
 } from "./resources/producers";
 import {
   createConsumer,
@@ -30,6 +31,7 @@ import type {
   ConsumerInfo,
   SendDestroyParams,
   DestroyConnectionParams,
+  Routes,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -123,6 +125,14 @@ export async function send(params: SendParams): Promise<string> {
   }
 
   return producer.id;
+}
+
+export async function sendScore(
+  params: Routes["/send/score"]["in"]
+): Promise<Routes["/send/score"]["out"]> {
+  const { producerId } = params;
+  const producer = getProducer(producerId);
+  return getProducerScore(producer);
 }
 
 export async function destroySend(params: SendDestroyParams): Promise<null> {

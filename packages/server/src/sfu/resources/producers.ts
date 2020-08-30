@@ -18,20 +18,18 @@ export async function createProducer(
     rtpParameters,
   });
 
-  // Set Producer events.
-  producer.on("score", () => {
-    const { score } = producer;
+  const onScoreChange = () => {
     requestApi("/event/producer/score/change", {
       transportId: transport.id,
       producerId: producer.id,
-      score:
-        score.length === 0
-          ? 0
-          : score.reduce((acc: number, s) => acc + s.score, 0) / score.length,
+      score: getProducerScore(producer),
     }).catch((e) => {
       console.error("Producer.onScoreChange: fail", e);
     });
-  });
+  };
+
+  // Set Producer events.
+  producer.on("score", onScoreChange);
 
   producer.on("videoorientationchange", (videoOrientation) => {
     console.log(
@@ -54,6 +52,14 @@ export async function createProducer(
   producersMeta.set(producer, { transportId: transport.id });
 
   return producer;
+}
+
+export function getProducerScore(producer: types.Producer): number {
+  const { score } = producer;
+
+  return score.length === 0
+    ? 0
+    : score.reduce((acc: number, s) => acc + s.score, 0) / score.length;
 }
 
 export function getProducers(): types.Producer[] {
