@@ -82,6 +82,7 @@ export default class RecvStream extends EventTarget {
     this.#transport = options.transport;
     this.#device = options.device;
     this.#sourceTransportId = options.sourceTransportId;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.#ws.addEventListener("stream:quality", this.#onQualityChange as any);
   }
 
@@ -92,6 +93,7 @@ export default class RecvStream extends EventTarget {
     this.#videoConsumer?.close();
     this.#ws.removeEventListener(
       "stream:quality",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.#onQualityChange as any
     );
   }

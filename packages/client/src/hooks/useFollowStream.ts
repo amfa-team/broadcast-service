@@ -20,6 +20,7 @@ export default function useFollowStream(stream: RecvStream): UseFollowStream {
   useEffect(() => {
     stream.resume();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const listener: any = (event: RecvStreamEventMap["quality"]) => {
       const { kind, score } = event.data;
       if (kind === "audio") {
