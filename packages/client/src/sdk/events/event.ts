@@ -1,4 +1,8 @@
-import { StreamInfo } from "../../../../types";
+import {
+  StreamInfo,
+  ConsumerState,
+  StreamConsumerInfo,
+} from "../../../../types";
 
 export class PicnicEvent<T> extends Event {
   data: T;
@@ -15,9 +19,13 @@ export type ServerEventMap = {
   "media:change": PicnicEvent<null>;
   "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
   "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
-  "stream:quality": PicnicEvent<StreamInfo>;
+  "stream:state": PicnicEvent<StreamInfo>;
+  "streamConsumer:state": PicnicEvent<StreamConsumerInfo>;
 };
 
 export type RecvStreamEventMap = {
-  quality: PicnicEvent<{ kind: "audio" | "video"; score: number }>;
+  state: PicnicEvent<{
+    state: ConsumerState;
+    kind: "audio" | "video";
+  }>;
 };

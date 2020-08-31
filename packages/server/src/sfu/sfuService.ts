@@ -14,12 +14,15 @@ import {
   createProducer,
   getProducer,
   getOptionalProducer,
+  getProducerScore,
+  getProducerState,
 } from "./resources/producers";
 import {
   createConsumer,
   getConsumer,
   getProducerConsumer,
   getOptionalConsumer,
+  getConsumerState,
 } from "./resources/consumers";
 import type {
   InitConnectionParams,
@@ -30,6 +33,7 @@ import type {
   ConsumerInfo,
   SendDestroyParams,
   DestroyConnectionParams,
+  Routes,
 } from "../../../types";
 
 async function initWorker(): Promise<void> {
@@ -125,6 +129,14 @@ export async function send(params: SendParams): Promise<string> {
   return producer.id;
 }
 
+export async function sendState(
+  params: Routes["/send/state"]["in"]
+): Promise<Routes["/send/state"]["out"]> {
+  const { producerId } = params;
+  const producer = getProducer(producerId);
+  return getProducerState(producer);
+}
+
 export async function destroySend(params: SendDestroyParams): Promise<null> {
   const { producerId, delay } = params;
   setTimeout(() => {
@@ -132,6 +144,17 @@ export async function destroySend(params: SendDestroyParams): Promise<null> {
     producer?.close();
   }, delay);
   return null;
+}
+
+export async function sendPlay(producerId: string): Promise<void> {
+  const producer = getProducer(producerId);
+  await producer.resume();
+}
+
+export async function sendPause(producerId: string): Promise<void> {
+  // Use optional producer because on close we might request pause on already closed producer
+  const producer = getOptionalProducer(producerId);
+  await producer?.pause();
 }
 
 export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
@@ -162,6 +185,14 @@ export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
     kind: producer.kind,
     rtpParameters: consumer.rtpParameters,
   };
+}
+
+export async function receiveState(
+  params: Routes["/receive/state"]["in"]
+): Promise<Routes["/receive/state"]["out"]> {
+  const { consumerId } = params;
+  const consumer = getConsumer(consumerId);
+  return getConsumerState(consumer);
 }
 
 export async function play(consumerId: string): Promise<void> {

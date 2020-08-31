@@ -1,4 +1,7 @@
-import { StreamConsumerInfo } from "../types/streamConsumer";
+import {
+  StreamConsumerInfo,
+  PatchStreamConsumer,
+} from "../types/streamConsumer";
 import { getAllSettledValues } from "../../io/promises";
 import { streamConsumerModel } from "../schema";
 
@@ -105,4 +108,15 @@ export async function deleteStreamConsumer(
     console.error(e);
     throw new Error("deleteStreamConsumer: failed");
   }
+}
+
+export async function patchStreamConsumer(
+  params: PatchStreamConsumer
+): Promise<StreamConsumerInfo> {
+  const { transportId, consumerId, ...rest } = params;
+  const doc = await streamConsumerModel.update(
+    { transportId, consumerId },
+    rest
+  );
+  return doc.toJSON() as StreamConsumerInfo;
 }

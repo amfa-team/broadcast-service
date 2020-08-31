@@ -30,7 +30,6 @@ export async function createTransport(
 
   transport.on("routerclose", () => {
     transports.delete(transport.id);
-    console.log("router closed so transport closed");
   });
 
   transport.observer.on("close", () => {

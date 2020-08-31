@@ -1,5 +1,6 @@
 import { types } from "mediasoup";
 import { requestApi } from "../../io/api";
+import { ProducerState } from "../../../../types";
 
 type ProducerMeta = {
   transportId: string;
@@ -18,32 +19,23 @@ export async function createProducer(
     rtpParameters,
   });
 
-  // Set Producer events.
-  producer.on("score", () => {
-    const { score } = producer;
-    requestApi("/event/producer/score/change", {
+  const onStateChange = () => {
+    requestApi("/event/producer/state/change", {
       transportId: transport.id,
       producerId: producer.id,
-      score:
-        score.length === 0
-          ? 0
-          : score.reduce((acc: number, s) => acc + s.score, 0) / score.length,
+      state: getProducerState(producer),
     }).catch((e) => {
-      console.error("Producer.onScoreChange: fail", e);
+      console.error("Producer.onStateChange: fail", e);
     });
-  });
+  };
 
-  producer.on("videoorientationchange", (videoOrientation) => {
-    console.log(
-      'producer "videoorientationchange" event [producerId:%s, videoOrientation:%o]',
-      producer.id,
-      videoOrientation
-    );
-  });
+  // Set Producer events.
+  producer.on("score", onStateChange);
+  producer.observer.on("resume", onStateChange);
+  producer.observer.on("pause", onStateChange);
 
   producer.on("transportclose", () => {
     producer.close();
-    console.log("transport closed so producer closed");
   });
 
   producer.observer.on("close", () => {
@@ -54,6 +46,21 @@ export async function createProducer(
   producersMeta.set(producer, { transportId: transport.id });
 
   return producer;
+}
+
+export function getProducerScore(producer: types.Producer): number {
+  const { score } = producer;
+
+  return score.length === 0
+    ? 0
+    : score.reduce((acc: number, s) => acc + s.score, 0) / score.length;
+}
+
+export function getProducerState(producer: types.Producer): ProducerState {
+  return {
+    paused: producer.paused,
+    score: getProducerScore(producer),
+  };
 }
 
 export function getProducers(): types.Producer[] {

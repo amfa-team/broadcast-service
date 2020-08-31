@@ -1,40 +1,41 @@
 import RecvStream from "../sdk/stream/RecvStream";
 import { useEffect, useState } from "react";
 import { RecvStreamEventMap } from "../sdk/events/event";
+import { ConsumerState } from "../../../types";
 
 type UseFollowStream = {
   stream: MediaStream;
-  videoQuality: number;
-  audioQuality: number;
+  videoState: ConsumerState;
+  audioState: ConsumerState;
 };
 
 export default function useFollowStream(stream: RecvStream): UseFollowStream {
   const media = stream.getMediaStream();
-  const [audioQuality, setAudioQuality] = useState<number>(
-    stream.getAudioQuality()
+  const [audioState, setAudioState] = useState<ConsumerState>(
+    stream.getAudioState()
   );
-  const [videoQuality, setVideoQuality] = useState<number>(
-    stream.getVideoQuality()
+  const [videoState, setVideoState] = useState<ConsumerState>(
+    stream.getVideoState()
   );
 
   useEffect(() => {
     stream.resume();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const listener: any = (event: RecvStreamEventMap["quality"]) => {
-      const { kind, score } = event.data;
+    const listener: any = (event: RecvStreamEventMap["state"]) => {
+      const { kind, state } = event.data;
       if (kind === "audio") {
-        setAudioQuality(score);
+        setAudioState(state);
       } else {
-        setVideoQuality(score);
+        setVideoState(state);
       }
     };
-    stream.addEventListener("quality", listener);
+    stream.addEventListener("state", listener);
     return () => {
       stream.pause();
-      stream.removeEventListener("quality", listener);
+      stream.removeEventListener("state", listener);
     };
   }, [stream]);
 
-  return { stream: media, videoQuality, audioQuality };
+  return { stream: media, videoState, audioState };
 }

@@ -2,7 +2,7 @@ import { types } from "mediasoup-client";
 import { PicnicTransport } from "../transport/transport";
 import { PicnicDevice } from "../device/device";
 import { PicnicWebSocket } from "../websocket/websocket";
-import { ReceiveParams, ConsumerInfo } from "../../../../types";
+import { ReceiveParams, ConsumerInfo, ConsumerState } from "../../../../types";
 import { PicnicEvent, ServerEventMap } from "../events/event";
 
 interface RecvStreamOptions {
@@ -44,7 +44,7 @@ async function createConsumer(
   device: PicnicDevice,
   sourceTransportId: string,
   producerId: string
-): Promise<types.Consumer> {
+): Promise<{ consumer: types.Consumer; state: ConsumerState }> {
   const req: ReceiveParams = {
     transportId: transport.getId(),
     rtpCapabilities: device.getRtpCapabilities(),
@@ -61,7 +61,12 @@ async function createConsumer(
     rtpParameters: info.rtpParameters,
   });
 
-  return consumer;
+  const state = await ws.send<ConsumerState>("/sfu/receive/state/get", {
+    consumerId: info.consumerId,
+    transportId: transport.getId(),
+  });
+
+  return { consumer, state };
 }
 
 export default class RecvStream extends EventTarget {
@@ -71,8 +76,18 @@ export default class RecvStream extends EventTarget {
   #device: PicnicDevice;
   #audioConsumer: types.Consumer | null = null;
   #videoConsumer: types.Consumer | null = null;
-  #audioQuality = 0;
-  #videoQuality = 0;
+  #audioState: ConsumerState = {
+    score: 0,
+    producerScore: 0,
+    paused: false,
+    producerPaused: false,
+  };
+  #videoState: ConsumerState = {
+    score: 0,
+    producerScore: 0,
+    paused: false,
+    producerPaused: false,
+  };
   #sourceTransportId: string;
 
   constructor(options: RecvStreamOptions) {
@@ -83,7 +98,10 @@ export default class RecvStream extends EventTarget {
     this.#device = options.device;
     this.#sourceTransportId = options.sourceTransportId;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.#ws.addEventListener("stream:quality", this.#onQualityChange as any);
+    this.#ws.addEventListener(
+      "streamConsumer:state",
+      this.#onQualityChange as any
+    );
   }
 
   async destroy(): Promise<void> {
@@ -92,23 +110,31 @@ export default class RecvStream extends EventTarget {
     this.#audioConsumer?.close();
     this.#videoConsumer?.close();
     this.#ws.removeEventListener(
-      "stream:quality",
+      "streamConsumer:state",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.#onQualityChange as any
     );
   }
 
-  #onQualityChange = (event: ServerEventMap["stream:quality"]): void => {
-    const { score, producerId } = event.data;
+  #onQualityChange = (event: ServerEventMap["streamConsumer:state"]): void => {
+    const {
+      score,
+      consumerId,
+      producerScore,
+      paused,
+      producerPaused,
+    } = event.data;
 
-    if (this.#audioConsumer?.producerId === producerId) {
-      this.#audioQuality = score;
-      const evt = new PicnicEvent("quality", { kind: "audio", score });
+    const state = { score, producerScore, paused, producerPaused };
+
+    if (this.#audioConsumer?.id === consumerId) {
+      this.#audioState = state;
+      const evt = new PicnicEvent("state", { state, kind: "audio" });
       this.dispatchEvent(evt);
     }
-    if (this.#videoConsumer?.producerId === producerId) {
-      this.#videoQuality = score;
-      const evt = new PicnicEvent("quality", { kind: "video", score });
+    if (this.#videoConsumer?.id === consumerId) {
+      this.#videoState = state;
+      const evt = new PicnicEvent("state", { state, kind: "video" });
       this.dispatchEvent(evt);
     }
   };
@@ -117,7 +143,7 @@ export default class RecvStream extends EventTarget {
     return this.#sourceTransportId;
   }
 
-  async load(producerId: string, score: number): Promise<void> {
+  async load(producerId: string): Promise<void> {
     if (this.#videoConsumer?.producerId === producerId) {
       return;
     }
@@ -125,7 +151,7 @@ export default class RecvStream extends EventTarget {
       return;
     }
 
-    const consumer = await createConsumer(
+    const { consumer, state } = await createConsumer(
       this.#ws,
       this.#transport,
       this.#device,
@@ -136,11 +162,11 @@ export default class RecvStream extends EventTarget {
     if (consumer.kind === "audio") {
       // TODO: If already exists (multiple audio per host)
       this.#audioConsumer = consumer;
-      this.#audioQuality = score;
+      this.#audioState = state;
     } else {
       // TODO: If already exists (multiple video per host)
       this.#videoConsumer = consumer;
-      this.#videoQuality = score;
+      this.#videoState = state;
     }
 
     this.#stream.addTrack(consumer.track);
@@ -168,8 +194,8 @@ export default class RecvStream extends EventTarget {
     return this.#audioConsumer?.paused ?? true;
   }
 
-  getAudioQuality(): number {
-    return this.#audioQuality;
+  getAudioState(): ConsumerState {
+    return this.#audioState;
   }
 
   async pauseVideo(): Promise<void> {
@@ -190,8 +216,8 @@ export default class RecvStream extends EventTarget {
     return this.#videoConsumer?.paused ?? true;
   }
 
-  getVideoQuality(): number {
-    return this.#videoQuality;
+  getVideoState(): ConsumerState {
+    return this.#videoState;
   }
 
   async resume(): Promise<void> {

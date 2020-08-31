@@ -9,14 +9,13 @@ type FollowStreamProps = {
 };
 
 export default function FollowStream(props: FollowStreamProps): JSX.Element {
-  const { stream, videoQuality, audioQuality } = useFollowStream(props.stream);
+  const { stream, videoState, audioState } = useFollowStream(props.stream);
 
   return (
     <div>
       <RecvControls stream={props.stream} />
-      <div>
-        Audio Quality: {audioQuality} / Video Quality: {videoQuality}
-      </div>
+      <div>Audio State: {JSON.stringify(audioState)}</div>
+      <div>Video State: {JSON.stringify(videoState)}</div>
       <Video stream={stream} muted={false} flip={false} />
     </div>
   );

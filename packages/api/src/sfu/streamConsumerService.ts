@@ -1,5 +1,8 @@
-import type { Routes, ConsumerInfo } from "../../../types";
-import { getConnection } from "../db/repositories/connectionRepository";
+import type { Routes, ConsumerInfo, ConsumerState } from "../../../types";
+import {
+  getConnection,
+  findConnectionByRecvTransportId,
+} from "../db/repositories/connectionRepository";
 import { postToServer } from "./serverService";
 import { JsonDecoder } from "ts.data.json";
 import {
@@ -8,8 +11,13 @@ import {
   deleteStreamConsumer,
   deleteStreamConsumerByTransportId,
   deleteStreamConsumerBySoourceTransportId,
+  patchStreamConsumer,
 } from "../db/repositories/streamConsumerRepository";
 import { getStream } from "../db/repositories/streamRepository";
+import { RequestContext } from "../io/types";
+import { postToConnection } from "../io/io";
+import { getAllSettledValues } from "../io/promises";
+import { StreamConsumerInfo } from "../db/types/streamConsumer";
 
 type CreateStreamConsumerEvent = {
   connectionId: string;
@@ -60,10 +68,31 @@ export async function onCreateStreamConsumer(
     sourceTransportId: data.sourceTransportId,
     producerId: data.producerId,
     consumerId: payload.consumerId,
+    score: 0,
+    producerScore: 0,
+    paused: true,
+    producerPaused: false,
   };
 
   // TODO: Handle connection/transport removed in between
   await createStreamConsumer(streamConsumer);
+
+  // We're forced to get state after, because event might eventually happen in between
+  const { score, producerScore, paused, producerPaused } = await postToServer(
+    "/receive/state",
+    {
+      consumerId: payload.consumerId,
+    }
+  );
+
+  await patchStreamConsumer({
+    consumerId: streamConsumer.consumerId,
+    transportId: streamConsumer.transportId,
+    score,
+    producerScore,
+    paused,
+    producerPaused,
+  });
 
   return payload;
 }
@@ -138,4 +167,89 @@ export async function closeConsumerOf(
   params: CloseConsumerOfParams
 ): Promise<void> {
   await deleteStreamConsumerBySoourceTransportId(params.sourceTransportId);
+}
+
+interface ConsumerStateChangeEvent {
+  transportId: string;
+  consumerId: string;
+  requestContext: RequestContext;
+  state: ConsumerState;
+}
+
+export async function onConsumerStateChange(
+  event: ConsumerStateChangeEvent
+): Promise<boolean> {
+  const {
+    transportId,
+    consumerId,
+    requestContext,
+    state: { score, producerScore, paused, producerPaused },
+  } = event;
+
+  const [streamConsumer, connections] = await Promise.all([
+    getStreamConsumer(transportId, consumerId),
+    findConnectionByRecvTransportId(transportId),
+  ]);
+
+  if (streamConsumer === null) {
+    return false;
+  }
+
+  const results = await Promise.allSettled([
+    patchStreamConsumer({
+      transportId,
+      consumerId,
+      score,
+      producerScore,
+      paused,
+      producerPaused,
+    }),
+    ...connections.map((connection) =>
+      postToConnection(
+        requestContext,
+        connection.connectionId,
+        JSON.stringify({
+          type: "event",
+          payload: {
+            type: "streamConsumer:state",
+            data: {
+              ...streamConsumer,
+              score,
+              producerScore,
+              paused,
+              producerPaused,
+            },
+          },
+        })
+      )
+    ),
+  ]);
+
+  getAllSettledValues<void | StreamConsumerInfo>(
+    results,
+    "onConsumerStateChange: Unexpected error"
+  );
+
+  return true;
+}
+
+interface GetConsumerStateParams {
+  consumerId: string;
+  transportId: string;
+}
+
+export async function getStreamConsumerState(
+  params: GetConsumerStateParams
+): Promise<ConsumerState> {
+  const consumer = await getStreamConsumer(
+    params.consumerId,
+    params.transportId
+  );
+
+  return {
+    paused: consumer?.paused ?? true,
+    producerPaused: consumer?.producerPaused ?? true,
+    score: consumer?.score ?? 0,
+    producerScore: consumer?.producerScore ?? 0,
+  };
 }

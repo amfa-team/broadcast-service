@@ -47,7 +47,6 @@ export async function getAllStreams(): Promise<StreamInfo[]> {
 
 export async function patchStream(params: PatchStream): Promise<StreamInfo> {
   const { transportId, producerId, ...rest } = params;
-  console.log({ transportId, producerId, rest });
   const doc = await streamModel.update({ transportId, producerId }, rest);
   return doc.toJSON() as StreamInfo;
 }
