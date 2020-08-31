@@ -66,6 +66,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.11.2",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "@rollup/plugin-typescript": "^5.0.2",
     "ts.data.json": "^1.2.0",
     "uuid": "^8.3.0"
