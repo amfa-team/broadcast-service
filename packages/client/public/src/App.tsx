@@ -1,10 +1,10 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
-import BroadcastPage from "./BroacastPage";
+import BroadcastPage from "./BroadcastPage";
 import ViewerPage from "./ViewerPage";
 import HomePage from "./HomePage";
 import Topology from "./Topology";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import { CssBaseline } from "@material-ui/core";
 import MenuBar from "./MenuBar";
 import CreateParticipantPage from "./CreateParticipantPage";
 

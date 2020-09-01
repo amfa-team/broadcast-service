@@ -1,5 +1,5 @@
 import React from "react";
-import { useApi, useCreateParticipant } from "./useApi";
+import { useApi } from "./useApi";
 import TextField from "@material-ui/core/TextField";
 import Container from "@material-ui/core/Container";
 
