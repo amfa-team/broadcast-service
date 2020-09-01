@@ -1,5 +1,5 @@
 import React from "react";
-import SendControls from "./SendControls";
+import { SendStreamControlsContainer } from "./SendControls";
 import Video from "./Video";
 import useBroadcast from "../hooks/useBroadcast";
 import { Picnic } from "../sdk/sdk";
@@ -19,7 +19,7 @@ export default function Broadcast(props: BroadcastProps): JSX.Element {
 
   return (
     <div>
-      <SendControls stream={stream} />
+      <SendStreamControlsContainer stream={stream} />
       {info !== null ? <div>{info}</div> : null}
       <Video stream={media} muted flip={!stream.isScreenShareEnabled()} />
     </div>
