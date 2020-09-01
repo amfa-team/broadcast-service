@@ -1,15 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
-import SendStream from "../sdk/stream/SendStream";
+import SendStream from "../../sdk/stream/SendStream";
 
-type UseSendStreamControls = {
+export interface UseSendStreamControls {
   audioPaused: boolean;
   videoPaused: boolean;
-  pauseAudio: (pause: boolean) => void;
-  pauseVideo: (pause: boolean) => void;
-  startScreenShare: () => void;
-  stopScreenShare: () => void;
+  toggleAudio: () => void;
+  toggleVideo: () => void;
+  toggleScreenShare: () => void;
   isScreenShareEnabled: boolean;
-};
+}
 
 export default function useSendStreamControls(
   stream: SendStream
@@ -42,42 +41,37 @@ export default function useSendStreamControls(
     };
   }, [stream]);
 
-  const pauseAudio = useCallback(
-    (pause) => {
-      if (pause) {
-        stream?.pauseAudio();
-      } else {
-        stream?.resumeAudio();
-      }
-    },
-    [stream]
-  );
-  const pauseVideo = useCallback(
-    (pause) => {
-      if (pause) {
-        stream?.pauseVideo();
-      } else {
-        stream?.resumeVideo();
-      }
-    },
-    [stream]
-  );
-
-  const startScreenShare = useCallback(() => {
-    stream.screenShare();
-  }, [stream]);
-
-  const stopScreenShare = useCallback(() => {
-    stream.disableShare();
-  }, [stream]);
+  const toggleAudio = useCallback(async () => {
+    setAudioPaused(!audioPaused);
+    if (audioPaused) {
+      await stream.resumeAudio();
+    } else {
+      await stream.pauseAudio();
+    }
+  }, [stream, audioPaused]);
+  const toggleVideo = useCallback(async () => {
+    setVideoPaused(!videoPaused);
+    if (videoPaused) {
+      await stream.resumeVideo();
+    } else {
+      await stream.pauseVideo();
+    }
+  }, [stream, videoPaused]);
+  const toggleScreenShare = useCallback(async () => {
+    setIsScreenShareEnabled(!isScreenShareEnabled);
+    if (isScreenShareEnabled) {
+      await stream.disableShare();
+    } else {
+      await stream.screenShare();
+    }
+  }, [stream, isScreenShareEnabled]);
 
   return {
     audioPaused,
     videoPaused,
-    pauseAudio,
-    pauseVideo,
-    startScreenShare,
-    stopScreenShare,
     isScreenShareEnabled,
+    toggleAudio,
+    toggleVideo,
+    toggleScreenShare,
   };
 }
