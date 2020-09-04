@@ -1,4 +1,5 @@
 import { types } from "mediasoup";
+import debounce from "lodash.debounce";
 import { requestApi } from "../../io/api";
 import { ProducerState } from "../../../../types";
 
@@ -8,6 +9,8 @@ type ProducerMeta = {
 
 const producers: Map<string, types.Producer> = new Map();
 const producersMeta: WeakMap<types.Producer, ProducerMeta> = new WeakMap();
+
+const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
 
 export async function createProducer(
   transport: types.Transport,
@@ -19,7 +22,7 @@ export async function createProducer(
     rtpParameters,
   });
 
-  const onStateChange = () => {
+  const onStateChange = debounce(() => {
     requestApi("/event/producer/state/change", {
       transportId: transport.id,
       producerId: producer.id,
@@ -27,7 +30,7 @@ export async function createProducer(
     }).catch((e) => {
       console.error("Producer.onStateChange: fail", e);
     });
-  };
+  }, DEBOUNCE_WAIT);
 
   // Set Producer events.
   producer.on("score", onStateChange);
