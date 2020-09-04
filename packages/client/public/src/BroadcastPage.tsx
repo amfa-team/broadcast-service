@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import { useSDK, StageContainer } from "../../src";
 import { useParams } from "react-router-dom";
 import { useApi } from "./useApi";

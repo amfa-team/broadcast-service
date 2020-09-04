@@ -97,9 +97,9 @@ export default class RecvStream extends EventTarget {
     this.#transport = options.transport;
     this.#device = options.device;
     this.#sourceTransportId = options.sourceTransportId;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.#ws.addEventListener(
       "streamConsumer:state",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.#onQualityChange as any
     );
   }
