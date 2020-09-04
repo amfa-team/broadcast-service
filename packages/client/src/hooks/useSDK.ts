@@ -15,9 +15,10 @@ type SDKState = SDKLoadingState | SDKLoadedState;
 
 export function useSDK(settings: Settings): SDKState {
   const [state, setSDKState] = useState<SDKState>({ loaded: false });
+  const { endpoint, token } = settings;
 
   useEffect(() => {
-    const sdk = new Picnic(settings);
+    const sdk = new Picnic({ endpoint, token });
     sdk
       .load()
       .then(() => setSDKState({ loaded: true, sdk }))
@@ -26,7 +27,7 @@ export function useSDK(settings: Settings): SDKState {
     return (): void => {
       sdk.destroy();
     };
-  }, []);
+  }, [endpoint, token]);
 
   return state;
 }

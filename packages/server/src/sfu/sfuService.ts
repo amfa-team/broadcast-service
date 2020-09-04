@@ -14,7 +14,6 @@ import {
   createProducer,
   getProducer,
   getOptionalProducer,
-  getProducerScore,
   getProducerState,
 } from "./resources/producers";
 import {

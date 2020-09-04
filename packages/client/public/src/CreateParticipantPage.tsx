@@ -26,7 +26,7 @@ export default function CreateParticipantPage(
   const { role } = props;
   useEffect(() => {
     createParticipant(role);
-  }, [role]);
+  }, [role, createParticipant]);
 
   if (loading) {
     return (

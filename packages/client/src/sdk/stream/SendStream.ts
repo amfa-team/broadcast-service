@@ -128,6 +128,10 @@ export default class SendStream extends EventTarget {
     this.#ws = ws;
   }
 
+  getId(): string {
+    return this.#transport.getId();
+  }
+
   #destroyAudioProducer = async (): Promise<void> => {
     if (this.#audioProducer !== null) {
       await this.#ws

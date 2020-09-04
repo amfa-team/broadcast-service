@@ -13,7 +13,6 @@ import {
 import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
-import { onDisconnect } from "../sfu/connectionService";
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
   const { connectionId } = event.requestContext;
