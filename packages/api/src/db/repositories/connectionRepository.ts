@@ -55,3 +55,17 @@ export async function patchConnection(
     throw new Error("patchConnection: fail");
   }
 }
+
+export async function findConnectionByRecvTransportId(
+  recvTransportId: string
+): Promise<Connection[]> {
+  try {
+    const results: unknown = await connectionModel
+      .scan({ recvTransportId: { eq: recvTransportId } })
+      .exec();
+    return results as Connection[];
+  } catch (e) {
+    console.error("findConnectionByRecvTransportId: failed", e);
+    throw new Error("findConnectionByRecvTransportId: failed");
+  }
+}

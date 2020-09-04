@@ -1,4 +1,7 @@
 import { types } from "mediasoup";
+import debounce from "lodash.debounce";
+import { requestApi } from "../../io/api";
+import { ConsumerState } from "../../../../types";
 
 type ConsumerMeta = {
   transportId: string;
@@ -6,6 +9,8 @@ type ConsumerMeta = {
 
 const consumers: Map<string, types.Consumer> = new Map();
 const consumersMeta: WeakMap<types.Consumer, ConsumerMeta> = new Map();
+
+const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
 
 export async function createConsumer(
   transport: types.Transport,
@@ -20,43 +25,45 @@ export async function createConsumer(
 
   consumer.on("transportclose", () => {
     consumer.close();
-    console.log("transport closed so consumer closed");
   });
 
   consumer.on("producerclose", () => {
     consumer.close();
-    console.log("associated producer closed so consumer closed");
-  });
-
-  consumer.on("producerresume", () => {
-    console.log("associated producer paused");
-  });
-
-  consumer.on("producerpause", () => {
-    console.log("associated producer paused");
   });
 
   consumer.observer.on("close", () => {
     consumers.delete(consumer.id);
   });
 
-  // consumer.on("score", (score) => {
-  //   console.log(
-  //     'consumer "score" event [consumerId:%s, score:%o]',
-  //     consumer.id,
-  //     score
-  //   );
-  // });
+  const onStateChange = debounce(() => {
+    requestApi("/event/consumer/state/change", {
+      transportId: transport.id,
+      consumerId: consumer.id,
+      state: getConsumerState(consumer),
+    }).catch((e) => {
+      console.error("Consumer.onStateChange: fail", e);
+    });
+  }, DEBOUNCE_WAIT);
 
-  // consumer.on("layerschange", (layers) => {
-  //   console.log('consumer "layerschange" event', consumer.id, layers);
-  // });
+  consumer.on("score", onStateChange);
+  consumer.on("producerpause", onStateChange);
+  consumer.on("producerresume", onStateChange);
+  consumer.observer.on("resume", onStateChange);
+  consumer.observer.on("pause", onStateChange);
 
-  // TODO: unset consumer onclose
   consumers.set(consumer.id, consumer);
   consumersMeta.set(consumer, { transportId: transport.id });
 
   return consumer;
+}
+
+export function getConsumerState(consumer: types.Consumer): ConsumerState {
+  return {
+    score: consumer.score.score,
+    producerScore: consumer.score.producerScore,
+    paused: consumer.paused,
+    producerPaused: consumer.producerPaused,
+  };
 }
 
 export function getOptionalConsumer(consumerId: string): types.Consumer | null {

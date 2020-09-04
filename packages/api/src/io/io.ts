@@ -13,7 +13,6 @@ import {
 import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
-import { onDisconnect } from "../sfu/connectionService";
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
   const { connectionId } = event.requestContext;
@@ -193,7 +192,6 @@ export async function postToConnection(
     // https://medium.com/@lancers/websocket-api-what-does-it-mean-that-disconnect-is-a-best-effort-event-317b7021456f
     if (typeof e === "object" && e?.statusCode === 410) {
       console.warn("io.postToConnection: client gone", connectionId);
-      await onDisconnect({ requestContext, connectionId });
     } else {
       throw e;
     }

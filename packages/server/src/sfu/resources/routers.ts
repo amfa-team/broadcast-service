@@ -65,7 +65,6 @@ export async function createRouter(
 
   router.on("workerclose", () => {
     // Router is closed automatically
-    console.log("worker closed so router closed");
     routers.delete(router.id);
     // TODO: remove from topology but should never happen
   });

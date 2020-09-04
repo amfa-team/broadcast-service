@@ -1,4 +1,4 @@
-import type { Routes, StreamInfo } from "../../../types";
+import type { Routes, StreamInfo, ProducerState } from "../../../types";
 import { getConnection } from "../db/repositories/connectionRepository";
 import { postToServer } from "./serverService";
 import {
@@ -46,7 +46,7 @@ export async function onCreateStream(
     );
   }
 
-  const producerId: string = await postToServer("/send/create", {
+  const producerId = await postToServer("/send/create", {
     ...data,
     // Force transportId for security reasons
     transportId: connection.sendTransportId,
@@ -58,20 +58,32 @@ export async function onCreateStream(
     producerId: producerId,
     kind: data.kind,
     score: 0,
+    paused: false,
   };
 
   // TODO: Handle connection/transport removed in between
   await createStream(stream);
 
-  await broadcastToConnections(
-    requestContext,
-    JSON.stringify({
-      type: "event",
-      payload: {
-        type: "stream:add",
-        data: stream,
-      },
-    })
+  // We're forced to get score after, because event might eventually happen in between
+  const { score, paused } = await postToServer("/send/state", { producerId });
+
+  const results = await Promise.allSettled([
+    patchStream({ ...stream, score }),
+    broadcastToConnections(
+      requestContext,
+      JSON.stringify({
+        type: "event",
+        payload: {
+          type: "stream:add",
+          data: { ...stream, score, paused },
+        },
+      })
+    ),
+  ]);
+
+  getAllSettledValues<StreamInfo | void>(
+    results,
+    "onCreateStream: Unexpected error"
   );
 
   return producerId;
@@ -80,7 +92,7 @@ export async function onCreateStream(
 type OnChangeStreamStateEventData = {
   transportId: string;
   producerId: string;
-  state: "close";
+  state: "close" | "pause" | "play";
 };
 
 type OnChangeStreamStateEvent = {
@@ -93,7 +105,14 @@ export const decodeOnChangeStreamStateData: JsonDecoder.Decoder<OnChangeStreamSt
   {
     transportId: JsonDecoder.string,
     producerId: JsonDecoder.string,
-    state: JsonDecoder.isExactly("close"),
+    state: JsonDecoder.oneOf(
+      [
+        JsonDecoder.isExactly("close"),
+        JsonDecoder.isExactly("pause"),
+        JsonDecoder.isExactly("play"),
+      ],
+      "state"
+    ),
   },
   "ChangeStreamStateEventData"
 );
@@ -107,28 +126,35 @@ export async function onChangeStreamState(
   } = event;
   const stream = await getStream(transportId, producerId);
 
-  if (stream === null || state !== "close") {
+  if (stream === null) {
     return null;
   }
 
   // TODO: Check connectionId?
+  if (state === "play") {
+    await postToServer("/send/play", { producerId });
+  }
+  if (state === "pause") {
+    await postToServer("/send/pause", { producerId });
+  }
+  if (state === "close") {
+    const results = await Promise.allSettled([
+      postToServer("/send/destroy", { transportId, producerId }),
+      deleteStream(transportId, producerId),
+      broadcastToConnections(
+        requestContext,
+        JSON.stringify({
+          type: "event",
+          payload: {
+            type: "stream:remove",
+            data: transportId,
+          },
+        })
+      ),
+    ]);
 
-  const results = await Promise.allSettled([
-    postToServer("/send/destroy", { transportId, producerId }),
-    deleteStream(transportId, producerId),
-    broadcastToConnections(
-      requestContext,
-      JSON.stringify({
-        type: "event",
-        payload: {
-          type: "stream:remove",
-          data: transportId,
-        },
-      })
-    ),
-  ]);
-
-  getAllSettledValues(results, "onChangeStreamState: Unexpected error");
+    getAllSettledValues(results, "onChangeStreamState: Unexpected error");
+  }
 
   return null;
 }
@@ -160,42 +186,41 @@ export async function closeStream(params: CloseStreamParams): Promise<void> {
   getAllSettledValues(results, "closeStream: Unexpected error");
 }
 
-interface ScoreChangeEvent {
+interface ProducerStateChangeEvent {
   transportId: string;
   producerId: string;
   requestContext: RequestContext;
-  score: number;
+  state: ProducerState;
 }
 
-export async function onScoreChange(event: ScoreChangeEvent): Promise<void> {
-  const { transportId, producerId, score, requestContext } = event;
+export async function onProducerStateChange(
+  event: ProducerStateChangeEvent
+): Promise<boolean> {
+  const {
+    transportId,
+    producerId,
+    requestContext,
+    state: { score, paused },
+  } = event;
 
   const stream = await getStream(transportId, producerId);
 
   if (stream === null) {
-    // Ignore, this is probably happening on close
-    console.log("Not found wesh", {
-      transportId,
-      producerId,
-      score,
-      requestContext,
-    });
-    return;
+    return false;
   }
 
   const results = await Promise.allSettled([
-    patchStream({ transportId, producerId, score }),
+    patchStream({ transportId, producerId, score, paused }),
     broadcastToConnections(
       requestContext,
       JSON.stringify({
         type: "event",
         payload: {
-          type: "stream:quality",
+          type: "stream:state",
           data: {
-            transportId,
-            producerId,
-            kind: stream.kind,
+            ...stream,
             score,
+            paused,
           },
         },
       })
@@ -204,6 +229,8 @@ export async function onScoreChange(event: ScoreChangeEvent): Promise<void> {
 
   getAllSettledValues<void | StreamInfo>(
     results,
-    "onScoreChange: Unexpected error"
+    "onProducerStateChange: Unexpected error"
   );
+
+  return true;
 }

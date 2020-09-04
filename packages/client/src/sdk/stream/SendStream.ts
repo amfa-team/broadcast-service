@@ -86,6 +86,32 @@ async function createAudioProducer(
   });
 }
 
+async function resumeProducer(
+  ws: PicnicWebSocket,
+  transport: PicnicTransport,
+  producer: types.Producer
+): Promise<void> {
+  await ws.send("/sfu/send/state", {
+    state: "play",
+    transportId: transport.getId(),
+    producerId: producer.id,
+  });
+  producer.resume();
+}
+
+async function pauseProducer(
+  ws: PicnicWebSocket,
+  transport: PicnicTransport,
+  producer: types.Producer
+): Promise<void> {
+  await ws.send("/sfu/send/state", {
+    state: "pause",
+    transportId: transport.getId(),
+    producerId: producer.id,
+  });
+  producer.pause();
+}
+
 export default class SendStream extends EventTarget {
   #transport: PicnicTransport;
   #ws: PicnicWebSocket;
@@ -102,10 +128,14 @@ export default class SendStream extends EventTarget {
     this.#ws = ws;
   }
 
+  getId(): string {
+    return this.#transport.getId();
+  }
+
   #destroyAudioProducer = async (): Promise<void> => {
     if (this.#audioProducer !== null) {
       await this.#ws
-        .send("/sfu/send/destroy", {
+        .send("/sfu/send/state", {
           producerId: this.#audioProducer.id,
           transportId: this.#transport.getId(),
           state: "close",
@@ -118,7 +148,7 @@ export default class SendStream extends EventTarget {
   #destroyVideoProducer = async (): Promise<void> => {
     if (this.#videoProducer !== null) {
       await this.#ws
-        .send("/sfu/send/destroy", {
+        .send("/sfu/send/state", {
           producerId: this.#videoProducer.id,
           transportId: this.#transport.getId(),
           state: "close",
@@ -189,13 +219,17 @@ export default class SendStream extends EventTarget {
     return this.#isScreenSharing;
   }
 
-  pauseAudio(): void {
-    this.#audioProducer?.pause();
+  async pauseAudio(): Promise<void> {
+    if (this.#audioProducer !== null) {
+      await pauseProducer(this.#ws, this.#transport, this.#audioProducer);
+    }
     this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "audio" }));
   }
 
-  resumeAudio(): void {
-    this.#audioProducer?.resume();
+  async resumeAudio(): Promise<void> {
+    if (this.#audioProducer !== null) {
+      await resumeProducer(this.#ws, this.#transport, this.#audioProducer);
+    }
     this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "audio" }));
   }
 
@@ -203,13 +237,17 @@ export default class SendStream extends EventTarget {
     return this.#audioProducer?.paused ?? true;
   }
 
-  pauseVideo(): void {
-    this.#videoProducer?.pause();
+  async pauseVideo(): Promise<void> {
+    if (this.#videoProducer !== null) {
+      await pauseProducer(this.#ws, this.#transport, this.#videoProducer);
+    }
     this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "video" }));
   }
 
-  resumeVideo(): void {
-    this.#videoProducer?.resume();
+  async resumeVideo(): Promise<void> {
+    if (this.#videoProducer !== null) {
+      await resumeProducer(this.#ws, this.#transport, this.#videoProducer);
+    }
     this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "video" }));
   }
 

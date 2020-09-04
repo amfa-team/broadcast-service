@@ -1,5 +1,6 @@
-import { Dispatch } from "react";
+import { Dispatch, useCallback, useState } from "react";
 import useLocalStorage from "react-use-localstorage";
+import { useHistory } from "react-router-dom";
 
 export function useApi(): {
   ws: string;
@@ -18,4 +19,52 @@ export function useApi(): {
     secret,
     setSecret,
   };
+}
+
+interface UseCreateHost {
+  loading: boolean;
+  createHost: () => Promise<string>;
+  createGuest: () => Promise<string>;
+  createParticipant: (role: "guest" | "host") => Promise<string>;
+}
+
+export function useCreateParticipant(): UseCreateHost {
+  const history = useHistory();
+  const [loading, setLoading] = useState(false);
+  const { http: endpoint, secret } = useApi();
+
+  const createParticipant = useCallback(
+    async (role: "guest" | "host"): Promise<string> => {
+      setLoading(true);
+
+      const res = await fetch(`${endpoint}/admin/participant`, {
+        body: JSON.stringify({ role }),
+        headers: {
+          "x-api-key": secret,
+          "content-type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      history.push(
+        role === "host"
+          ? `/broadcast/${data.payload.token}`
+          : `/view/${data.payload.token}`
+      );
+
+      return data.payload.token;
+    },
+    [endpoint, secret, history]
+  );
+
+  const createHost = useCallback(() => createParticipant("host"), [
+    createParticipant,
+  ]);
+  const createGuest = useCallback(() => createParticipant("guest"), [
+    createParticipant,
+  ]);
+
+  return { loading, createHost, createParticipant, createGuest };
 }

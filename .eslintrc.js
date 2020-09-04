@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "react-hooks"],
   extends: [
     "plugin:@typescript-eslint/recommended",
     "plugin:eslint-comments/recommended",
@@ -12,6 +12,10 @@ module.exports = {
     "prettier",
     "prettier/@typescript-eslint",
   ],
+  rules: {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+  },
   settings: {
     react: {
       version: "16.13",

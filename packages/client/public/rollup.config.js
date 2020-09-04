@@ -33,16 +33,15 @@ export default [
     },
     external: ["react", "react-dom"],
     plugins: [
-      // Allows node_modules resolution
       resolve({
         extensions,
         browser: true,
         preferBuiltins: false,
       }),
-      replace(replacements),
       commonjs(),
       json(),
       babel({
+        exclude: "node_modules/**", // only transpile our source code,
         babelHelpers: "bundled",
         extensions,
         presets: [
@@ -68,6 +67,8 @@ export default [
         ],
         plugins: production ? ["@babel/plugin-proposal-class-properties"] : [],
       }),
+      // Allows node_modules resolution
+      replace(replacements),
       production
         ? terser()
         : serve({

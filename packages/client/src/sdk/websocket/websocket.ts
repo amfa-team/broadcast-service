@@ -259,7 +259,9 @@ export class PicnicWebSocket extends EventTarget {
       reason: event.reason,
     });
     this.#pendingReq.forEach((pendingReq) => {
-      pendingReq.reject("onWsClose");
+      pendingReq.reject(
+        new Error("PicnicWebSocket.onError: websocket is closing")
+      );
     });
   };
 
