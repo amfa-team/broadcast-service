@@ -18,6 +18,7 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage}
   region: eu-west-3
+  memorySize: 512
   profile: picnic # aws credential profile name
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   environment:
@@ -40,6 +41,11 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service.name}-${self:provider.stage}-*"
+    - Effect: Allow
+      Action:
+        - execute-api:Invoke
+        - execute-api:ManageConnections
+      Resource: "arn:aws:execute-api:#{AWS::Region}:#{AWS::AccountId}:*/${self:provider.stage}/*"
 package:
   individually: true
 
