@@ -67,6 +67,8 @@ streamConsumerTable:
         AttributeType: S
       - AttributeName: consumerId
         AttributeType: S
+      - AttributeName: sourceTransportId
+        AttributeType: S
     KeySchema:
       - AttributeName: transportId
         KeyType: HASH
@@ -75,6 +77,16 @@ streamConsumerTable:
     ProvisionedThroughput:
       ReadCapacityUnits: 25
       WriteCapacityUnits: 5
+    GlobalSecondaryIndexes:
+      - IndexName: ${self:provider.environment.STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT}
+        KeySchema:
+          - AttributeName: sourceTransportId
+            KeyType: HASH
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 participantSendTransport:
   Type: AWS::DynamoDB::Table
   Properties:
