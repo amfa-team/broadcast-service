@@ -2,6 +2,8 @@ import { types } from "mediasoup-client";
 import { PicnicTransport } from "../transport/transport";
 import { PicnicEvent } from "../events/event";
 import { PicnicWebSocket } from "../websocket/websocket";
+import PicnicError from "../../exceptions/PicnicError";
+import { captureException } from "@sentry/react";
 
 // https://github.com/microsoft/TypeScript/issues/33232#issuecomment-633343054
 declare global {
@@ -140,7 +142,7 @@ export default class SendStream extends EventTarget {
           transportId: this.#transport.getId(),
           state: "close",
         })
-        .catch(() => null);
+        .catch(captureException);
       this.#audioProducer.close();
     }
   };
@@ -153,7 +155,7 @@ export default class SendStream extends EventTarget {
           transportId: this.#transport.getId(),
           state: "close",
         })
-        .catch(() => null);
+        .catch(captureException);
       this.#videoProducer?.close();
     }
   };
@@ -257,7 +259,10 @@ export default class SendStream extends EventTarget {
 
   getUserMediaStream(): MediaStream {
     if (this.#userMedia === null) {
-      throw new Error("SendStream.getUserMediaStream: is not loaded");
+      throw new PicnicError(
+        "SendStream.getUserMediaStream: is not loaded",
+        null
+      );
     }
 
     return this.#userMedia;

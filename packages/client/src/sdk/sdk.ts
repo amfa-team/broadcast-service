@@ -6,6 +6,7 @@ import SendStream from "./stream/SendStream";
 import { PicnicTransport } from "./transport/transport";
 import RecvStream from "./stream/RecvStream";
 import { ServerEventMap, PicnicEvent } from "./events/event";
+import { captureException } from "@sentry/react";
 
 export const initialState: SDKState = {
   websocket: "initial",
@@ -140,7 +141,9 @@ export class Picnic extends EventTarget {
         this.dispatchEvent(evt);
       }
     } catch (error) {
+      // TODO: handle error
       console.error("Unable to receive stream", { error, info });
+      captureException(error);
     }
   };
 

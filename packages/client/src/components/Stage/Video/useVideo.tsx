@@ -1,5 +1,6 @@
 import { Ref, useRef, useState, useEffect } from "react";
 import { Size } from "../StageGrid/layout";
+import { captureException } from "@sentry/react";
 
 export type VideoProps = {
   media: MediaStream | null | string;
@@ -56,7 +57,7 @@ export function useVideo({
             if (e.name === "NotAllowedError") {
               document.addEventListener("click", autoPlay, false);
             } else {
-              console.error(e);
+              captureException(e);
             }
           });
       }

@@ -4,6 +4,8 @@ import { PicnicDevice } from "../device/device";
 import { ConnectionInfo, ConnectParams, SendParams } from "../../../../types";
 import { PicnicEvent } from "../events/event";
 import { TransportState } from "../../types";
+import PicnicError from "../../exceptions/PicnicError";
+import { captureException } from "@sentry/react";
 
 type TransportType = "send" | "recv";
 
@@ -43,7 +45,10 @@ export class PicnicTransport extends EventTarget {
 
   getId(): string {
     if (this.#transport === null) {
-      throw new Error("PicnicTransport.getId: transport is not loaded yet");
+      throw new PicnicError(
+        "PicnicTransport.getId: transport is not loaded yet",
+        null
+      );
     }
 
     return this.#transport.id;
@@ -89,9 +94,8 @@ export class PicnicTransport extends EventTarget {
 
       this.#setState("connected");
     } catch (e) {
-      console.error("PicnicTransport.load: fail", e);
       this.#setState("error");
-      throw new Error("PicnicTransport.load: fail");
+      throw new PicnicError("PicnicTransport.load: fail", e);
     }
   }
 
@@ -99,7 +103,10 @@ export class PicnicTransport extends EventTarget {
     options: types.ProducerOptions & { track: MediaStreamTrack }
   ): Promise<types.Producer> {
     if (this.#transport === null || this.#type !== "send") {
-      throw new Error("PicnicTransport.produce: requires a send transport");
+      throw new PicnicError(
+        "PicnicTransport.produce: requires a send transport",
+        null
+      );
     }
 
     return this.#transport.produce(options);
@@ -107,7 +114,10 @@ export class PicnicTransport extends EventTarget {
 
   async consume(options: types.ConsumerOptions): Promise<types.Consumer> {
     if (this.#transport === null || this.#type !== "recv") {
-      throw new Error("PicnicTransport.consume: requires a recv transport");
+      throw new PicnicError(
+        "PicnicTransport.consume: requires a recv transport",
+        null
+      );
     }
 
     return this.#transport.consume(options);
@@ -120,8 +130,9 @@ export class PicnicTransport extends EventTarget {
   ): Promise<void> => {
     try {
       if (!this.#transport) {
-        throw new Error(
-          "PicnicTransport.ensureTransport: transport must exists"
+        throw new PicnicError(
+          "PicnicTransport.ensureTransport: transport must exists",
+          null
         );
       }
       const connectParams: ConnectParams = {
@@ -131,6 +142,7 @@ export class PicnicTransport extends EventTarget {
       await this.#ws.send<ConnectionInfo>("/sfu/connect/create", connectParams);
       callback();
     } catch (e) {
+      captureException(e);
       errback(e);
     }
   };
@@ -157,8 +169,9 @@ export class PicnicTransport extends EventTarget {
   ): Promise<void> => {
     try {
       if (!this.#transport) {
-        throw new Error(
-          "PicnicTransport.ensureTransport: transport must exists"
+        throw new PicnicError(
+          "PicnicTransport.ensureTransport: transport must exists",
+          null
         );
       }
       const req: SendParams = {
@@ -171,6 +184,7 @@ export class PicnicTransport extends EventTarget {
 
       callback({ id: producerId });
     } catch (error) {
+      captureException(error);
       errback(error);
     }
   };

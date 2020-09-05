@@ -7,8 +7,9 @@ import Topology from "./Topology";
 import { CssBaseline } from "@material-ui/core";
 import MenuBar from "./MenuBar";
 import CreateParticipantPage from "./CreateParticipantPage";
+import * as Sentry from "@sentry/react";
 
-export default function App(): JSX.Element {
+function App(): JSX.Element {
   return (
     <div style={{ position: "absolute", width: "100%", height: "100%" }}>
       <CssBaseline />
@@ -44,3 +45,5 @@ export default function App(): JSX.Element {
     </div>
   );
 }
+
+export default Sentry.withProfiler(App);

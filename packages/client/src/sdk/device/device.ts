@@ -3,6 +3,7 @@ import { PicnicWebSocket } from "../websocket/websocket";
 import { InitConnectionParams } from "../../../../types";
 import { DeviceState } from "../../types";
 import { PicnicEvent } from "../events/event";
+import PicnicError from "../../exceptions/PicnicError";
 
 export class PicnicDevice extends EventTarget {
   #state: DeviceState = "initial";
@@ -42,16 +43,16 @@ export class PicnicDevice extends EventTarget {
       await this.#device.load({ routerRtpCapabilities });
       this.setState("ready");
     } catch (e) {
-      console.error("PicnicDevice.loadDevice: fail", e);
       this.setState("error");
-      throw new Error("PicnicDevice.loadDevice: fail");
+      throw new PicnicError("PicnicDevice.loadDevice: fail", e);
     }
   }
 
   #ensureIsLoaded = (): void => {
     if (!this.#device.loaded) {
-      throw new Error(
-        "PicnicDevice.getInitConnectionParams: Device must be loaded"
+      throw new PicnicError(
+        "PicnicDevice.getInitConnectionParams: Device must be loaded",
+        null
       );
     }
   };

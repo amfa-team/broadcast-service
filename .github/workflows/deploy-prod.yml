@@ -120,6 +120,7 @@ jobs:
         env:
           WS_API: ${{ secrets.PRODUCTION_WEBSOCKET }}
           HTTP_API: ${{ secrets.PRODUCTION_CLUSTER_API }}
+          SENTRY_ENVIRONMENT: "production"
       - name: update stack
         working-directory: ./packages/client
         run: yarn serverless deploy --stage production
