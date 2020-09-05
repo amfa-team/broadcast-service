@@ -22,7 +22,7 @@ export async function createProducer(
     rtpParameters,
   });
 
-  const onStateChange = debounce(() => {
+  const onStateChange = () => {
     requestApi("/event/producer/state/change", {
       transportId: transport.id,
       producerId: producer.id,
@@ -30,10 +30,11 @@ export async function createProducer(
     }).catch((e) => {
       console.error("Producer.onStateChange: fail", e);
     });
-  }, DEBOUNCE_WAIT);
+  };
+  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT);
 
   // Set Producer events.
-  producer.on("score", onStateChange);
+  producer.on("score", onScoreChange);
   producer.observer.on("resume", onStateChange);
   producer.observer.on("pause", onStateChange);
 

@@ -5,6 +5,9 @@ import {
 import { getAllSettledValues } from "../../io/promises";
 import { streamConsumerModel } from "../schema";
 
+const INDEX_SOURCE_TRANSPORT =
+  process.env.STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT ?? "";
+
 export async function createStreamConsumer(
   stream: StreamConsumerInfo
 ): Promise<StreamConsumerInfo> {
@@ -32,7 +35,7 @@ export async function findStreamConsumerByTransportId(
 ): Promise<StreamConsumerInfo[]> {
   try {
     const results: unknown = await streamConsumerModel
-      .scan({ transportId: { eq: transportId } })
+      .query({ transportId: { eq: transportId } })
       .exec();
     return results as StreamConsumerInfo[];
   } catch (e) {
@@ -46,7 +49,8 @@ export async function findStreamConsumerBySourceTransportId(
 ): Promise<StreamConsumerInfo[]> {
   try {
     const results: unknown = await streamConsumerModel
-      .scan({ sourceTransportId: { eq: sourceTransportId } })
+      .query({ sourceTransportId: { eq: sourceTransportId } })
+      .using(INDEX_SOURCE_TRANSPORT)
       .exec();
     return results as StreamConsumerInfo[];
   } catch (e) {

@@ -125,7 +125,7 @@ export function useStage(sdk: Picnic, broadcastEnabled: boolean): UseStage {
         return;
       }
       setSizes((prevSize) => ({ ...prevSize, [id]: size }));
-    }, 300),
+    }, 100),
     []
   );
 

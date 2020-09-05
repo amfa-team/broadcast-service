@@ -9,13 +9,9 @@ export interface RecvStreamVideoContainerProps {
   onResize: (size: Size, id: string) => void;
 }
 
-function RecvStreamVideoContainerBase(
+export function RecvStreamVideoContainer(
   props: RecvStreamVideoContainerProps
 ): JSX.Element {
   const componentProps = useRecvStreamVideo(props);
   return <RecvStreamVideo {...componentProps} />;
 }
-
-export const RecvStreamVideoContainer = React.memo(
-  RecvStreamVideoContainerBase
-);

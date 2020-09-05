@@ -83,7 +83,7 @@ export function StageGrid(props: StageGridProps): JSX.Element | null {
   }
 
   return (
-    <ReactResizeDetector refreshMode="debounce" refreshRate={500}>
+    <ReactResizeDetector refreshMode="debounce" refreshRate={150}>
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {({ width = 0, height = 0, targetRef }: any) => {
         return (
