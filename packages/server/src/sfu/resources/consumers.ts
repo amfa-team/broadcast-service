@@ -35,7 +35,7 @@ export async function createConsumer(
     consumers.delete(consumer.id);
   });
 
-  const onStateChange = debounce(() => {
+  const onStateChange = () => {
     requestApi("/event/consumer/state/change", {
       transportId: transport.id,
       consumerId: consumer.id,
@@ -43,9 +43,10 @@ export async function createConsumer(
     }).catch((e) => {
       console.error("Consumer.onStateChange: fail", e);
     });
-  }, DEBOUNCE_WAIT);
+  };
+  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT);
 
-  consumer.on("score", onStateChange);
+  consumer.on("score", onScoreChange);
   consumer.on("producerpause", onStateChange);
   consumer.on("producerresume", onStateChange);
   consumer.observer.on("resume", onStateChange);
