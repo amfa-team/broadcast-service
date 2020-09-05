@@ -120,6 +120,7 @@ jobs:
         env:
           WS_API: ${{ secrets.STAGING_WEBSOCKET }}
           HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
+          SENTRY_ENVIRONMENT: "staging"
       - name: update stack
         working-directory: ./packages/client
         run: yarn serverless deploy --stage staging

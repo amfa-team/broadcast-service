@@ -15,6 +15,9 @@ const replacements = {
   ),
   "process.env.WS_API": JSON.stringify(process.env.WS_API || null),
   "process.env.HTTP_API": JSON.stringify(process.env.HTTP_API || null),
+  "process.env.SENTRY_ENVIRONMENT": JSON.stringify(
+    process.env.HTTP_API || "local"
+  ),
 };
 
 export default [

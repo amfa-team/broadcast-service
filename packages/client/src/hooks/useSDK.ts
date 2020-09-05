@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Settings } from "../types";
 import { Picnic } from "../sdk/sdk";
+import { captureException } from "@sentry/react";
 
 type SDKLoadingState = {
   loaded: false;
@@ -23,7 +24,7 @@ export function useSDK(settings: Settings): SDKState {
       .load()
       .then(() => setSDKState({ loaded: true, sdk }))
       // TODO: handle error
-      .catch(console.error);
+      .catch(captureException);
     return (): void => {
       sdk.destroy();
     };
