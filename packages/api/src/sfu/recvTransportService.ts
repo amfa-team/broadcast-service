@@ -4,7 +4,6 @@ import {
   deleteRecvTransport,
   createRecvTransport,
 } from "../db/repositories/recvTransportRepository";
-import { RequestContext } from "../io/types";
 import { getAllSettledValues } from "../io/promises";
 import { patchConnection } from "../db/repositories/connectionRepository";
 import { closeConsumer } from "./streamConsumerService";
@@ -52,7 +51,6 @@ export async function onConnectRecvTransport(
 interface OnRecvTransportCloseEvent {
   connectionId: string;
   transportId: string;
-  requestContext: RequestContext;
 }
 
 export async function onRecvTransportClose(
@@ -64,7 +62,6 @@ export async function onRecvTransportClose(
 interface CloseRecvTransportParams {
   connectionId: string;
   transportId: string | null;
-  requestContext: RequestContext;
   skipConnectionPatch: boolean;
 }
 
