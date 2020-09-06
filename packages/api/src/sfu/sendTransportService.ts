@@ -5,7 +5,6 @@ import {
   deleteSendTransport,
   createSendTransport,
 } from "../db/repositories/sendTransportRepository";
-import { RequestContext } from "../io/types";
 import { getAllSettledValues } from "../io/promises";
 import { closeStream } from "./streamService";
 import { Connection } from "../db/types/connection";
@@ -52,7 +51,6 @@ export async function onConnectSendTransport(
 interface OnSendTransportCloseEvent {
   connectionId: string;
   transportId: string;
-  requestContext: RequestContext;
 }
 
 export async function onSendTransportClose(
@@ -64,7 +62,6 @@ export async function onSendTransportClose(
 interface CloseSendTransportParams {
   connectionId: string;
   transportId: string | null;
-  requestContext: RequestContext;
   skipConnectionPatch: boolean;
 }
 
@@ -89,7 +86,6 @@ export async function closeSendTransport(
       transportId: params.transportId,
       producerId: null,
       destroy: false,
-      requestContext: params.requestContext,
     }),
     params.skipConnectionPatch
       ? Promise.resolve(null)

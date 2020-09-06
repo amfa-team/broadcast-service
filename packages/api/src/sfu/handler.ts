@@ -54,32 +54,16 @@ export async function routerCapabilities(
 
     try {
       const payload = await onConnect({
-        requestContext: event.requestContext,
         connectionId,
         token: req.token,
       });
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -101,27 +85,12 @@ export async function refreshConnection(
         token: req.token,
       });
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -138,27 +107,12 @@ export async function ping(
     );
 
     try {
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        onPing()
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, onPing());
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -171,7 +125,6 @@ export async function disconnect(
     try {
       await onDisconnect({
         connectionId,
-        requestContext: event.requestContext,
       });
       return handleSuccessResponse(null);
     } catch (e) {
@@ -205,27 +158,12 @@ export async function initConnect(
           ? await onInitSendTransport(params)
           : await onInitRecvTransport(params);
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -249,27 +187,12 @@ export async function createConnect(
           ? await onConnectSendTransport(params)
           : await onConnectRecvTransport(params);
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -287,32 +210,20 @@ export async function createSend(
 
     try {
       const producerId = await onCreateStream({
-        requestContext: event.requestContext,
         connectionId,
         data: req.data,
       });
 
       return handleWebSocketSuccessResponse(
-        event.requestContext,
         connectionId,
         req.msgId,
         producerId
       );
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -331,27 +242,12 @@ export async function getStreams(
     const streams = await getAllStreams();
 
     try {
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        streams
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, streams);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -373,27 +269,12 @@ export async function createReceive(
         data: req.data,
       });
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -412,31 +293,15 @@ export async function handleOnChangeStreamState(
     try {
       const payload = await onChangeStreamState({
         connectionId,
-        requestContext: event.requestContext,
         data: req.data,
       });
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -457,27 +322,12 @@ export async function handleOnChangeConsumerStreamState(
         data: req.data,
       });
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }
 
@@ -502,26 +352,11 @@ export async function handleGetConsumerStreamState(
     try {
       const payload = await getStreamConsumerState(req.data);
 
-      return handleWebSocketSuccessResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        payload
-      );
+      return handleWebSocketSuccessResponse(connectionId, req.msgId, payload);
     } catch (e) {
-      return handleWebSocketErrorResponse(
-        event.requestContext,
-        connectionId,
-        req.msgId,
-        e
-      );
+      return handleWebSocketErrorResponse(connectionId, req.msgId, e);
     }
   } catch (e) {
-    return handleWebSocketErrorResponse(
-      event.requestContext,
-      connectionId,
-      null,
-      e
-    );
+    return handleWebSocketErrorResponse(connectionId, null, e);
   }
 }

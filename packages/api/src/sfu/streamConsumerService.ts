@@ -14,7 +14,6 @@ import {
   patchStreamConsumer,
 } from "../db/repositories/streamConsumerRepository";
 import { getStream } from "../db/repositories/streamRepository";
-import { RequestContext } from "../io/types";
 import { postToConnection } from "../io/io";
 import { getAllSettledValues } from "../io/promises";
 import { StreamConsumerInfo } from "../db/types/streamConsumer";
@@ -172,7 +171,6 @@ export async function closeConsumerOf(
 interface ConsumerStateChangeEvent {
   transportId: string;
   consumerId: string;
-  requestContext: RequestContext;
   state: ConsumerState;
 }
 
@@ -182,7 +180,6 @@ export async function onConsumerStateChange(
   const {
     transportId,
     consumerId,
-    requestContext,
     state: { score, producerScore, paused, producerPaused },
   } = event;
 
@@ -206,7 +203,6 @@ export async function onConsumerStateChange(
     }),
     ...connections.map((connection) =>
       postToConnection(
-        requestContext,
         connection.connectionId,
         JSON.stringify({
           type: "event",

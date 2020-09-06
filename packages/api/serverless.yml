@@ -31,6 +31,7 @@ provider:
     SEND_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-send-transport"
     RECV_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-recv-transport"
     STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT: "${self:service.name}-${self:provider.stage}-src-transport"
+    WEBSOCKET_DOMAIN: "#{WebsocketsApi}.execute-api.#{AWS::Region}.amazonaws.com/${self:provider.stage}"
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
@@ -48,7 +49,7 @@ provider:
         - execute-api:ManageConnections
       Resource: "arn:aws:execute-api:#{AWS::Region}:#{AWS::AccountId}:*/${self:provider.stage}/*"
 package:
-  individually: true
+  individually: false
 
 functions:
   - ${file(./serverless/adminRoutes.yml)}

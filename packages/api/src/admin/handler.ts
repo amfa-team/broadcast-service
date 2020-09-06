@@ -99,7 +99,6 @@ export async function registerServer(
     if (existingServer !== null && existingServer.token !== data.token) {
       console.error("Server restarted, trigger client restart");
       await broadcastToConnections(
-        event.requestContext,
         JSON.stringify({
           type: "cmd",
           payload: {
