@@ -1,15 +1,8 @@
 import React from "react";
-import { useStage } from "./useStage";
-import { Picnic } from "../../sdk/sdk";
+import { useStage, UseStageParams } from "./useStage";
 import { Stage } from "./Stage";
 
-export interface StageProps {
-  sdk: Picnic;
-  broadcastEnabled: boolean;
-}
-
-export function StageContainer(props: StageProps): JSX.Element {
-  const { sdk, broadcastEnabled } = props;
-  const stageProps = useStage(sdk, broadcastEnabled);
+export function StageContainer(props: UseStageParams): JSX.Element {
+  const stageProps = useStage(props);
   return <Stage {...stageProps} />;
 }

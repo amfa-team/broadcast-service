@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import SendStream from "../../../sdk/stream/SendStream";
+import { ControlElement } from "../Controls";
 
 export interface UseSendStreamControls {
   active: boolean;
@@ -10,16 +11,19 @@ export interface UseSendStreamControls {
   toggleVideo: () => void;
   toggleScreenShare: () => void;
   isScreenShareEnabled: boolean;
+  extraControls: ControlElement[];
 }
 
 export interface UseSendStreamControlsParams {
   stream: SendStream | null;
   toggleActive: () => void;
+  extraControls?: ControlElement[] | null;
 }
 
 export default function useSendStreamControls({
   stream,
   toggleActive,
+  extraControls,
 }: UseSendStreamControlsParams): UseSendStreamControls {
   const [audioPaused, setAudioPaused] = useState<boolean>(
     stream?.isAudioPaused() ?? false
@@ -85,5 +89,6 @@ export default function useSendStreamControls({
     toggleActive,
     toggleVideo,
     toggleScreenShare,
+    extraControls: extraControls ?? [],
   };
 }

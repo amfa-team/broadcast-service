@@ -12,6 +12,7 @@ import {
   WifiTetheringOutlined,
   PortableWifiOffOutlined,
 } from "@material-ui/icons";
+import { Controls } from "../Controls";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,34 +42,54 @@ export function SendStreamControls(props: UseSendStreamControls): JSX.Element {
     toggleVideo,
     toggleScreenShare,
     toggleActive,
+    extraControls,
   } = props;
 
   if (!active) {
     return (
-      <div className={classes.root}>
-        <Fab onClick={toggleActive}>
-          <WifiTetheringOutlined />
-        </Fab>
-      </div>
+      <Controls
+        controls={[
+          {
+            name: "broadcast",
+            icon: <WifiTetheringOutlined />,
+            onClick: toggleActive,
+          },
+          ...extraControls,
+        ]}
+      />
     );
   }
 
   return (
-    <div className={classes.root}>
-      <Fab onClick={toggleAudio}>{audioPaused ? <MicOff /> : <Mic />}</Fab>
-      <Fab onClick={toggleVideo}>
-        {videoPaused ? <VideocamOff /> : <Videocam />}
-      </Fab>
-      <Fab onClick={toggleScreenShare}>
-        {isScreenShareEnabled ? (
-          <StopScreenShareOutlined />
-        ) : (
-          <ScreenShareOutlined />
-        )}
-      </Fab>
-      <Fab onClick={toggleActive} color="secondary">
-        <PortableWifiOffOutlined />
-      </Fab>
-    </div>
+    <Controls
+      controls={[
+        {
+          name: "audio",
+          icon: audioPaused ? <MicOff /> : <Mic />,
+          onClick: toggleAudio,
+        },
+        {
+          name: "video",
+          icon: videoPaused ? <VideocamOff /> : <Videocam />,
+          onClick: toggleVideo,
+        },
+        {
+          name: "screenShare",
+          icon: isScreenShareEnabled ? (
+            <StopScreenShareOutlined />
+          ) : (
+            <ScreenShareOutlined />
+          ),
+          onClick: toggleScreenShare,
+        },
+        ...extraControls,
+        {
+          name: "stop",
+          icon: <PortableWifiOffOutlined />,
+          onClick: toggleActive,
+          color: "secondary",
+        },
+      ]}
+    />
   );
 }

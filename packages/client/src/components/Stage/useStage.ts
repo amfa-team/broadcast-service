@@ -8,6 +8,7 @@ import { Size } from "./StageGrid/layout";
 import { UseSendStreamControls } from "./SendStreamControls";
 import SendStream from "../../sdk/stream/SendStream";
 import useSendStreamControls from "./SendStreamControls/useSendStreamControls";
+import { ControlElement } from "./Controls";
 
 export interface UseRecvStreams {
   recvStreams: RecvStream[];
@@ -20,9 +21,16 @@ export interface UseSendStream {
   controls: UseSendStreamControls | null;
 }
 
+export interface UseStageParams {
+  sdk: Picnic;
+  broadcastEnabled: boolean;
+  extraControls?: ControlElement[] | null;
+}
+
 export interface UseStage extends UseRecvStreams, UseSendStream {
   onResize: (size: Size, id: string) => void;
   sizes: Size[];
+  extraControls: ControlElement[];
 }
 
 function getRecvStreamsInfo(state: SDKState): string | null {
@@ -111,7 +119,11 @@ export function useRecvStreams(sdk: Picnic): UseRecvStreams {
   return { recvStreams, info: getRecvStreamsInfo(state) };
 }
 
-export function useStage(sdk: Picnic, broadcastEnabled: boolean): UseStage {
+export function useStage({
+  sdk,
+  extraControls,
+  broadcastEnabled,
+}: UseStageParams): UseStage {
   const { sendStream, sendInfo, controls } = useSendStream(
     sdk,
     broadcastEnabled
@@ -147,5 +159,6 @@ export function useStage(sdk: Picnic, broadcastEnabled: boolean): UseStage {
     sizes: sizeArray,
     controls,
     sendStream,
+    extraControls: extraControls ?? [],
   };
 }
