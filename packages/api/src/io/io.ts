@@ -12,8 +12,15 @@ import {
 import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
+import * as Sentry from "@sentry/node";
 
 const DOMAIN_NAME = process.env.WEBSOCKET_DOMAIN ?? "";
+
+Sentry.init({
+  dsn:
+    "https://2a21d2e5da45411aa305ee47379874d5@o443877.ingest.sentry.io/5418762",
+  environment: process.env.SENTRY_ENVIRONMENT,
+});
 
 const apigwManagementApi: ApiGatewayManagementApi = new ApiGatewayManagementApi(
   process.env.IS_OFFLINE
@@ -120,7 +127,7 @@ export async function parseWsParticipantRequest<T>(
   };
 }
 
-export function handleHttpErrorResponse(
+export async function handleHttpErrorResponse(
   e: unknown,
   msgId: string | null = null
 ): APIGatewayProxyResult {
@@ -135,7 +142,8 @@ export function handleHttpErrorResponse(
     };
   }
 
-  console.error(e);
+  Sentry.captureException(e);
+  await Sentry.flush(2000);
 
   return {
     statusCode: 500,
@@ -215,7 +223,7 @@ export async function handleWebSocketErrorResponse(
   msgId: string | null,
   e: unknown
 ): Promise<APIGatewayProxyResult> {
-  const result = handleHttpErrorResponse(e, msgId);
+  const result = await handleHttpErrorResponse(e, msgId);
 
   // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
   // https://github.com/dherault/serverless-offline/issues/1008

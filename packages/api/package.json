@@ -26,6 +26,7 @@
     "dynamo:migrate": "serverless dynamodb migrate --stage dev"
   },
   "dependencies": {
+    "@sentry/node": "^5.22.3",
     "@types/aws-lambda": "^8.10.61",
     "aws-lambda": "^1.0.6",
     "aws-sdk": "^2.738.0",

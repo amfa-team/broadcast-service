@@ -32,6 +32,7 @@ provider:
     RECV_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-recv-transport"
     STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT: "${self:service.name}-${self:provider.stage}-src-transport"
     WEBSOCKET_DOMAIN: "#{WebsocketsApi}.execute-api.#{AWS::Region}.amazonaws.com/${self:provider.stage}"
+    SENTRY_ENVIRONMENT: "${self:provider.stage}"
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
