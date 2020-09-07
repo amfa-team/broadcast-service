@@ -130,7 +130,7 @@ export async function parseWsParticipantRequest<T>(
 export async function handleHttpErrorResponse(
   e: unknown,
   msgId: string | null = null
-): APIGatewayProxyResult {
+): Promise<APIGatewayProxyResult> {
   if (e instanceof InvalidRequestError) {
     return {
       statusCode: e.code,
