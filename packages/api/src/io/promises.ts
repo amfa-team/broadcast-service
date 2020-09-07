@@ -1,3 +1,6 @@
+import { captureException } from "@sentry/node";
+import { PicnicError } from "./exceptions";
+
 export function getAllSettledValues<T>(
   results: PromiseSettledResult<T>[],
   errorMessage: string
@@ -10,13 +13,16 @@ export function getAllSettledValues<T>(
     if (result.status === "fulfilled") {
       values.push(result.value);
     } else {
-      console.error(result.reason);
+      captureException(result.reason);
       errorIndexes.push(i);
     }
   }
 
   if (errorIndexes.length > 0) {
-    throw new Error(`${errorMessage} at indexes [${errorIndexes.join(", ")}]`);
+    throw new PicnicError(
+      `${errorMessage} at indexes [${errorIndexes.join(", ")}]`,
+      null
+    );
   }
 
   return values;
