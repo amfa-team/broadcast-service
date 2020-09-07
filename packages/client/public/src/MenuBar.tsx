@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import { useLocation, useHistory, useRouteMatch } from "react-router-dom";
+import { useLocation, useHistory, useRouteMatch, Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,12 +43,49 @@ export default function MenuBar(): JSX.Element {
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={tabValue} onChange={handleChange} variant="scrollable">
-          <Tab label="Settings" value="/" />
-          <Tab label="Create Host" value="/admin/create-host" />
-          <Tab label="Create Guest" value="/admin/create-guest" />
+          <Tab
+            label={
+              <Link style={{ color: "inherit", textDecoration: "none" }} to="/">
+                Settings
+              </Link>
+            }
+            value="/"
+          />
+          <Tab
+            label={
+              <Link
+                style={{ color: "inherit", textDecoration: "none" }}
+                to="/admin/create-host"
+              >
+                Create Host
+              </Link>
+            }
+            value="/admin/create-host"
+          />
+          <Tab
+            label={
+              <Link
+                style={{ color: "inherit", textDecoration: "none" }}
+                to="/admin/create-guest"
+              >
+                Create Guest
+              </Link>
+            }
+            value="/admin/create-guest"
+          />
           <Tab label="Broadcast" value="/broadcast" disabled />
           <Tab label="View" value="/view" disabled />
-          <Tab label="Topology" value="/admin/topology" />
+          <Tab
+            label={
+              <Link
+                style={{ color: "inherit", textDecoration: "none" }}
+                to="/admin/topology"
+              >
+                Topology
+              </Link>
+            }
+            value="/admin/topology"
+          />
         </Tabs>
       </AppBar>
     </div>
