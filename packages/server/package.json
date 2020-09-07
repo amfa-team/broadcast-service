@@ -25,6 +25,7 @@
     "pm2": "pm2"
   },
   "dependencies": {
+    "@sentry/node": "^5.22.3",
     "@types/lodash.debounce": "^4.0.6",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

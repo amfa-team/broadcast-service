@@ -115,7 +115,10 @@ export class Picnic extends EventTarget {
     try {
       const { transportId, producerId } = info;
 
-      if (this.#sendTransport?.getId() === transportId) {
+      if (
+        this.#sendTransport?.getState() === "connected" &&
+        this.#sendTransport?.getId() === transportId
+      ) {
         // ignore self stream
         return;
       }

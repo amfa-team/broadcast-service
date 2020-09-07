@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import { JsonDecoder } from "ts.data.json";
 import { InvalidRequestError } from "./exceptions";
+import * as Sentry from "@sentry/node";
 
 export function parse(body: string | null): unknown {
   try {
@@ -32,7 +33,7 @@ export function handleErrorResponse(res: Response, e: unknown): Response {
     });
   }
 
-  console.error(e);
+  Sentry.captureException(e);
 
   return res.status(500).json({
     success: false,
