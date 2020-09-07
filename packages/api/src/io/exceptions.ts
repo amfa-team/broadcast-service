@@ -1,3 +1,17 @@
+export class PicnicError extends Error {
+  cause: Error | null;
+
+  constructor(message: string, cause: Error | null) {
+    super(message);
+
+    this.cause = cause;
+
+    if (process.env.NODE_ENV !== "production") {
+      console.error(message, cause);
+    }
+  }
+}
+
 export class InvalidRequestError extends Error {
   readonly code: 400 | 403;
 
