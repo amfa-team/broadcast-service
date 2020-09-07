@@ -23,6 +23,7 @@ const replacements = {
 export default [
   {
     input: "public/src/index.tsx",
+    cache: true,
     output: {
       file: "public/dist/index.umd.js",
       format: "umd",
