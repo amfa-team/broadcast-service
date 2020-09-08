@@ -77,7 +77,7 @@ export default [
         ? terser()
         : serve({
             open: true,
-            host: "0.0.0.0",
+            host: "127.0.0.1",
             contentBase: ["public"],
             historyApiFallback: true,
             port: 4000,

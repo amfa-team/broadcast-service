@@ -71,12 +71,15 @@ export function useSendStream(sdk: Picnic, enabled: boolean): UseSendStream {
   const [sendStream, setStream] = useState<SendStream | null>(null);
   const [active, setActive] = useState(false);
   const state = useSDKState(sdk);
-  const toggleActive = useCallback(() => {
-    setActive(!active);
-    if (active) {
+  const toggleActive = useCallback(async () => {
+    if (sendStream) {
+      await sendStream.pauseAudio().catch(setError);
+      await sendStream.pauseVideo().catch(setError);
       setStream(null);
     }
-  }, [active]);
+
+    setActive(!active);
+  }, [active, sendStream]);
   const controls = useSendStreamControls({ stream: sendStream, toggleActive });
   const [error, setError] = useState<Error | null>(null);
 
