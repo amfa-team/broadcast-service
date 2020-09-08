@@ -13,7 +13,7 @@
           "safari": 11,
           "node": "12.18"
         },
-        "loose": true
+        "loose": false
       }
     ]
   ],

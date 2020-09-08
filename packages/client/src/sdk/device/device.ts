@@ -2,10 +2,15 @@ import { Device, types } from "mediasoup-client";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { InitConnectionParams } from "../../../../types";
 import { DeviceState } from "../../types";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, Empty } from "../events/event";
 import PicnicError from "../../exceptions/PicnicError";
+import { EventTarget } from "event-target-shim";
 
-export class PicnicDevice extends EventTarget {
+export type DeviceEvents = {
+  "state:change": PicnicEvent<DeviceState>;
+};
+
+export class PicnicDevice extends EventTarget<DeviceEvents, Empty, "strict"> {
   #state: DeviceState = "initial";
 
   #device: types.Device = new Device();

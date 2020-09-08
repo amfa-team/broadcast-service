@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import RecvStream from "../../../../../sdk/stream/RecvStream";
+import RecvStream, {
+  RecvStreamEvents,
+} from "../../../../../sdk/stream/RecvStream";
 import { ConsumerState } from "../../../../../../../types";
-import { RecvStreamEventMap } from "../../../../../sdk/events/event";
 
 export type RecvQuality = 0 | 1 | 2 | 3 | 4 | null;
 
@@ -44,8 +45,7 @@ export function useRecvStreamStatus(stream: RecvStream): UseRecvStreamStatus {
   useEffect(() => {
     stream.resume();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const listener: any = (event: RecvStreamEventMap["state"]) => {
+    const listener = (event: RecvStreamEvents["state"]) => {
       const { kind, state } = event.data;
       if (kind === "audio") {
         setAudioState(state);

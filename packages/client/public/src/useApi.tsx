@@ -7,17 +7,26 @@ export function useApi(): {
   http: string;
   secret: string;
   setSecret: Dispatch<string>;
+  setHttp: Dispatch<string>;
+  setWs: Dispatch<string>;
 } {
-  const ws = process.env.WS_API ?? `ws://${window.location.hostname}:3001`;
-  const http =
-    process.env.HTTP_API ?? `http://${window.location.hostname}:3000/dev`;
   const [secret, setSecret] = useLocalStorage("API_SECRET", "super-SECRET");
+  const [http, setHttp] = useLocalStorage(
+    "HTTP_API",
+    `http://${window.location.hostname}:3000/dev`
+  );
+  const [ws, setWs] = useLocalStorage(
+    "WS_API",
+    process.env.WS_API ?? `ws://${window.location.hostname}:3001`
+  );
 
   return {
     ws,
     http,
     secret,
     setSecret,
+    setHttp,
+    setWs,
   };
 }
 

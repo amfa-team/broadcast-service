@@ -1,8 +1,9 @@
 import { v4 as uuid } from "uuid";
 import { Settings, WebSocketState } from "../../types";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, ServerEvents, Empty } from "../events/event";
 import PicnicError from "../../exceptions/PicnicError";
 import { captureException, captureMessage, Severity } from "@sentry/react";
+import { EventTarget } from "event-target-shim";
 
 type PendingReq = {
   resolve: (payload: unknown) => void;
@@ -61,7 +62,15 @@ async function sendToWs<T>(
   });
 }
 
-export class PicnicWebSocket extends EventTarget {
+export type WebSocketEvents = ServerEvents & {
+  "state:change": PicnicEvent<WebSocketState>;
+};
+
+export class PicnicWebSocket extends EventTarget<
+  WebSocketEvents,
+  Empty,
+  "strict"
+> {
   #ws: WebSocket;
 
   #state: WebSocketState = "initial";

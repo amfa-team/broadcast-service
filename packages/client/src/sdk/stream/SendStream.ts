@@ -1,9 +1,10 @@
 import { types } from "mediasoup-client";
 import { PicnicTransport } from "../transport/transport";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, Empty } from "../events/event";
 import { PicnicWebSocket } from "../websocket/websocket";
 import PicnicError from "../../exceptions/PicnicError";
 import { captureException } from "@sentry/react";
+import { EventTarget } from "event-target-shim";
 
 // https://github.com/microsoft/TypeScript/issues/33232#issuecomment-633343054
 declare global {
@@ -39,6 +40,9 @@ const screenConstraints = {
     frameRate: { max: 30 },
   },
 };
+
+const audioKind = "audio" as const;
+const videoKind = "video" as const;
 
 async function createVideoProducer(
   mediaStream: MediaStream,
@@ -114,7 +118,17 @@ async function pauseProducer(
   producer.pause();
 }
 
-export default class SendStream extends EventTarget {
+export type SendStreamEvents = {
+  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
+  "media:change": PicnicEvent<null>;
+};
+
+export default class SendStream extends EventTarget<
+  SendStreamEvents,
+  Empty,
+  "strict"
+> {
   #transport: PicnicTransport;
   #ws: PicnicWebSocket;
 
@@ -225,14 +239,15 @@ export default class SendStream extends EventTarget {
     if (this.#audioProducer !== null) {
       await pauseProducer(this.#ws, this.#transport, this.#audioProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "audio" }));
+    const evt = new PicnicEvent("stream:pause", { kind: audioKind });
+    this.dispatchEvent(evt);
   }
 
   async resumeAudio(): Promise<void> {
     if (this.#audioProducer !== null) {
       await resumeProducer(this.#ws, this.#transport, this.#audioProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "audio" }));
+    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: audioKind }));
   }
 
   isAudioPaused(): boolean {
@@ -243,14 +258,14 @@ export default class SendStream extends EventTarget {
     if (this.#videoProducer !== null) {
       await pauseProducer(this.#ws, this.#transport, this.#videoProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "video" }));
+    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: videoKind }));
   }
 
   async resumeVideo(): Promise<void> {
     if (this.#videoProducer !== null) {
       await resumeProducer(this.#ws, this.#transport, this.#videoProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "video" }));
+    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: videoKind }));
   }
 
   isVideoPaused(): boolean {
