@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useCreateParticipant } from "./useApi";
 import { Typography } from "@material-ui/core";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { Loading } from "../../src";
 
 interface CreateParticipantPageProps {
