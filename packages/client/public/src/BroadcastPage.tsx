@@ -5,6 +5,7 @@ import { useApi } from "./useApi";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
+import { Forum } from "@material-ui/icons";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -32,5 +33,13 @@ export default function BroadcastPage(): JSX.Element {
     );
   }
 
-  return <StageContainer sdk={state.sdk} broadcastEnabled />;
+  return (
+    <StageContainer
+      sdk={state.sdk}
+      broadcastEnabled
+      extraControls={[
+        { name: "chat", onClick: () => console.log("chat"), icon: <Forum /> },
+      ]}
+    />
+  );
 }

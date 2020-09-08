@@ -7,6 +7,7 @@ import RecvStream from "../../sdk/stream/RecvStream";
 import SendStream from "../../sdk/stream/SendStream";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { SendStreamControls } from "./SendStreamControls";
+import { Controls } from "./Controls";
 
 const useStyles = makeStyles(
   createStyles({
@@ -20,7 +21,14 @@ const useStyles = makeStyles(
 
 export function Stage(props: UseStage): JSX.Element {
   const classes = useStyles();
-  const { recvStreams, sendStream, onResize, sizes, controls } = props;
+  const {
+    recvStreams,
+    sendStream,
+    onResize,
+    sizes,
+    controls,
+    extraControls,
+  } = props;
 
   // TODO: Info
   const elements: Array<SendStream | RecvStream> = [...recvStreams];
@@ -51,7 +59,11 @@ export function Stage(props: UseStage): JSX.Element {
           }
         })}
       </StageGrid>
-      {controls && <SendStreamControls {...controls} />}
+      {controls ? (
+        <SendStreamControls {...controls} extraControls={extraControls} />
+      ) : (
+        <Controls controls={extraControls} />
+      )}
     </div>
   );
 }
