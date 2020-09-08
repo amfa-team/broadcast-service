@@ -33,21 +33,21 @@ export function useRecvStreamControls(
     };
   }, [stream]);
 
-  const toggleAudio = useCallback(() => {
-    setAudioPaused(!audioPaused);
+  const toggleAudio = useCallback(async () => {
     if (audioPaused) {
-      stream.resumeAudio();
+      await stream.resumeAudio();
     } else {
-      stream.pauseAudio();
+      await stream.pauseAudio();
     }
+    setAudioPaused(!audioPaused);
   }, [stream, audioPaused]);
-  const toggleVideo = useCallback(() => {
-    setVideoPaused(!videoPaused);
+  const toggleVideo = useCallback(async () => {
     if (videoPaused) {
-      stream.resumeVideo();
+      await stream.resumeVideo();
     } else {
-      stream.pauseVideo();
+      await stream.pauseVideo();
     }
+    setVideoPaused(!videoPaused);
   }, [stream, videoPaused]);
 
   return { audioPaused, videoPaused, toggleAudio, toggleVideo };

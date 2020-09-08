@@ -56,28 +56,28 @@ export default function useSendStreamControls({
   }, [stream]);
 
   const toggleAudio = useCallback(async () => {
-    setAudioPaused(!audioPaused);
     if (audioPaused) {
       await stream?.resumeAudio();
     } else {
       await stream?.pauseAudio();
     }
+    setAudioPaused(!audioPaused);
   }, [stream, audioPaused]);
   const toggleVideo = useCallback(async () => {
-    setVideoPaused(!videoPaused);
     if (videoPaused) {
       await stream?.resumeVideo();
     } else {
       await stream?.pauseVideo();
     }
+    setVideoPaused(!videoPaused);
   }, [stream, videoPaused]);
   const toggleScreenShare = useCallback(async () => {
-    setIsScreenShareEnabled(!isScreenShareEnabled);
     if (isScreenShareEnabled) {
       await stream?.disableShare();
     } else {
       await stream?.screenShare();
     }
+    setIsScreenShareEnabled(!isScreenShareEnabled);
   }, [stream, isScreenShareEnabled]);
 
   return {
