@@ -12,6 +12,8 @@ const useStyles = makeStyles<Theme, { flip: boolean }, string>(
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
+        height: "100%",
+        width: "100%",
         flex: 1,
       },
       video: {
