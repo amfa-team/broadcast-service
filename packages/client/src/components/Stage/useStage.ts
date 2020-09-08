@@ -78,21 +78,29 @@ export function useSendStream(sdk: Picnic, enabled: boolean): UseSendStream {
     }
   }, [active]);
   const controls = useSendStreamControls({ stream: sendStream, toggleActive });
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     // TODO: handle errors like permissions
     let s: SendStream | null = null;
     if (enabled && active) {
-      sdk.broadcast().then((stream) => {
-        s = stream;
-        setStream(stream);
-      });
+      sdk
+        .broadcast()
+        .then((stream) => {
+          s = stream;
+          setStream(stream);
+        })
+        .catch(setError);
     }
 
     return (): void => {
       s?.destroy();
     };
   }, [sdk, enabled, active]);
+
+  if (error !== null) {
+    throw error;
+  }
 
   return {
     sendStream,
