@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       position: "relative",
       width: "100%",
-      height: "100%",
+      height: "56px",
     },
     controls: {
       position: "absolute",
@@ -22,12 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "flex-start",
       justifyContent: "flex-end",
       color: theme.palette.info.light,
-      transition: "opacity .25s ease-in-out .0s",
       backgroundColor: "rgba(0, 0, 0, 0.5)",
-      opacity: 0,
-      "&:hover": {
-        opacity: 1,
-      },
     },
     status: {
       zIndex: 10,
