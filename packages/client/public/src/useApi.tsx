@@ -13,7 +13,7 @@ export function useApi(): {
   const [secret, setSecret] = useLocalStorage("API_SECRET", "super-SECRET");
   const [http, setHttp] = useLocalStorage(
     "HTTP_API",
-    `http://${window.location.hostname}:3000/dev`
+    process.env.HTTP_API ?? `http://${window.location.hostname}:3000/dev`
   );
   const [ws, setWs] = useLocalStorage(
     "WS_API",
