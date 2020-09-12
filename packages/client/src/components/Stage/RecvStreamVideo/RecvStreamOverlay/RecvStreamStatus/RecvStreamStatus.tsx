@@ -6,6 +6,7 @@ import {
   SignalCellularConnectedNoInternet2Bar,
   SignalCellular3Bar,
   SignalCellular4Bar,
+  MicOff,
 } from "@material-ui/icons";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
@@ -15,11 +16,6 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
       "& > *": {
         margin: theme.spacing(1),
-      },
-    },
-    icon: {
-      "&:hover": {
-        cursor: "pointer",
       },
     },
   })
@@ -43,8 +39,13 @@ function getQualityIcon(recvQuality: RecvQuality): JSX.Element | null {
 }
 
 export function RecvStreamStatus(props: UseRecvStreamStatus): JSX.Element {
-  const { recvQuality } = props;
+  const { recvQuality, producerAudioPaused } = props;
   const classes = useStyles();
 
-  return <div className={classes.root}>{getQualityIcon(recvQuality)}</div>;
+  return (
+    <div className={classes.root}>
+      {getQualityIcon(recvQuality)}
+      {producerAudioPaused && <MicOff />}
+    </div>
+  );
 }

@@ -1,6 +1,12 @@
 import React from "react";
 import { UseRecvStreamControls } from "./useRecvStreamControls";
-import { VolumeOff, VolumeUp, Videocam, VideocamOff } from "@material-ui/icons";
+import {
+  VolumeOff,
+  VolumeUp,
+  Videocam,
+  VideocamOff,
+  SettingsOverscan,
+} from "@material-ui/icons";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -20,7 +26,13 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export function RecvStreamControls(props: UseRecvStreamControls): JSX.Element {
-  const { audioPaused, videoPaused, toggleAudio, toggleVideo } = props;
+  const {
+    audioPaused,
+    videoPaused,
+    toggleAudio,
+    toggleVideo,
+    maximize,
+  } = props;
   const classes = useStyles();
 
   return (
@@ -34,6 +46,9 @@ export function RecvStreamControls(props: UseRecvStreamControls): JSX.Element {
         <VolumeOff className={classes.icon} onClick={toggleAudio} />
       ) : (
         <VolumeUp className={classes.icon} onClick={toggleAudio} />
+      )}
+      {maximize && (
+        <SettingsOverscan className={classes.icon} onClick={maximize} />
       )}
     </div>
   );

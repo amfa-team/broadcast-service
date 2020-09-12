@@ -48,6 +48,8 @@ export default function useSendStreamControls({
     stream?.addEventListener("stream:resume", listener);
     stream?.addEventListener("media:change", listener);
 
+    listener();
+
     return () => {
       stream?.removeEventListener("stream:pause", listener);
       stream?.removeEventListener("stream:resume", listener);

@@ -3,11 +3,13 @@ import RecvStream, {
   RecvStreamEvents,
 } from "../../../../../sdk/stream/RecvStream";
 import { ConsumerState } from "../../../../../../../types";
+import { TransportState } from "../../../../../types";
 
 export type RecvQuality = 0 | 1 | 2 | 3 | 4 | null;
 
 export interface UseRecvStreamStatus {
   recvQuality: RecvQuality;
+  producerAudioPaused: boolean;
 }
 
 function getRecvQuality(state: ConsumerState): RecvQuality {
@@ -34,7 +36,10 @@ function getRecvQuality(state: ConsumerState): RecvQuality {
   return 4;
 }
 
-export function useRecvStreamStatus(stream: RecvStream): UseRecvStreamStatus {
+export function useRecvStreamStatus(
+  stream: RecvStream,
+  state: TransportState
+): UseRecvStreamStatus {
   const [audioState, setAudioState] = useState<ConsumerState>(
     stream.getAudioState()
   );
@@ -54,6 +59,8 @@ export function useRecvStreamStatus(stream: RecvStream): UseRecvStreamStatus {
       }
     };
     stream.addEventListener("state", listener);
+    setAudioState(stream.getAudioState());
+    setVideoState(stream.getVideoState());
     return () => {
       stream.pause();
       stream.removeEventListener("state", listener);
@@ -62,5 +69,8 @@ export function useRecvStreamStatus(stream: RecvStream): UseRecvStreamStatus {
 
   const recvQuality = getRecvQuality(videoState) ?? getRecvQuality(audioState);
 
-  return { recvQuality };
+  return {
+    recvQuality: state !== "connected" ? 0 : recvQuality,
+    producerAudioPaused: audioState.producerPaused,
+  };
 }

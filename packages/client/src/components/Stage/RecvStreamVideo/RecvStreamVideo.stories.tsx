@@ -28,9 +28,11 @@ Loading.args = {
       videoPaused: false,
       toggleAudio: action("toggleAudio"),
       toggleVideo: action("toggleVideo"),
+      maximize: action("maximize"),
     },
     status: {
       recvQuality: null,
+      producerAudioPaused: true,
     },
   },
 };
@@ -57,9 +59,11 @@ Default.args = {
       videoPaused: false,
       toggleAudio: action("toggleAudio"),
       toggleVideo: action("toggleVideo"),
+      maximize: action("maximize"),
     },
     status: {
       recvQuality: 3,
+      producerAudioPaused: true,
     },
   },
 };
@@ -83,9 +87,11 @@ ManualPlay.args = {
       videoPaused: false,
       toggleAudio: action("toggleAudio"),
       toggleVideo: action("toggleVideo"),
+      maximize: null,
     },
     status: {
       recvQuality: 1,
+      producerAudioPaused: true,
     },
   },
 };

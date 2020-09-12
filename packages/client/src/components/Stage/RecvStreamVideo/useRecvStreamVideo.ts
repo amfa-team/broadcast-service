@@ -6,6 +6,7 @@ import { UseVideo, useVideo } from "../Video";
 import RecvStream from "../../../sdk/stream/RecvStream";
 import { Size } from "../StageGrid/layout";
 import { useCallback } from "react";
+import { SDKState } from "../../../types";
 
 export interface UseRecvStreamVideo {
   overlay: UseRecvStreamOverlay;
@@ -16,11 +17,17 @@ export interface UseRecvStreamVideo {
 export interface UseRecvStreamVideoParams {
   recvStream: RecvStream;
   onResize: (size: Size, id: string) => void;
+  setMain: (id: string) => void;
+  isMain: boolean;
+  state: SDKState;
 }
 
 export function useRecvStreamVideo({
   recvStream,
   onResize,
+  setMain,
+  isMain,
+  state,
 }: UseRecvStreamVideoParams): UseRecvStreamVideo {
   const id = recvStream.getId();
   const onVideoResize = useCallback(
@@ -30,7 +37,12 @@ export function useRecvStreamVideo({
     [onResize, id]
   );
   return {
-    overlay: useRecvStreamOverlay(recvStream),
+    overlay: useRecvStreamOverlay({
+      recvStream,
+      setMain,
+      isMain,
+      state: state.recvTransport,
+    }),
     video: useVideo({
       media: recvStream.getMediaStream(),
       muted: false,

@@ -41,3 +41,9 @@ export const Four = Template.bind({});
 Four.args = {
   recvQuality: 4,
 };
+
+export const AudioPaused = Template.bind({});
+AudioPaused.args = {
+  recvQuality: 4,
+  producerAudioPaused: true,
+};

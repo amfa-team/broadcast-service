@@ -1,6 +1,7 @@
 import React from "react";
 import { RecvStreamControls, UseRecvStreamControls } from ".";
 import type { Story } from "@storybook/react/types-6-0";
+import { action } from "@storybook/addon-actions";
 
 export default {
   title: "Stage/RecvStreamVideo/RecvStreamOverlay/RecvStreamControls",
@@ -22,4 +23,9 @@ AudioPaused.args = {
 export const VideoPaused = Template.bind({});
 VideoPaused.args = {
   videoPaused: true,
+};
+
+export const WithMaximize = Template.bind({});
+WithMaximize.args = {
+  maximize: action("maximize"),
 };
