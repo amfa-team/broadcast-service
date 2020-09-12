@@ -1,16 +1,14 @@
 import React from "react";
-import RecvStream from "../../../../../sdk/stream/RecvStream";
-import { useRecvStreamControls } from "./useRecvStreamControls";
+import {
+  useRecvStreamControls,
+  UseRecvStreamControlsParams,
+} from "./useRecvStreamControls";
 import { RecvStreamControls } from "./RecvStreamControls";
 
-export interface RecvControlsProps {
-  stream: RecvStream;
-}
-
 export function RecvStreamControlsContainer(
-  props: RecvControlsProps
+  props: UseRecvStreamControlsParams
 ): JSX.Element {
-  const controlsProps = useRecvStreamControls(props.stream);
+  const controlsProps = useRecvStreamControls(props);
 
   return <RecvStreamControls {...controlsProps} />;
 }
