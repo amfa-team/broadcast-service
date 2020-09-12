@@ -1,16 +1,12 @@
 import React from "react";
-import RecvStream from "../../../sdk/stream/RecvStream";
-import { useRecvStreamVideo } from "./useRecvStreamVideo";
+import {
+  useRecvStreamVideo,
+  UseRecvStreamVideoParams,
+} from "./useRecvStreamVideo";
 import { RecvStreamVideo } from "./RecvStreamVideo";
-import { Size } from "../StageGrid/layout";
-
-export interface RecvStreamVideoContainerProps {
-  recvStream: RecvStream;
-  onResize: (size: Size, id: string) => void;
-}
 
 export function RecvStreamVideoContainer(
-  props: RecvStreamVideoContainerProps
+  props: UseRecvStreamVideoParams
 ): JSX.Element {
   const componentProps = useRecvStreamVideo(props);
   return <RecvStreamVideo {...componentProps} />;

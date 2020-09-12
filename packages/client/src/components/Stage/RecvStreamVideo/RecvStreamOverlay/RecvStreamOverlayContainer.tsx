@@ -1,16 +1,14 @@
 import React from "react";
-import RecvStream from "../../../../sdk/stream/RecvStream";
 import { RecvStreamOverlay } from "./RecvStreamOverlay";
-import { useRecvStreamOverlay } from "./useRecvStreamOverlay";
-
-export interface RecvStreamOverlayContainerProps {
-  stream: RecvStream;
-}
+import {
+  useRecvStreamOverlay,
+  UseRecvStreamOverlayParams,
+} from "./useRecvStreamOverlay";
 
 export function RecvStreamOverlayContainer(
-  props: RecvStreamOverlayContainerProps
+  props: UseRecvStreamOverlayParams
 ): JSX.Element {
-  const componentProps = useRecvStreamOverlay(props.stream);
+  const componentProps = useRecvStreamOverlay(props);
 
   return <RecvStreamOverlay {...componentProps} />;
 }

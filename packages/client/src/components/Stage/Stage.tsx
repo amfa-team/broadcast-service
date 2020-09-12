@@ -28,6 +28,7 @@ export function Stage(props: UseStage): JSX.Element {
     sizes,
     controls,
     extraControls,
+    setMain,
   } = props;
 
   // TODO: Info
@@ -39,13 +40,15 @@ export function Stage(props: UseStage): JSX.Element {
   return (
     <div className={classes.root}>
       <StageGrid sizes={sizes}>
-        {elements.map((stream) => {
+        {elements.map((stream, i) => {
           if (stream instanceof RecvStream) {
             return (
               <RecvStreamVideoContainer
                 key={stream.getId()}
                 recvStream={stream}
                 onResize={onResize}
+                isMain={i === 0}
+                setMain={setMain}
               />
             );
           } else {

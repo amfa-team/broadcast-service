@@ -19,6 +19,7 @@ Default.args = {
     videoPaused: false,
     toggleAudio: action("toggleAudio"),
     toggleVideo: action("toggleVideo"),
+    maximize: null,
   },
   status: {
     recvQuality: 2,

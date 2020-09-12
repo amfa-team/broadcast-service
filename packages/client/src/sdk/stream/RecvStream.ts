@@ -109,6 +109,8 @@ export default class RecvStream extends EventTarget<
     producerPaused: false,
   };
   #sourceTransportId: string;
+  // Used to order streams by reception order to prevent flickering
+  #createdAt: number;
 
   constructor(options: RecvStreamOptions) {
     super();
@@ -118,6 +120,7 @@ export default class RecvStream extends EventTarget<
     this.#device = options.device;
     this.#sourceTransportId = options.sourceTransportId;
     this.#ws.addEventListener("streamConsumer:state", this.#onQualityChange);
+    this.#createdAt = Date.now();
   }
 
   async destroy(): Promise<void> {
@@ -126,6 +129,10 @@ export default class RecvStream extends EventTarget<
     this.#audioConsumer?.close();
     this.#videoConsumer?.close();
     this.#ws.removeEventListener("streamConsumer:state", this.#onQualityChange);
+  }
+
+  getCreatedAt(): number {
+    return this.#createdAt;
   }
 
   #onQualityChange = (event: ServerEvents["streamConsumer:state"]): void => {

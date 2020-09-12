@@ -10,9 +10,17 @@ export interface UseRecvStreamOverlay {
   status: UseRecvStreamStatus;
 }
 
-export function useRecvStreamOverlay(stream: RecvStream): UseRecvStreamOverlay {
+export interface UseRecvStreamOverlayParams {
+  recvStream: RecvStream;
+  setMain: (id: string) => void;
+  isMain: boolean;
+}
+
+export function useRecvStreamOverlay(
+  params: UseRecvStreamOverlayParams
+): UseRecvStreamOverlay {
   return {
-    controls: useRecvStreamControls(stream),
-    status: useRecvStreamStatus(stream),
+    controls: useRecvStreamControls(params),
+    status: useRecvStreamStatus(params.recvStream),
   };
 }

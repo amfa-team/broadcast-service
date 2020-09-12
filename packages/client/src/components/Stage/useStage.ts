@@ -1,7 +1,7 @@
 import { Picnic } from "../../sdk/sdk";
 import { debounce } from "lodash-es";
 import RecvStream from "../../sdk/stream/RecvStream";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { SDKState } from "../../types";
 import { useSDKState } from "../../hooks/useSDKState";
 import { Size } from "./StageGrid/layout";
@@ -13,6 +13,7 @@ import { ControlElement } from "./Controls";
 export interface UseRecvStreams {
   recvStreams: RecvStream[];
   info: string | null;
+  setMain: (id: string) => void;
 }
 
 export interface UseSendStream {
@@ -113,21 +114,60 @@ export function useSendStream(sdk: Picnic, enabled: boolean): UseSendStream {
 }
 
 export function useRecvStreams(sdk: Picnic): UseRecvStreams {
-  const [recvStreams, setStreams] = useState(
-    Array.from(sdk.getStreams().values())
-  );
+  const [recvStreams, setStreams] = useState<Record<string, RecvStream>>({});
   const state = useSDKState(sdk);
+  const [main, setMain] = useState<string | null>(null);
 
   useEffect(() => {
-    const listener = () => setStreams(Array.from(sdk.getStreams().values()));
+    const listener = () => {
+      setStreams((prevProps) => {
+        const prevKeys = Object.keys(prevProps);
+        const nextRecvStreams = sdk.getStreams();
+        if (
+          prevKeys.length === nextRecvStreams.size &&
+          prevKeys.every((k) => nextRecvStreams.has(k))
+        ) {
+          return prevProps;
+        }
+
+        const newProps: Record<string, RecvStream> = {};
+        sdk.getStreams().forEach((stream, key) => {
+          newProps[key] = stream;
+        });
+
+        return newProps;
+      });
+    };
     sdk.addEventListener("stream:update", listener);
+
+    listener();
 
     return (): void => {
       sdk.removeEventListener("stream:update", listener);
     };
   }, [sdk]);
 
-  return { recvStreams, info: getRecvStreamsInfo(state) };
+  const orderedRecvStream = useMemo(() => {
+    const orderedStreams = Object.values(recvStreams).sort((a, b) => {
+      if (a.getId() === main) {
+        return -1;
+      }
+
+      if (b.getId() === main) {
+        return 1;
+      }
+
+      return a.getCreatedAt() - b.getCreatedAt();
+    });
+
+    return orderedStreams;
+  }, [recvStreams, main]);
+
+  return {
+    recvStreams: orderedRecvStream,
+    info: getRecvStreamsInfo(state),
+    setMain,
+  };
 }
 
 export function useStage({
@@ -162,7 +202,7 @@ export function useStage({
     []
   );
 
-  const { recvStreams, info } = useRecvStreams(sdk);
+  const { recvStreams, info, setMain } = useRecvStreams(sdk);
 
   const sizeArray = recvStreams.map(
     (recvStream) => sizes[recvStream.getId()] ?? { width: 360, height: 180 }
@@ -181,5 +221,6 @@ export function useStage({
     controls,
     sendStream,
     extraControls: extraControls ?? [],
+    setMain,
   };
 }

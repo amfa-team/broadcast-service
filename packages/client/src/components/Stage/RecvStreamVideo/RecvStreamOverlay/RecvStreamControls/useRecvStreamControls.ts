@@ -6,49 +6,71 @@ export interface UseRecvStreamControls {
   videoPaused: boolean;
   toggleAudio: () => void;
   toggleVideo: () => void;
+  maximize: null | (() => void);
+}
+
+export interface UseRecvStreamControlsParams {
+  recvStream: RecvStream;
+  setMain: (id: string) => void;
+  isMain: boolean;
 }
 
 export function useRecvStreamControls(
-  stream: RecvStream
+  params: UseRecvStreamControlsParams
 ): UseRecvStreamControls {
+  const { recvStream, setMain, isMain } = params;
+
   const [audioPaused, setAudioPaused] = useState<boolean>(
-    stream.isAudioPaused()
+    recvStream.isAudioPaused()
   );
   const [videoPaused, setVideoPaused] = useState<boolean>(
-    stream.isVideoPaused()
+    recvStream.isVideoPaused()
   );
 
   useEffect(() => {
     const listener = () => {
-      setAudioPaused(stream.isAudioPaused());
-      setVideoPaused(stream.isVideoPaused());
+      setAudioPaused(recvStream.isAudioPaused());
+      setVideoPaused(recvStream.isVideoPaused());
     };
 
-    stream.addEventListener("stream:pause", listener);
-    stream.addEventListener("stream:resume", listener);
+    recvStream.addEventListener("stream:pause", listener);
+    recvStream.addEventListener("stream:resume", listener);
+
+    listener();
 
     return () => {
-      stream.removeEventListener("stream:pause", listener);
-      stream.removeEventListener("stream:resume", listener);
+      recvStream.removeEventListener("stream:pause", listener);
+      recvStream.removeEventListener("stream:resume", listener);
     };
-  }, [stream]);
+  }, [recvStream]);
 
   const toggleAudio = useCallback(async () => {
     if (audioPaused) {
-      await stream.resumeAudio();
+      await recvStream.resumeAudio();
     } else {
-      await stream.pauseAudio();
+      await recvStream.pauseAudio();
     }
     setAudioPaused(!audioPaused);
-  }, [stream, audioPaused]);
+  }, [recvStream, audioPaused]);
+
   const toggleVideo = useCallback(async () => {
     if (videoPaused) {
-      await stream.resumeVideo();
+      await recvStream.resumeVideo();
     } else {
-      await stream.pauseVideo();
+      await recvStream.pauseVideo();
     }
     setVideoPaused(!videoPaused);
-  }, [stream, videoPaused]);
+  }, [recvStream, videoPaused]);
 
-  return { audioPaused, videoPaused, toggleAudio, toggleVideo };
+  const maximize = useCallback(() => {
+    setMain(recvStream.getId());
+  }, [recvStream, setMain]);
+
+  return {
+    audioPaused,
+    videoPaused,
+    toggleAudio,
+    toggleVideo,
+    maximize: isMain ? null : maximize,
+  };
 }

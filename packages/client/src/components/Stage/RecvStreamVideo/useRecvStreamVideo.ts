@@ -16,11 +16,15 @@ export interface UseRecvStreamVideo {
 export interface UseRecvStreamVideoParams {
   recvStream: RecvStream;
   onResize: (size: Size, id: string) => void;
+  setMain: (id: string) => void;
+  isMain: boolean;
 }
 
 export function useRecvStreamVideo({
   recvStream,
   onResize,
+  setMain,
+  isMain,
 }: UseRecvStreamVideoParams): UseRecvStreamVideo {
   const id = recvStream.getId();
   const onVideoResize = useCallback(
@@ -30,7 +34,7 @@ export function useRecvStreamVideo({
     [onResize, id]
   );
   return {
-    overlay: useRecvStreamOverlay(recvStream),
+    overlay: useRecvStreamOverlay({ recvStream, setMain, isMain }),
     video: useVideo({
       media: recvStream.getMediaStream(),
       muted: false,
