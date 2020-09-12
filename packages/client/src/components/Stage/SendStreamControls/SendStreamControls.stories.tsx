@@ -11,7 +11,7 @@ export default {
 
 const Template: Story<UseSendStreamControls> = (
   props: UseSendStreamControls
-): JSX.Element => <SendStreamControls {...props} />;
+): JSX.Element => <SendStreamControls {...props} extraControls={[]} />;
 
 export const Default = Template.bind({});
 Default.args = {

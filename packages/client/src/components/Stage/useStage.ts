@@ -147,7 +147,17 @@ export function useStage({
       if (size.width === 0 || size.height === 0) {
         return;
       }
-      setSizes((prevSize) => ({ ...prevSize, [id]: size }));
+      setSizes((prevSize) => {
+        if (
+          prevSize[id]?.width === size.width &&
+          prevSize[id]?.height === size.height
+        ) {
+          // If same object is returned, react will skip re-render
+          return prevSize;
+        }
+
+        return { ...prevSize, [id]: size };
+      });
     }, 100),
     []
   );
