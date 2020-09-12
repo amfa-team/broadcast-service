@@ -12,13 +12,11 @@ import { ControlElement } from "./Controls";
 
 export interface UseRecvStreams {
   recvStreams: RecvStream[];
-  info: string | null;
   setMain: (id: string) => void;
 }
 
 export interface UseSendStream {
   sendStream: SendStream | null;
-  sendInfo: string | null;
   controls: UseSendStreamControls | null;
 }
 
@@ -32,46 +30,12 @@ export interface UseStage extends UseRecvStreams, UseSendStream {
   onResize: (size: Size, id: string) => void;
   sizes: Size[];
   extraControls: ControlElement[];
-}
-
-function getRecvStreamsInfo(state: SDKState): string | null {
-  if (state.recvTransport === "connected") {
-    return null;
-  }
-  if (state.recvTransport === "creating") {
-    return "Creating connection";
-  }
-  if (state.recvTransport === "connecting") {
-    return "Connecting";
-  }
-  if (state.recvTransport === "disconnected") {
-    return "Disconnected, check your network";
-  }
-
-  return "Error, please reload";
-}
-
-function getBroadcastInfo(state: SDKState): string | null {
-  if (state.sendTransport === "connected") {
-    return null;
-  }
-  if (state.sendTransport === "creating") {
-    return "Creating connection";
-  }
-  if (state.sendTransport === "connecting") {
-    return "Connecting";
-  }
-  if (state.sendTransport === "disconnected") {
-    return "Disconnected, check your network";
-  }
-
-  return "Error, please reload";
+  state: SDKState;
 }
 
 export function useSendStream(sdk: Picnic, enabled: boolean): UseSendStream {
   const [sendStream, setStream] = useState<SendStream | null>(null);
   const [active, setActive] = useState(false);
-  const state = useSDKState(sdk);
   const toggleActive = useCallback(async () => {
     if (sendStream) {
       await sendStream.pauseAudio().catch(setError);
@@ -108,14 +72,12 @@ export function useSendStream(sdk: Picnic, enabled: boolean): UseSendStream {
 
   return {
     sendStream,
-    sendInfo: getBroadcastInfo(state),
     controls: enabled ? controls : null,
   };
 }
 
 export function useRecvStreams(sdk: Picnic): UseRecvStreams {
   const [recvStreams, setStreams] = useState<Record<string, RecvStream>>({});
-  const state = useSDKState(sdk);
   const [main, setMain] = useState<string | null>(null);
 
   useEffect(() => {
@@ -165,7 +127,6 @@ export function useRecvStreams(sdk: Picnic): UseRecvStreams {
 
   return {
     recvStreams: orderedRecvStream,
-    info: getRecvStreamsInfo(state),
     setMain,
   };
 }
@@ -175,10 +136,8 @@ export function useStage({
   extraControls,
   broadcastEnabled,
 }: UseStageParams): UseStage {
-  const { sendStream, sendInfo, controls } = useSendStream(
-    sdk,
-    broadcastEnabled
-  );
+  const state = useSDKState(sdk);
+  const { sendStream, controls } = useSendStream(sdk, broadcastEnabled);
   const [sizes, setSizes] = useState<Record<string, Size>>({});
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,7 +161,7 @@ export function useStage({
     []
   );
 
-  const { recvStreams, info, setMain } = useRecvStreams(sdk);
+  const { recvStreams, setMain } = useRecvStreams(sdk);
 
   const sizeArray = recvStreams.map(
     (recvStream) => sizes[recvStream.getId()] ?? { width: 360, height: 180 }
@@ -213,14 +172,13 @@ export function useStage({
   }
 
   return {
-    info,
     recvStreams,
     onResize,
-    sendInfo,
     sizes: sizeArray,
     controls,
     sendStream,
     extraControls: extraControls ?? [],
     setMain,
+    state,
   };
 }

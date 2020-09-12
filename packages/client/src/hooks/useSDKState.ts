@@ -12,6 +12,7 @@ export function useSDKState(sdk: Picnic | null): SDKState {
       setSDKState(sdk?.getState() ?? initialState);
     };
     sdk?.addEventListener("state:change", listener);
+    listener();
     return (): void => {
       sdk?.removeEventListener("state:change", listener);
       sdk?.destroy();

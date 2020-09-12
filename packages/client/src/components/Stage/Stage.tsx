@@ -29,9 +29,9 @@ export function Stage(props: UseStage): JSX.Element {
     controls,
     extraControls,
     setMain,
+    state,
   } = props;
 
-  // TODO: Info
   const elements: Array<SendStream | RecvStream> = [...recvStreams];
   if (sendStream !== null) {
     elements.push(sendStream);
@@ -49,6 +49,7 @@ export function Stage(props: UseStage): JSX.Element {
                 onResize={onResize}
                 isMain={i === 0}
                 setMain={setMain}
+                state={state}
               />
             );
           } else {
@@ -57,6 +58,7 @@ export function Stage(props: UseStage): JSX.Element {
                 key={stream.getId()}
                 sendStream={stream}
                 onResize={onResize}
+                state={state}
               />
             );
           }

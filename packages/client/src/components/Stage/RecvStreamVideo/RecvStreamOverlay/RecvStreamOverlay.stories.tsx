@@ -23,5 +23,6 @@ Default.args = {
   },
   status: {
     recvQuality: 2,
+    producerAudioPaused: true,
   },
 };
