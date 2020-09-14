@@ -30,7 +30,7 @@ function getStatusIcon(state: TransportState): JSX.Element | null {
     case "connected":
       return null;
     default:
-      return <SignalCellularConnectedNoInternet0Bar />;
+      return <SignalCellularConnectedNoInternet0Bar color="secondary" />;
   }
 }
 

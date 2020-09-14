@@ -38,12 +38,20 @@ export function RecvStreamControls(props: UseRecvStreamControls): JSX.Element {
   return (
     <div className={classes.root}>
       {videoPaused ? (
-        <VideocamOff className={classes.icon} onClick={toggleVideo} />
+        <VideocamOff
+          className={classes.icon}
+          onClick={toggleVideo}
+          color="secondary"
+        />
       ) : (
         <Videocam className={classes.icon} onClick={toggleVideo} />
       )}
       {audioPaused ? (
-        <VolumeOff className={classes.icon} onClick={toggleAudio} />
+        <VolumeOff
+          className={classes.icon}
+          onClick={toggleAudio}
+          color="secondary"
+        />
       ) : (
         <VolumeUp className={classes.icon} onClick={toggleAudio} />
       )}
