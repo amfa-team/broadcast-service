@@ -71,6 +71,7 @@ async function createVideoProducer(
   });
 
   await producer.setMaxSpatialLayer(1);
+  console.log("producer", producer);
 
   return producer;
 }
