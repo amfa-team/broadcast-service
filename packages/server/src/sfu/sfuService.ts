@@ -52,13 +52,18 @@ export async function startup(): Promise<void> {
   await Promise.all(tasks);
 }
 
-export function getLessUsedRouterId(): string {
+export function getLessUsedRouterId(type: "send" | "recv" = "recv"): string {
   const best: { id: string | null; load: number } = { id: null, load: 0 };
 
   const transportUsage = getTransportUsage();
   const routers = getRouters();
 
-  for (let i = 0; i < routers.length; i += 1) {
+  if (type === "send" || routers.length == 1) {
+    return routers[0].id;
+  }
+
+  // Ignore first router, which is reserved for producers only
+  for (let i = 1; i < routers.length; i += 1) {
     const routerId = routers[i].id;
     const load = transportUsage[routerId] ?? 0;
     if (best.id === null || best.load > load) {
@@ -85,7 +90,7 @@ export function getRouterCapabilities(): types.RtpCapabilities {
 export async function initConnection(
   request: InitConnectionParams
 ): Promise<ConnectionInfo> {
-  const routerId = getLessUsedRouterId();
+  const routerId = getLessUsedRouterId(request.type);
   const router = getRouter(routerId);
 
   const transport = await createTransport(router, request.sctpCapabilities);
