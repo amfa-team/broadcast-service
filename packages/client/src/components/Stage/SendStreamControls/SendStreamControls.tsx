@@ -45,12 +45,12 @@ export function SendStreamControls(props: UseSendStreamControls): JSX.Element {
       controls={[
         {
           name: "audio",
-          icon: audioPaused ? <MicOff /> : <Mic />,
+          icon: audioPaused ? <MicOff color="secondary" /> : <Mic />,
           onClick: toggleAudio,
         },
         {
           name: "video",
-          icon: videoPaused ? <VideocamOff /> : <Videocam />,
+          icon: videoPaused ? <VideocamOff color="secondary" /> : <Videocam />,
           onClick: toggleVideo,
         },
         {

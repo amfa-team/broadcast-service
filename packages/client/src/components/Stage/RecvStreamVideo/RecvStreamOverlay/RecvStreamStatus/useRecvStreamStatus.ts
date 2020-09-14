@@ -62,7 +62,6 @@ export function useRecvStreamStatus(
     setAudioState(stream.getAudioState());
     setVideoState(stream.getVideoState());
     return () => {
-      stream.pause();
       stream.removeEventListener("state", listener);
     };
   }, [stream]);
