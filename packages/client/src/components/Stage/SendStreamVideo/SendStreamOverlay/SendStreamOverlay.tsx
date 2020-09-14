@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       width: "100%",
       height: "56px",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     status: {
       zIndex: 10,
@@ -18,7 +19,6 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "flex-end",
       justifyContent: "flex-start",
       color: theme.palette.info.light,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
   })
 );
