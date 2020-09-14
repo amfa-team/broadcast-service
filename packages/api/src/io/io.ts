@@ -8,12 +8,25 @@ import {
   Request,
   WsRequest,
   WsParticipantRequest,
-  RequestContext,
 } from "./types";
 import { Role } from "../db/types/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { getAllSettledValues } from "./promises";
-import { onDisconnect } from "../sfu/connectionService";
+import * as Sentry from "@sentry/node";
+
+const DOMAIN_NAME = process.env.WEBSOCKET_DOMAIN ?? "";
+
+Sentry.init({
+  dsn:
+    "https://2a21d2e5da45411aa305ee47379874d5@o443877.ingest.sentry.io/5418762",
+  environment: process.env.SENTRY_ENVIRONMENT,
+});
+
+const apigwManagementApi: ApiGatewayManagementApi = new ApiGatewayManagementApi(
+  process.env.IS_OFFLINE
+    ? { apiVersion: "2018-11-29", endpoint: `http://localhost:3001` }
+    : { apiVersion: "2018-11-29", endpoint: `${DOMAIN_NAME}` }
+);
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
   const { connectionId } = event.requestContext;
@@ -114,10 +127,10 @@ export async function parseWsParticipantRequest<T>(
   };
 }
 
-export function handleHttpErrorResponse(
+export async function handleHttpErrorResponse(
   e: unknown,
   msgId: string | null = null
-): APIGatewayProxyResult {
+): Promise<APIGatewayProxyResult> {
   if (e instanceof InvalidRequestError) {
     return {
       statusCode: e.code,
@@ -129,7 +142,8 @@ export function handleHttpErrorResponse(
     };
   }
 
-  console.error(e);
+  Sentry.captureException(e);
+  await Sentry.flush(2000);
 
   return {
     statusCode: 500,
@@ -158,31 +172,12 @@ export function handleSuccessResponse(
   };
 }
 
-let apigwManagementApi: ApiGatewayManagementApi | null = null;
-
-function getApiGatewayManagementApi(
-  requestContext: RequestContext
-): ApiGatewayManagementApi {
-  const { domainName = "", stage } = requestContext;
-
-  if (apigwManagementApi === null) {
-    apigwManagementApi = new ApiGatewayManagementApi(
-      process.env.IS_OFFLINE
-        ? { apiVersion: "2018-11-29", endpoint: `http://localhost:3001` }
-        : { apiVersion: "2018-11-29", endpoint: `${domainName}/${stage}` }
-    );
-  }
-
-  return apigwManagementApi;
-}
-
 export async function postToConnection(
-  requestContext: RequestContext,
   connectionId: string,
   data: string
 ): Promise<void> {
   try {
-    await getApiGatewayManagementApi(requestContext)
+    await apigwManagementApi
       .postToConnection({
         ConnectionId: connectionId,
         Data: data,
@@ -199,21 +194,15 @@ export async function postToConnection(
   }
 }
 
-export async function broadcastToConnections(
-  requestContext: RequestContext,
-  data: string
-): Promise<void> {
+export async function broadcastToConnections(data: string): Promise<void> {
   const connections = await getAllConnections();
   const results = await Promise.allSettled(
-    connections.map((c) =>
-      postToConnection(requestContext, c.connectionId, data)
-    )
+    connections.map((c) => postToConnection(c.connectionId, data))
   );
   getAllSettledValues(results, "broadcastToConnections: Unexpected Error");
 }
 
 export async function handleWebSocketSuccessResponse(
-  requestContext: RequestContext,
   connectionId: string,
   msgId: string,
   data: unknown
@@ -223,24 +212,23 @@ export async function handleWebSocketSuccessResponse(
   // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
   // https://github.com/dherault/serverless-offline/issues/1008
   if (process.env.IS_OFFLINE) {
-    await postToConnection(requestContext, connectionId, result.body);
+    await postToConnection(connectionId, result.body);
   }
 
   return result;
 }
 
 export async function handleWebSocketErrorResponse(
-  requestContext: RequestContext,
   connectionId: string,
   msgId: string | null,
   e: unknown
 ): Promise<APIGatewayProxyResult> {
-  const result = handleHttpErrorResponse(e, msgId);
+  const result = await handleHttpErrorResponse(e, msgId);
 
   // Lambda response is sent through WebSocket in Api Gateway but not in serverless offline
   // https://github.com/dherault/serverless-offline/issues/1008
-  if (requestContext.domainName === "localhost") {
-    await postToConnection(requestContext, connectionId, result.body);
+  if (process.env.IS_OFFLINE) {
+    await postToConnection(connectionId, result.body);
   }
 
   return result;

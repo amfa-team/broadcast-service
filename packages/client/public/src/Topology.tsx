@@ -15,7 +15,7 @@ export default function Topology(): JSX.Element {
       },
     });
     setTopology(JSON.stringify(await res.json(), null, 2));
-  }, [endpoint, secret, history]);
+  }, [endpoint, secret]);
 
   useEffect(() => {
     refresh();

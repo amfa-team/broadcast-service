@@ -1,6 +1,9 @@
 import { v4 as uuid } from "uuid";
 import { Settings, WebSocketState } from "../../types";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, ServerEvents, Empty } from "../events/event";
+import PicnicError from "../../exceptions/PicnicError";
+import { captureException, captureMessage, Severity } from "@sentry/react";
+import { EventTarget } from "event-target-shim";
 
 type PendingReq = {
   resolve: (payload: unknown) => void;
@@ -59,7 +62,15 @@ async function sendToWs<T>(
   });
 }
 
-export class PicnicWebSocket extends EventTarget {
+export type WebSocketEvents = ServerEvents & {
+  "state:change": PicnicEvent<WebSocketState>;
+};
+
+export class PicnicWebSocket extends EventTarget<
+  WebSocketEvents,
+  Empty,
+  "strict"
+> {
   #ws: WebSocket;
 
   #state: WebSocketState = "initial";
@@ -117,6 +128,7 @@ export class PicnicWebSocket extends EventTarget {
       });
     } catch (e) {
       console.error("PicnicWebSocket.refresh: fail to reconnect", e);
+      captureException(e);
       ws.close();
       return;
     }
@@ -137,6 +149,8 @@ export class PicnicWebSocket extends EventTarget {
       console.warn(success);
     } catch (e) {
       console.error("PicnicWebSocket.refresh: fail to refresh", e);
+      captureException(e);
+
       // We do not want to trigger onClose event
       ws.removeEventListener("message", this.#onMessage);
       ws.removeEventListener("error", this.#onError);
@@ -175,6 +189,7 @@ export class PicnicWebSocket extends EventTarget {
       await this.send("/sfu/ping", null);
     } catch (e) {
       console.error(e);
+      captureException(e);
     }
     this.#pingID = setTimeout(this.#ping, 60 * 1000);
   };
@@ -189,7 +204,7 @@ export class PicnicWebSocket extends EventTarget {
 
     if (this.#ws.readyState !== WebSocket.CONNECTING) {
       this.setState("disconnected");
-      throw new Error("PicnicWebSocket.load: Unable to connect");
+      throw new PicnicError("PicnicWebSocket.load: Unable to connect", null);
     }
 
     this.setState("connecting");
@@ -231,9 +246,9 @@ export class PicnicWebSocket extends EventTarget {
           pending.reject(msg.error);
         }
       } else {
-        console.error(
+        captureMessage(
           "onWsMessage: Received response for unknown or expired message",
-          msg
+          { level: Severity.Error, extra: msg }
         );
       }
     }
@@ -259,7 +274,9 @@ export class PicnicWebSocket extends EventTarget {
       reason: event.reason,
     });
     this.#pendingReq.forEach((pendingReq) => {
-      pendingReq.reject("onWsClose");
+      pendingReq.reject(
+        new Error("PicnicWebSocket.onError: websocket is closing")
+      );
     });
   };
 

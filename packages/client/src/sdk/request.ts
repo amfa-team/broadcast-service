@@ -1,4 +1,5 @@
 import { Settings } from "../types";
+import PicnicError from "../exceptions/PicnicError";
 
 function getAuthHeaders(settings: Settings) {
   return { "x-api-key": settings.token };
@@ -20,15 +21,14 @@ export async function get<T>(settings: Settings, path: string): Promise<T> {
   });
 
   if (!res.ok) {
-    console.error(res.status);
-    throw new Error(`get request failed with status ${res.status}`);
+    throw new PicnicError(`get request failed with status ${res.status}`, null);
   }
 
   const response = await res.json();
   if (!response.success) {
-    console.error(response.error);
-    throw new Error(
-      `get request failed with error: ${JSON.stringify(response.error)}`
+    throw new PicnicError(
+      `get request failed with error: ${JSON.stringify(response.error)}`,
+      null
     );
   }
 
@@ -50,15 +50,14 @@ export async function post<T>(
   });
 
   if (!res.ok) {
-    console.error(res.status);
-    throw new Error(`get request failed with status ${res.status}`);
+    throw new PicnicError(`get request failed with status ${res.status}`, null);
   }
 
   const response = await res.json();
   if (!response.success) {
-    console.error(response.error);
-    throw new Error(
-      `get request failed with error: ${JSON.stringify(response.error)}`
+    throw new PicnicError(
+      `get request failed with error: ${JSON.stringify(response.error)}`,
+      null
     );
   }
 

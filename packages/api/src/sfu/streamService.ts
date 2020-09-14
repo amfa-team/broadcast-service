@@ -9,7 +9,6 @@ import {
   patchStream,
 } from "../db/repositories/streamRepository";
 import { broadcastToConnections } from "../io/io";
-import { RequestContext } from "../io/types";
 import { JsonDecoder } from "ts.data.json";
 import { getAllSettledValues } from "../io/promises";
 import { closeConsumerOf } from "./streamConsumerService";
@@ -17,7 +16,6 @@ import { closeConsumerOf } from "./streamConsumerService";
 type CreateStreamEvent = {
   connectionId: string;
   data: Routes["/send/create"]["in"];
-  requestContext: RequestContext;
 };
 
 export const decodeSendParams: JsonDecoder.Decoder<
@@ -37,7 +35,7 @@ export const decodeSendParams: JsonDecoder.Decoder<
 export async function onCreateStream(
   event: CreateStreamEvent
 ): Promise<string> {
-  const { connectionId, data, requestContext } = event;
+  const { connectionId, data } = event;
 
   const connection = await getConnection({ connectionId });
   if (connection === null || connection.sendTransportId === null) {
@@ -70,7 +68,6 @@ export async function onCreateStream(
   const results = await Promise.allSettled([
     patchStream({ ...stream, score }),
     broadcastToConnections(
-      requestContext,
       JSON.stringify({
         type: "event",
         payload: {
@@ -98,7 +95,6 @@ type OnChangeStreamStateEventData = {
 type OnChangeStreamStateEvent = {
   connectionId: string;
   data: OnChangeStreamStateEventData;
-  requestContext: RequestContext;
 };
 
 export const decodeOnChangeStreamStateData: JsonDecoder.Decoder<OnChangeStreamStateEventData> = JsonDecoder.object(
@@ -121,7 +117,6 @@ export async function onChangeStreamState(
   event: OnChangeStreamStateEvent
 ): Promise<null> {
   const {
-    requestContext,
     data: { state, transportId, producerId },
   } = event;
   const stream = await getStream(transportId, producerId);
@@ -142,7 +137,6 @@ export async function onChangeStreamState(
       postToServer("/send/destroy", { transportId, producerId }),
       deleteStream(transportId, producerId),
       broadcastToConnections(
-        requestContext,
         JSON.stringify({
           type: "event",
           payload: {
@@ -164,7 +158,6 @@ interface CloseStreamParams {
   // Specific producer Id not supported yet
   producerId: null;
   destroy: false;
-  requestContext: RequestContext;
 }
 
 export async function closeStream(params: CloseStreamParams): Promise<void> {
@@ -172,7 +165,6 @@ export async function closeStream(params: CloseStreamParams): Promise<void> {
     deleteStreamByTransportId(params.transportId),
     closeConsumerOf({ sourceTransportId: params.transportId, destroy: false }),
     broadcastToConnections(
-      params.requestContext,
       JSON.stringify({
         type: "event",
         payload: {
@@ -189,7 +181,6 @@ export async function closeStream(params: CloseStreamParams): Promise<void> {
 interface ProducerStateChangeEvent {
   transportId: string;
   producerId: string;
-  requestContext: RequestContext;
   state: ProducerState;
 }
 
@@ -199,7 +190,6 @@ export async function onProducerStateChange(
   const {
     transportId,
     producerId,
-    requestContext,
     state: { score, paused },
   } = event;
 
@@ -212,7 +202,6 @@ export async function onProducerStateChange(
   const results = await Promise.allSettled([
     patchStream({ transportId, producerId, score, paused }),
     broadcastToConnections(
-      requestContext,
       JSON.stringify({
         type: "event",
         payload: {

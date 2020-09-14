@@ -2,9 +2,15 @@ import { Device, types } from "mediasoup-client";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { InitConnectionParams } from "../../../../types";
 import { DeviceState } from "../../types";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, Empty } from "../events/event";
+import PicnicError from "../../exceptions/PicnicError";
+import { EventTarget } from "event-target-shim";
 
-export class PicnicDevice extends EventTarget {
+export type DeviceEvents = {
+  "state:change": PicnicEvent<DeviceState>;
+};
+
+export class PicnicDevice extends EventTarget<DeviceEvents, Empty, "strict"> {
   #state: DeviceState = "initial";
 
   #device: types.Device = new Device();
@@ -42,16 +48,16 @@ export class PicnicDevice extends EventTarget {
       await this.#device.load({ routerRtpCapabilities });
       this.setState("ready");
     } catch (e) {
-      console.error("PicnicDevice.loadDevice: fail", e);
       this.setState("error");
-      throw new Error("PicnicDevice.loadDevice: fail");
+      throw new PicnicError("PicnicDevice.loadDevice: fail", e);
     }
   }
 
   #ensureIsLoaded = (): void => {
     if (!this.#device.loaded) {
-      throw new Error(
-        "PicnicDevice.getInitConnectionParams: Device must be loaded"
+      throw new PicnicError(
+        "PicnicDevice.getInitConnectionParams: Device must be loaded",
+        null
       );
     }
   };

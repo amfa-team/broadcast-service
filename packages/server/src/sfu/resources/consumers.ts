@@ -1,4 +1,5 @@
 import { types } from "mediasoup";
+import debounce from "lodash.debounce";
 import { requestApi } from "../../io/api";
 import { ConsumerState } from "../../../../types";
 
@@ -8,6 +9,8 @@ type ConsumerMeta = {
 
 const consumers: Map<string, types.Consumer> = new Map();
 const consumersMeta: WeakMap<types.Consumer, ConsumerMeta> = new Map();
+
+const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
 
 export async function createConsumer(
   transport: types.Transport,
@@ -41,8 +44,9 @@ export async function createConsumer(
       console.error("Consumer.onStateChange: fail", e);
     });
   };
+  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT);
 
-  consumer.on("score", onStateChange);
+  consumer.on("score", onScoreChange);
   consumer.on("producerpause", onStateChange);
   consumer.on("producerresume", onStateChange);
   consumer.observer.on("resume", onStateChange);

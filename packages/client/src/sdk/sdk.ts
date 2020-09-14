@@ -5,7 +5,9 @@ import { PicnicDevice } from "./device/device";
 import SendStream from "./stream/SendStream";
 import { PicnicTransport } from "./transport/transport";
 import RecvStream from "./stream/RecvStream";
-import { ServerEventMap, PicnicEvent } from "./events/event";
+import { Empty, ServerEvents, PicnicEvent } from "./events/event";
+import { captureException } from "@sentry/react";
+import { EventTarget } from "event-target-shim";
 
 export const initialState: SDKState = {
   websocket: "initial",
@@ -14,7 +16,12 @@ export const initialState: SDKState = {
   sendTransport: "initial",
 };
 
-export class Picnic extends EventTarget {
+export type SdkEvents = {
+  "state:change": PicnicEvent<SDKState>;
+  "stream:update": PicnicEvent<Map<string, RecvStream>>;
+};
+
+export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
   #state: SDKState = initialState;
 
   #recvStreams: Map<string, RecvStream> = new Map();
@@ -78,9 +85,8 @@ export class Picnic extends EventTarget {
   }
 
   #updateStreams = async (): Promise<void> => {
-    const removedEvents: Array<ServerEventMap["stream:remove"]["data"]> = [];
-    const watchRemoved = (event: Event) => {
-      const { data } = event as ServerEventMap["stream:remove"];
+    const removedEvents: Array<ServerEvents["stream:remove"]["data"]> = [];
+    const watchRemoved = ({ data }: ServerEvents["stream:remove"]) => {
       removedEvents.push(data);
     };
     this.#ws.addEventListener("stream:remove", watchRemoved);
@@ -98,14 +104,18 @@ export class Picnic extends EventTarget {
     await this.#device.loadDevice();
     await this.#recvTransport.load();
 
-    this.#ws.addEventListener("stream:add", async (event) => {
-      const { data } = event as ServerEventMap["stream:add"];
-      await this.#addStream(data);
-    });
-    this.#ws.addEventListener("stream:remove", (event) => {
-      const { data } = event as ServerEventMap["stream:remove"];
-      this.#removeStream(data);
-    });
+    this.#ws.addEventListener(
+      "stream:add",
+      async ({ data }: ServerEvents["stream:add"]) => {
+        await this.#addStream(data);
+      }
+    );
+    this.#ws.addEventListener(
+      "stream:remove",
+      ({ data }: ServerEvents["stream:remove"]) => {
+        this.#removeStream(data);
+      }
+    );
 
     await this.#updateStreams();
   }
@@ -114,7 +124,10 @@ export class Picnic extends EventTarget {
     try {
       const { transportId, producerId } = info;
 
-      if (this.#sendTransport?.getId() === transportId) {
+      if (
+        this.#sendTransport?.getState() === "connected" &&
+        this.#sendTransport?.getId() === transportId
+      ) {
         // ignore self stream
         return;
       }
@@ -134,13 +147,13 @@ export class Picnic extends EventTarget {
 
       // Might not be ready if only one of audio/video track is loaded
       if (recvStream.isReady()) {
-        const evt = new MessageEvent("stream:update", {
-          data: this.#recvStreams,
-        });
+        const evt = new PicnicEvent("stream:update", this.#recvStreams);
         this.dispatchEvent(evt);
       }
     } catch (error) {
+      // TODO: handle error
       console.error("Unable to receive stream", { error, info });
+      captureException(error);
     }
   };
 
@@ -152,9 +165,7 @@ export class Picnic extends EventTarget {
 
     recvStream.destroy();
     this.#recvStreams.delete(sourceTransportId);
-    const evt = new MessageEvent("stream:update", {
-      data: this.#recvStreams,
-    });
+    const evt = new PicnicEvent("stream:update", this.#recvStreams);
     this.dispatchEvent(evt);
   };
 

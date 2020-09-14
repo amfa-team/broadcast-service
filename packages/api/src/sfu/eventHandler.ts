@@ -30,10 +30,7 @@ export async function producerStateChange(
         "ProducerStateChange"
       )
     );
-    const payload = await onProducerStateChange({
-      ...data,
-      requestContext: event.requestContext,
-    });
+    const payload = await onProducerStateChange(data);
 
     return handleSuccessResponse(payload);
   } catch (e) {
@@ -64,10 +61,7 @@ export async function consumerStateChange(
         "ConsumerStateChange"
       )
     );
-    const payload = await onConsumerStateChange({
-      ...data,
-      requestContext: event.requestContext,
-    });
+    const payload = await onConsumerStateChange(data);
 
     return handleSuccessResponse(payload);
   } catch (e) {

@@ -9,7 +9,7 @@ participantTable:
       - AttributeName: token
         KeyType: HASH
     ProvisionedThroughput:
-      ReadCapacityUnits: 5
+      ReadCapacityUnits: 25
       WriteCapacityUnits: 5
 serverTable:
   Type: AWS::DynamoDB::Table
@@ -39,7 +39,7 @@ connectionTable:
       - AttributeName: connectionId
         KeyType: HASH
     ProvisionedThroughput:
-      ReadCapacityUnits: 5
+      ReadCapacityUnits: 25
       WriteCapacityUnits: 5
 streamTable:
   Type: AWS::DynamoDB::Table
@@ -67,14 +67,26 @@ streamConsumerTable:
         AttributeType: S
       - AttributeName: consumerId
         AttributeType: S
+      - AttributeName: sourceTransportId
+        AttributeType: S
     KeySchema:
       - AttributeName: transportId
         KeyType: HASH
       - AttributeName: consumerId
         KeyType: RANGE
     ProvisionedThroughput:
-      ReadCapacityUnits: 5
+      ReadCapacityUnits: 25
       WriteCapacityUnits: 5
+    GlobalSecondaryIndexes:
+      - IndexName: ${self:provider.environment.STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT}
+        KeySchema:
+          - AttributeName: sourceTransportId
+            KeyType: HASH
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 participantSendTransport:
   Type: AWS::DynamoDB::Table
   Properties:

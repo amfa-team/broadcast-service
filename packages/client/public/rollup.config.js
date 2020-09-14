@@ -15,11 +15,15 @@ const replacements = {
   ),
   "process.env.WS_API": JSON.stringify(process.env.WS_API || null),
   "process.env.HTTP_API": JSON.stringify(process.env.HTTP_API || null),
+  "process.env.SENTRY_ENVIRONMENT": JSON.stringify(
+    process.env.SENTRY_ENVIRONMENT || "local"
+  ),
 };
 
 export default [
   {
     input: "public/src/index.tsx",
+    cache: true,
     output: {
       file: "public/dist/index.umd.js",
       format: "umd",
@@ -33,16 +37,15 @@ export default [
     },
     external: ["react", "react-dom"],
     plugins: [
-      // Allows node_modules resolution
       resolve({
         extensions,
         browser: true,
         preferBuiltins: false,
       }),
-      replace(replacements),
       commonjs(),
       json(),
       babel({
+        exclude: "node_modules/**", // only transpile our source code,
         babelHelpers: "bundled",
         extensions,
         presets: [
@@ -68,11 +71,13 @@ export default [
         ],
         plugins: production ? ["@babel/plugin-proposal-class-properties"] : [],
       }),
+      // Allows node_modules resolution
+      replace(replacements),
       production
         ? terser()
         : serve({
             open: true,
-            host: "0.0.0.0",
+            host: "127.0.0.1",
             contentBase: ["public"],
             historyApiFallback: true,
             port: 4000,

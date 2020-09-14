@@ -4,6 +4,7 @@ import {
   PatchSendTransport,
 } from "../types/sendTransport";
 import { sendTransportModel } from "../schema";
+import { PicnicError } from "../../io/exceptions";
 
 export async function createSendTransport(
   transport: SendTransportKey
@@ -17,8 +18,7 @@ export async function deleteSendTransport({
   try {
     await sendTransportModel.delete({ transportId });
   } catch (e) {
-    console.error(e);
-    throw new Error("deleteSendTransport: failed");
+    throw new PicnicError("deleteSendTransport: failed", e);
   }
 }
 

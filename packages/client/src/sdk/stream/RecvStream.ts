@@ -3,7 +3,8 @@ import { PicnicTransport } from "../transport/transport";
 import { PicnicDevice } from "../device/device";
 import { PicnicWebSocket } from "../websocket/websocket";
 import { ReceiveParams, ConsumerInfo, ConsumerState } from "../../../../types";
-import { PicnicEvent, ServerEventMap } from "../events/event";
+import { PicnicEvent, ServerEvents, Empty } from "../events/event";
+import { EventTarget } from "event-target-shim";
 
 interface RecvStreamOptions {
   ws: PicnicWebSocket;
@@ -69,7 +70,26 @@ async function createConsumer(
   return { consumer, state };
 }
 
-export default class RecvStream extends EventTarget {
+const audioKind = "audio" as const;
+const videoKind = "video" as const;
+
+export type RecvStreamEvents = {
+  state: PicnicEvent<{
+    state: Pick<
+      ServerEvents["streamConsumer:state"]["data"],
+      "score" | "producerScore" | "paused" | "producerPaused"
+    >;
+    kind: "audio" | "video";
+  }>;
+  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
+};
+
+export default class RecvStream extends EventTarget<
+  RecvStreamEvents,
+  Empty,
+  "strict"
+> {
   #ws: PicnicWebSocket;
   #stream: MediaStream = new MediaStream();
   #transport: PicnicTransport;
@@ -89,6 +109,8 @@ export default class RecvStream extends EventTarget {
     producerPaused: false,
   };
   #sourceTransportId: string;
+  // Used to order streams by reception order to prevent flickering
+  #createdAt: number;
 
   constructor(options: RecvStreamOptions) {
     super();
@@ -97,11 +119,8 @@ export default class RecvStream extends EventTarget {
     this.#transport = options.transport;
     this.#device = options.device;
     this.#sourceTransportId = options.sourceTransportId;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.#ws.addEventListener(
-      "streamConsumer:state",
-      this.#onQualityChange as any
-    );
+    this.#ws.addEventListener("streamConsumer:state", this.#onQualityChange);
+    this.#createdAt = Date.now();
   }
 
   async destroy(): Promise<void> {
@@ -109,14 +128,14 @@ export default class RecvStream extends EventTarget {
     // Not needed from stream:delete event because sourceTransport closed ==> consumer closed server-side
     this.#audioConsumer?.close();
     this.#videoConsumer?.close();
-    this.#ws.removeEventListener(
-      "streamConsumer:state",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.#onQualityChange as any
-    );
+    this.#ws.removeEventListener("streamConsumer:state", this.#onQualityChange);
   }
 
-  #onQualityChange = (event: ServerEventMap["streamConsumer:state"]): void => {
+  getCreatedAt(): number {
+    return this.#createdAt;
+  }
+
+  #onQualityChange = (event: ServerEvents["streamConsumer:state"]): void => {
     const {
       score,
       consumerId,
@@ -129,12 +148,12 @@ export default class RecvStream extends EventTarget {
 
     if (this.#audioConsumer?.id === consumerId) {
       this.#audioState = state;
-      const evt = new PicnicEvent("state", { state, kind: "audio" });
+      const evt = new PicnicEvent("state", { state, kind: audioKind });
       this.dispatchEvent(evt);
     }
     if (this.#videoConsumer?.id === consumerId) {
       this.#videoState = state;
-      const evt = new PicnicEvent("state", { state, kind: "video" });
+      const evt = new PicnicEvent("state", { state, kind: videoKind });
       this.dispatchEvent(evt);
     }
   };
@@ -179,14 +198,14 @@ export default class RecvStream extends EventTarget {
   async pauseAudio(): Promise<void> {
     if (this.#audioConsumer !== null) {
       await pauseConsumer(this.#ws, this.#transport, this.#audioConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "audio" }));
+      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: audioKind }));
     }
   }
 
   async resumeAudio(): Promise<void> {
     if (this.#audioConsumer !== null) {
       await resumeConsumer(this.#ws, this.#transport, this.#audioConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "audio" }));
+      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: audioKind }));
     }
   }
 
@@ -201,14 +220,14 @@ export default class RecvStream extends EventTarget {
   async pauseVideo(): Promise<void> {
     if (this.#videoConsumer !== null) {
       await pauseConsumer(this.#ws, this.#transport, this.#videoConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "video" }));
+      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: videoKind }));
     }
   }
 
   async resumeVideo(): Promise<void> {
     if (this.#videoConsumer !== null) {
       await resumeConsumer(this.#ws, this.#transport, this.#videoConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "video" }));
+      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: videoKind }));
     }
   }
 

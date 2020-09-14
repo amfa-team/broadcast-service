@@ -13,6 +13,9 @@ if (process.env.IS_OFFLINE) {
   aws.ddb.local("http://localhost:9005");
 }
 
+const INDEX_SOURCE_TRANSPORT =
+  process.env.STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT ?? "";
+
 export type ServerDocument = Server & Document;
 
 export const serverSchema = new Schema({
@@ -167,6 +170,11 @@ export const streamConsumerSchema = new Schema({
   sourceTransportId: {
     type: String,
     required: true,
+    index: {
+      name: INDEX_SOURCE_TRANSPORT,
+      global: true,
+      project: true,
+    },
   },
   producerId: {
     type: String,

@@ -1,7 +1,10 @@
 import { types } from "mediasoup-client";
 import { PicnicTransport } from "../transport/transport";
-import { PicnicEvent } from "../events/event";
+import { PicnicEvent, Empty } from "../events/event";
 import { PicnicWebSocket } from "../websocket/websocket";
+import PicnicError from "../../exceptions/PicnicError";
+import { captureException } from "@sentry/react";
+import { EventTarget } from "event-target-shim";
 
 // https://github.com/microsoft/TypeScript/issues/33232#issuecomment-633343054
 declare global {
@@ -20,9 +23,9 @@ declare global {
 const videoConstraints = {
   audio: true,
   video: {
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
-    frameRate: { max: 30 },
+    width: { ideal: 960 },
+    height: { ideal: 540 },
+    frameRate: { max: 24 },
   },
 };
 
@@ -32,11 +35,14 @@ const screenConstraints = {
     cursor: "motion",
     logicalSurface: true,
     displaySurface: "monitor",
-    width: { max: 1920 },
-    height: { max: 1080 },
-    frameRate: { max: 30 },
+    width: { max: 1280 },
+    height: { max: 720 },
+    frameRate: { max: 24 },
   },
 };
+
+const audioKind = "audio" as const;
+const videoKind = "video" as const;
 
 async function createVideoProducer(
   mediaStream: MediaStream,
@@ -49,23 +55,25 @@ async function createVideoProducer(
     return null;
   }
 
-  return transport.produce({
+  const producer = await transport.produce({
     track,
     codecOptions: {
       videoGoogleStartBitrate: 1000,
-      videoGoogleMaxBitrate: 2000000,
+      videoGoogleMaxBitrate: 5000000,
     },
     disableTrackOnPause: true,
     zeroRtpOnPause: true,
     encodings: [
-      // { dtx: true, maxBitrate: 500000 },
-      // { dtx: true, maxBitrate: 1000000 },
-      // { dtx: true, maxBitrate: 2000000 },
-      { scaleResolutionDownBy: 4, maxBitrate: 500000 },
-      { scaleResolutionDownBy: 2, maxBitrate: 1000000 },
-      { scaleResolutionDownBy: 1, maxBitrate: 2000000 },
+      { dtx: true, scaleResolutionDownBy: 3, maxBitrate: 1000000 },
+      { dtx: true, scaleResolutionDownBy: 1.5, maxBitrate: 2500000 },
+      { dtx: true, scaleResolutionDownBy: 1, maxBitrate: 5000000 },
     ],
   });
+
+  await producer.setMaxSpatialLayer(1);
+  console.log("producer", producer);
+
+  return producer;
 }
 
 async function createAudioProducer(
@@ -112,7 +120,17 @@ async function pauseProducer(
   producer.pause();
 }
 
-export default class SendStream extends EventTarget {
+export type SendStreamEvents = {
+  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
+  "media:change": PicnicEvent<null>;
+};
+
+export default class SendStream extends EventTarget<
+  SendStreamEvents,
+  Empty,
+  "strict"
+> {
   #transport: PicnicTransport;
   #ws: PicnicWebSocket;
 
@@ -128,6 +146,10 @@ export default class SendStream extends EventTarget {
     this.#ws = ws;
   }
 
+  getId(): string {
+    return this.#transport.getId();
+  }
+
   #destroyAudioProducer = async (): Promise<void> => {
     if (this.#audioProducer !== null) {
       await this.#ws
@@ -136,7 +158,7 @@ export default class SendStream extends EventTarget {
           transportId: this.#transport.getId(),
           state: "close",
         })
-        .catch(() => null);
+        .catch(captureException);
       this.#audioProducer.close();
     }
   };
@@ -149,7 +171,7 @@ export default class SendStream extends EventTarget {
           transportId: this.#transport.getId(),
           state: "close",
         })
-        .catch(() => null);
+        .catch(captureException);
       this.#videoProducer?.close();
     }
   };
@@ -180,6 +202,7 @@ export default class SendStream extends EventTarget {
 
     if (videoTrack !== null) {
       this.#videoProducer?.replaceTrack({ track: videoTrack });
+      await this.#videoProducer?.setMaxSpatialLayer(2);
       videoTrack.addEventListener("ended", () => {
         this.disableShare();
       });
@@ -202,6 +225,7 @@ export default class SendStream extends EventTarget {
 
     if (videoTrack !== null) {
       this.#videoProducer?.replaceTrack({ track: videoTrack });
+      await this.#videoProducer?.setMaxSpatialLayer(1);
     }
     if (audioTrack !== null) {
       this.#audioProducer?.replaceTrack({ track: audioTrack });
@@ -219,14 +243,15 @@ export default class SendStream extends EventTarget {
     if (this.#audioProducer !== null) {
       await pauseProducer(this.#ws, this.#transport, this.#audioProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "audio" }));
+    const evt = new PicnicEvent("stream:pause", { kind: audioKind });
+    this.dispatchEvent(evt);
   }
 
   async resumeAudio(): Promise<void> {
     if (this.#audioProducer !== null) {
       await resumeProducer(this.#ws, this.#transport, this.#audioProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "audio" }));
+    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: audioKind }));
   }
 
   isAudioPaused(): boolean {
@@ -237,14 +262,14 @@ export default class SendStream extends EventTarget {
     if (this.#videoProducer !== null) {
       await pauseProducer(this.#ws, this.#transport, this.#videoProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: "video" }));
+    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: videoKind }));
   }
 
   async resumeVideo(): Promise<void> {
     if (this.#videoProducer !== null) {
       await resumeProducer(this.#ws, this.#transport, this.#videoProducer);
     }
-    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: "video" }));
+    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: videoKind }));
   }
 
   isVideoPaused(): boolean {
@@ -253,7 +278,10 @@ export default class SendStream extends EventTarget {
 
   getUserMediaStream(): MediaStream {
     if (this.#userMedia === null) {
-      throw new Error("SendStream.getUserMediaStream: is not loaded");
+      throw new PicnicError(
+        "SendStream.getUserMediaStream: is not loaded",
+        null
+      );
     }
 
     return this.#userMedia;

@@ -5,6 +5,7 @@ import {
   PatchConnection,
 } from "../types/connection";
 import { connectionModel } from "../schema";
+import { PicnicError } from "../../io/exceptions";
 
 export async function createConnection(
   data: CreateConnection
@@ -51,8 +52,7 @@ export async function patchConnection(
     const doc = await connectionModel.update({ connectionId }, rest);
     return doc.toJSON() as Connection;
   } catch (e) {
-    console.error(e, params);
-    throw new Error("patchConnection: fail");
+    throw new PicnicError("patchConnection: fail", e);
   }
 }
 
@@ -65,7 +65,6 @@ export async function findConnectionByRecvTransportId(
       .exec();
     return results as Connection[];
   } catch (e) {
-    console.error("findConnectionByRecvTransportId: failed", e);
-    throw new Error("findConnectionByRecvTransportId: failed");
+    throw new PicnicError("findConnectionByRecvTransportId: failed", e);
   }
 }

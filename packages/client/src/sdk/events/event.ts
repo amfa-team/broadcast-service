@@ -1,8 +1,4 @@
-import {
-  StreamInfo,
-  ConsumerState,
-  StreamConsumerInfo,
-} from "../../../../types";
+import { StreamInfo, StreamConsumerInfo } from "../../../../types";
 
 export class PicnicEvent<T> extends Event {
   data: T;
@@ -13,7 +9,7 @@ export class PicnicEvent<T> extends Event {
   }
 }
 
-export type ServerEventMap = {
+export type ServerEvents = {
   "stream:add": PicnicEvent<StreamInfo>;
   "stream:remove": PicnicEvent<string>;
   "media:change": PicnicEvent<null>;
@@ -23,9 +19,5 @@ export type ServerEventMap = {
   "streamConsumer:state": PicnicEvent<StreamConsumerInfo>;
 };
 
-export type RecvStreamEventMap = {
-  state: PicnicEvent<{
-    state: ConsumerState;
-    kind: "audio" | "video";
-  }>;
-};
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type Empty = {};

@@ -1,5 +1,5 @@
 import React from "react";
-import { useSDK, Stage } from "../../src";
+import { useSDK, StageContainer, Loading } from "../../src";
 import { useParams } from "react-router-dom";
 import { useApi } from "./useApi";
 
@@ -11,8 +11,8 @@ export default function ViewerPage(): JSX.Element {
   const state = useSDK(settings);
 
   if (!state.loaded) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
-  return <Stage sdk={state.sdk} />;
+  return <StageContainer sdk={state.sdk} broadcastEnabled={false} />;
 }
