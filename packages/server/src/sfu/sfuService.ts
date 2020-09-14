@@ -164,6 +164,10 @@ export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
   const existingConsumer = getProducerConsumer(producer, selfTransport);
 
   if (existingConsumer !== null) {
+    if (producer.kind === "audio") {
+      await existingConsumer.setPriority(10);
+    }
+
     return {
       consumerId: existingConsumer.id,
       producerId: producer.id,
@@ -177,6 +181,10 @@ export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
     producer.id,
     rtpCapabilities
   );
+
+  if (producer.kind === "audio") {
+    await consumer.setPriority(10);
+  }
 
   return {
     consumerId: consumer.id,
