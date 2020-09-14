@@ -23,9 +23,9 @@ declare global {
 const videoConstraints = {
   audio: true,
   video: {
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
-    frameRate: { max: 30 },
+    width: { ideal: 960 },
+    height: { ideal: 540 },
+    frameRate: { max: 24 },
   },
 };
 
@@ -37,7 +37,7 @@ const screenConstraints = {
     displaySurface: "monitor",
     width: { max: 1280 },
     height: { max: 720 },
-    frameRate: { max: 30 },
+    frameRate: { max: 24 },
   },
 };
 
@@ -64,13 +64,13 @@ async function createVideoProducer(
     disableTrackOnPause: true,
     zeroRtpOnPause: true,
     encodings: [
-      { dtx: true, scaleResolutionDownBy: 4, maxBitrate: 1000000 },
-      { dtx: true, scaleResolutionDownBy: 2, maxBitrate: 2500000 },
+      { dtx: true, scaleResolutionDownBy: 3, maxBitrate: 1000000 },
+      { dtx: true, scaleResolutionDownBy: 1.5, maxBitrate: 2500000 },
       { dtx: true, scaleResolutionDownBy: 1, maxBitrate: 5000000 },
     ],
   });
 
-  await producer.setMaxSpatialLayer(2);
+  await producer.setMaxSpatialLayer(1);
 
   return producer;
 }
@@ -201,7 +201,7 @@ export default class SendStream extends EventTarget<
 
     if (videoTrack !== null) {
       this.#videoProducer?.replaceTrack({ track: videoTrack });
-      await this.#videoProducer?.setMaxSpatialLayer(3);
+      await this.#videoProducer?.setMaxSpatialLayer(2);
       videoTrack.addEventListener("ended", () => {
         this.disableShare();
       });
@@ -224,7 +224,7 @@ export default class SendStream extends EventTarget<
 
     if (videoTrack !== null) {
       this.#videoProducer?.replaceTrack({ track: videoTrack });
-      await this.#videoProducer?.setMaxSpatialLayer(2);
+      await this.#videoProducer?.setMaxSpatialLayer(1);
     }
     if (audioTrack !== null) {
       this.#audioProducer?.replaceTrack({ track: audioTrack });
