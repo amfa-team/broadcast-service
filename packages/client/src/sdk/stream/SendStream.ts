@@ -23,8 +23,8 @@ declare global {
 const videoConstraints = {
   audio: true,
   video: {
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
     frameRate: { max: 30 },
   },
 };
@@ -35,8 +35,8 @@ const screenConstraints = {
     cursor: "motion",
     logicalSurface: true,
     displaySurface: "monitor",
-    width: { max: 1920 },
-    height: { max: 1080 },
+    width: { max: 1280 },
+    height: { max: 720 },
     frameRate: { max: 30 },
   },
 };
@@ -55,23 +55,24 @@ async function createVideoProducer(
     return null;
   }
 
-  return transport.produce({
+  const producer = await transport.produce({
     track,
     codecOptions: {
       videoGoogleStartBitrate: 1000,
-      videoGoogleMaxBitrate: 2000000,
+      videoGoogleMaxBitrate: 5000000,
     },
     disableTrackOnPause: true,
     zeroRtpOnPause: true,
     encodings: [
-      // { dtx: true, maxBitrate: 500000 },
-      // { dtx: true, maxBitrate: 1000000 },
-      // { dtx: true, maxBitrate: 2000000 },
-      { scaleResolutionDownBy: 4, maxBitrate: 500000 },
-      { scaleResolutionDownBy: 2, maxBitrate: 1000000 },
-      { scaleResolutionDownBy: 1, maxBitrate: 2000000 },
+      { dtx: true, scaleResolutionDownBy: 4, maxBitrate: 1000000 },
+      { dtx: true, scaleResolutionDownBy: 2, maxBitrate: 2500000 },
+      { dtx: true, scaleResolutionDownBy: 1, maxBitrate: 5000000 },
     ],
   });
+
+  await producer.setMaxSpatialLayer(2);
+
+  return producer;
 }
 
 async function createAudioProducer(
@@ -200,6 +201,7 @@ export default class SendStream extends EventTarget<
 
     if (videoTrack !== null) {
       this.#videoProducer?.replaceTrack({ track: videoTrack });
+      await this.#videoProducer?.setMaxSpatialLayer(3);
       videoTrack.addEventListener("ended", () => {
         this.disableShare();
       });
@@ -222,6 +224,7 @@ export default class SendStream extends EventTarget<
 
     if (videoTrack !== null) {
       this.#videoProducer?.replaceTrack({ track: videoTrack });
+      await this.#videoProducer?.setMaxSpatialLayer(2);
     }
     if (audioTrack !== null) {
       this.#audioProducer?.replaceTrack({ track: audioTrack });
