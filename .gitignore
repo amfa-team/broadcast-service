@@ -95,6 +95,7 @@ typings/
 # Builds
 dist
 build
+packages/*/lib
 
 # Webpack directories
 .webpack

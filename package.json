@@ -17,7 +17,9 @@
   },
   "scripts": {
     "prettier:fix": "prettier --write .",
-    "prettier:check": "prettier --check ."
+    "prettier:check": "prettier --check .",
+    "build": "yarn workspaces run build",
+    "clean": "yarn workspaces run clean"
   },
   "husky": {
     "hooks": {

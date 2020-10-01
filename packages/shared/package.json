@@ -1,0 +1,20 @@
+{
+  "name": "@amfa-team/shared",
+  "private": true,
+  "repository": "https://github.com/amfa-team/sbs-service-template.git",
+  "version": "0.1.0",
+  "description": "Shared code between environment",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "sideEffects": false,
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.0.3"
+  },
+  "peerDependencies": {},
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  }
+}

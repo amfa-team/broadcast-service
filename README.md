@@ -43,3 +43,10 @@ see https://docs.github.com/en/free-pro-team@latest/packages/using-github-packag
 ### Github Actions
 
 - prettier check
+
+### Packages
+
+#### Shared
+
+- typescript
+- shared code between environments
