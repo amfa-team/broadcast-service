@@ -1,0 +1,17 @@
+{
+  "name": "sbs-service-template",
+  "repository": "https://github.com/amfa-team/sbs-service-template.git",
+  "version": "0.1.0",
+  "description": "Side By Side Service template",
+  "main": "index.js",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+  },
+  "scripts": {
+  }
+}
