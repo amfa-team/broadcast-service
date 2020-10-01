@@ -86,7 +86,8 @@ typings/
 .serverless/
 
 # User-specific stuff
-.vscode/
+.vscode/*
+!.vscode/settings.json
 
 # Serverless build
 .build

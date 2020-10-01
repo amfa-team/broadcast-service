@@ -27,4 +27,14 @@ In order to use private npm packages, you need to set `.npmrc` using the `.npmrc
 
 see https://docs.github.com/en/free-pro-team@latest/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#authenticating-with-a-personal-access-token
 
+## What's included
 
+### Prettier
+
+- Extensions: `js,ts,tsx,css,md`
+- VsCode settings: AutoFormat on save
+- Husky: AutoFormat on commit
+
+### Yarn Workspaces
+
+- Uses yarn workspaces
