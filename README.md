@@ -19,6 +19,17 @@
   "version": "0.1.0",
 ```
 
+#### Update packages/react/package.json
+
+```diff
+{
+-  "name": "@amfa-team/react-service-template",
++  "name": "@amfa-team/test-service",
+-  "repository": "https://github.com/amfa-team/sbs-service-template.git",
++  "repository": "https://github.com/amfa-team/test-service.git",
+  "version": "0.1.0",
+```
+
 ## Usage
 
 ### Github Packages
@@ -51,3 +62,8 @@ see https://docs.github.com/en/free-pro-team@latest/packages/using-github-packag
 
 - typescript
 - shared code between environments
+
+#### React
+
+- React component library
+- typescript
