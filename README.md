@@ -31,10 +31,15 @@ see https://docs.github.com/en/free-pro-team@latest/packages/using-github-packag
 
 ### Prettier
 
-- Extensions: `js,ts,tsx,css,md`
+- Extensions: `js,ts,tsx,css,md,json`
 - VsCode settings: AutoFormat on save
 - Husky: AutoFormat on commit
+- Github Action check
 
 ### Yarn Workspaces
 
 - Uses yarn workspaces
+
+### Github Actions
+
+- prettier check
