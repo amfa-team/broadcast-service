@@ -124,6 +124,8 @@ export type SendStreamEvents = {
   "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
   "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
   "media:change": PicnicEvent<null>;
+  "start": PicnicEvent<null>;
+  "stop": PicnicEvent<null>;
 };
 
 export default class SendStream extends EventTarget<
@@ -191,6 +193,7 @@ export default class SendStream extends EventTarget<
       createVideoProducer(this.#userMedia, this.#transport),
       createAudioProducer(this.#userMedia, this.#transport),
     ]);
+    this.dispatchEvent(new PicnicEvent("start", null));
   }
 
   async screenShare(): Promise<void> {
@@ -292,5 +295,6 @@ export default class SendStream extends EventTarget<
       this.#userMedia.getTracks().forEach((track) => track.stop());
       this.#userMedia = null;
     }
+    this.dispatchEvent(new PicnicEvent("stop", null));
   }
 }
