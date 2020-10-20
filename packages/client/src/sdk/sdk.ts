@@ -21,6 +21,7 @@ export type SdkEvents = {
   "stream:update": PicnicEvent<Map<string, RecvStream>>;
   "broadcast:start": PicnicEvent<null>;
   "broadcast:stop": PicnicEvent<null>;
+  destroy: PicnicEvent<null>;
 };
 
 export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
@@ -85,6 +86,8 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
     await this.#recvTransport.destroy();
     await this.#sendTransport?.destroy();
     await this.#ws.destroy();
+
+    this.dispatchEvent(new PicnicEvent("destroy", null));
   }
 
   getBroadcastStream(): SendStream | null {
