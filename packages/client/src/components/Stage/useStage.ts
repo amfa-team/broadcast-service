@@ -40,6 +40,7 @@ export function useSendStream(sdk: Picnic, enabled: boolean): UseSendStream {
     if (sendStream) {
       await sendStream.pauseAudio().catch(setError);
       await sendStream.pauseVideo().catch(setError);
+      sendStream.destroy();
       setStream(null);
     }
 

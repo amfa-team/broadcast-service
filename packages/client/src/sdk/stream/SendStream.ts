@@ -124,8 +124,8 @@ export type SendStreamEvents = {
   "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
   "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
   "media:change": PicnicEvent<null>;
-  "start": PicnicEvent<null>;
-  "stop": PicnicEvent<null>;
+  start: PicnicEvent<null>;
+  stop: PicnicEvent<null>;
 };
 
 export default class SendStream extends EventTarget<
@@ -135,6 +135,7 @@ export default class SendStream extends EventTarget<
 > {
   #transport: PicnicTransport;
   #ws: PicnicWebSocket;
+  #active = false;
 
   #userMedia: MediaStream | null = null;
   #isScreenSharing = false;
@@ -179,10 +180,23 @@ export default class SendStream extends EventTarget<
   };
 
   async destroy(): Promise<void> {
+    this.#active = false;
+
     await Promise.all([
       this.#destroyAudioProducer(),
       this.#destroyVideoProducer(),
     ]);
+
+    if (this.#userMedia) {
+      this.#userMedia.getTracks().forEach((track) => track.stop());
+      this.#userMedia = null;
+    }
+
+    this.dispatchEvent(new PicnicEvent("stop", null));
+  }
+
+  isActive(): boolean {
+    return this.#active;
   }
 
   async load(): Promise<void> {
@@ -194,6 +208,7 @@ export default class SendStream extends EventTarget<
       createAudioProducer(this.#userMedia, this.#transport),
     ]);
     this.dispatchEvent(new PicnicEvent("start", null));
+    this.#active = true;
   }
 
   async screenShare(): Promise<void> {
@@ -288,13 +303,5 @@ export default class SendStream extends EventTarget<
     }
 
     return this.#userMedia;
-  }
-
-  unload(): void {
-    if (this.#userMedia) {
-      this.#userMedia.getTracks().forEach((track) => track.stop());
-      this.#userMedia = null;
-    }
-    this.dispatchEvent(new PicnicEvent("stop", null));
   }
 }
