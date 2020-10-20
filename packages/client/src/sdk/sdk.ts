@@ -19,6 +19,8 @@ export const initialState: SDKState = {
 export type SdkEvents = {
   "state:change": PicnicEvent<SDKState>;
   "stream:update": PicnicEvent<Map<string, RecvStream>>;
+  "broadcast:start": PicnicEvent<null>;
+  "broadcast:stop": PicnicEvent<null>;
 };
 
 export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
@@ -75,6 +77,9 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
       "state:change",
       this.#onStateChange
     );
+    this.#broadcastStream?.removeEventListener("start", this.#onBroadcastStart);
+    this.#broadcastStream?.removeEventListener("stop", this.#onBroadcastStop);
+
     await this.#device.destroy();
     await this.#recvStreams.forEach((s) => this.#removeStream(s.getId()));
     await this.#recvTransport.destroy();
@@ -175,6 +180,16 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
     this.dispatchEvent(evt);
   };
 
+  #onBroadcastStart = (): void => {
+    const event = new PicnicEvent("broadcast:start", null);
+    this.dispatchEvent(event);
+  };
+
+  #onBroadcastStop = (): void => {
+    const event = new PicnicEvent("broadcast:stop", null);
+    this.dispatchEvent(event);
+  };
+
   async broadcast(): Promise<SendStream> {
     if (this.#sendTransport === null) {
       this.#sendTransport = new PicnicTransport(this.#ws, this.#device, "send");
@@ -182,6 +197,9 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
       await this.#sendTransport.load();
     }
     const broadcastStream = new SendStream(this.#sendTransport, this.#ws);
+
+    broadcastStream.addEventListener("start", this.#onBroadcastStart);
+    broadcastStream.addEventListener("stop", this.#onBroadcastStop);
 
     await broadcastStream.load();
     this.#broadcastStream = broadcastStream;
