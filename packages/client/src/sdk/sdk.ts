@@ -34,6 +34,8 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
 
   #recvTransport: PicnicTransport;
 
+  #broadcastStream: SendStream | null = null;
+
   constructor(settings: Settings) {
     super();
 
@@ -78,6 +80,10 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
     await this.#recvTransport.destroy();
     await this.#sendTransport?.destroy();
     await this.#ws.destroy();
+  }
+
+  getBroadcastStream(): SendStream | null {
+    return this.#broadcastStream;
   }
 
   getStreams(): Map<string, RecvStream> {
@@ -178,6 +184,7 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
     const broadcastStream = new SendStream(this.#sendTransport, this.#ws);
 
     await broadcastStream.load();
+    this.#broadcastStream = broadcastStream;
 
     return broadcastStream;
   }
