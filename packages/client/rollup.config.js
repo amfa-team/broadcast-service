@@ -6,6 +6,8 @@ import autoExternal from "rollup-plugin-auto-external";
 import typescript from "@rollup/plugin-typescript";
 
 export const extensions = [".js", ".jsx", ".ts", ".tsx"];
+const extraPlugins = process.env.ROLLUP_WATCH ? [] : [terser()];
+
 export default [
   {
     input: "src/index.ts",
@@ -33,7 +35,7 @@ export default [
         babelHelpers: "bundled",
         extensions,
       }),
-      terser(),
+      ...extraPlugins,
     ],
   },
   {
