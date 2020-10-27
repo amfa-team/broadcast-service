@@ -1,26 +1,27 @@
-import { RecvTransportKey, RecvTransport } from "../types/recvTransport";
-import { recvTransportModel } from "../schema";
+import type { RecvTransport, RecvTransportKey } from "@amfa-team/types";
+import { RecvTransportModel } from "../schema";
 
 export async function createRecvTransport(
-  transport: RecvTransport
+  transport: RecvTransport,
 ): Promise<void> {
-  await recvTransportModel.create(transport);
+  await RecvTransportModel.create(transport);
 }
 
 export async function deleteRecvTransport({
   transportId,
 }: RecvTransportKey): Promise<void> {
-  await recvTransportModel.delete({ transportId });
+  await RecvTransportModel.delete({ transportId });
 }
 
 export async function getRecvTransport({
   transportId,
 }: RecvTransportKey): Promise<RecvTransport | null> {
-  const doc = await recvTransportModel.get({ transportId });
+  const doc = await RecvTransportModel.get({ transportId });
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return (doc?.toJSON() ?? null) as RecvTransport | null;
 }
 
 export async function getAllRecvTransport(): Promise<RecvTransport[]> {
-  const results: unknown = await recvTransportModel.scan().exec();
+  const results: unknown = await RecvTransportModel.scan().exec();
   return results as RecvTransport[];
 }

@@ -1,20 +1,20 @@
-import { types } from "mediasoup";
-import { getWorkerRouter } from "./resources/routers";
-import { getRouterTransports, getTransports } from "./resources/transport";
-import { getWorkers } from "./resources/workers";
-import { getTransportProducers } from "./resources/producers";
-import {
-  getTransportConsumers,
-  getProducerConsumers,
-} from "./resources/consumers";
 import type {
   ConsumerTopology,
   ProducerTopology,
   RouterTopology,
+  ServerTopology,
   TransportTopology,
   WorkerTopology,
-  ServerTopology,
-} from "../../../types";
+} from "@amfa-team/types";
+import type { types } from "mediasoup";
+import {
+  getProducerConsumers,
+  getTransportConsumers,
+} from "./resources/consumers";
+import { getTransportProducers } from "./resources/producers";
+import { getWorkerRouter } from "./resources/routers";
+import { getRouterTransports, getTransports } from "./resources/transport";
+import { getWorkers } from "./resources/workers";
 
 function getConsumerTopology(consumer: types.Consumer): ConsumerTopology {
   return {
@@ -32,7 +32,7 @@ function getConsumerTopology(consumer: types.Consumer): ConsumerTopology {
 }
 
 async function getProducerTopology(
-  producer: types.Producer
+  producer: types.Producer,
 ): Promise<ProducerTopology> {
   return {
     id: producer.id,
@@ -47,30 +47,30 @@ async function getProducerTopology(
 }
 
 async function getTransportTopology(
-  transport: types.Transport
+  transport: types.Transport,
 ): Promise<TransportTopology> {
   return {
     id: transport.id,
     consumers: getTransportConsumers(transport.id).map(getConsumerTopology),
     producers: await Promise.all(
-      getTransportProducers(transport).map(getProducerTopology)
+      getTransportProducers(transport).map(getProducerTopology),
     ),
   };
 }
 
 async function getRouterTopology(
-  router: types.Router
+  router: types.Router,
 ): Promise<RouterTopology> {
   return {
     id: router.id,
     transports: await Promise.all(
-      getRouterTransports(router).map(getTransportTopology)
+      getRouterTransports(router).map(getTransportTopology),
     ),
   };
 }
 
 async function getWorkerTopology(
-  worker: types.Worker
+  worker: types.Worker,
 ): Promise<WorkerTopology> {
   return {
     pid: worker.pid,

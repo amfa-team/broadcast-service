@@ -1,0 +1,1 @@
+{"version":3,"file":"SendStreamStatus.d.ts","sourceRoot":"","sources":["../../../../../../src/components/Stage/SendStreamVideo/SendStreamOverlay/SendStreamStatus/SendStreamStatus.tsx"],"names":[],"mappings":"AAOA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,sBAAsB,CAAC;AAa3D,MAAM,WAAW,mBAAmB;IAClC,KAAK,EAAE,cAAc,CAAC;CACvB;AAeD,wBAAgB,gBAAgB,CAAC,KAAK,EAAE,mBAAmB,GAAG,GAAG,CAAC,OAAO,CAKxE"}

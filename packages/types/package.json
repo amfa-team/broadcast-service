@@ -1,21 +1,24 @@
 {
-  "name": "@amfa-team/broadcast-types",
+  "name": "@amfa-team/types",
   "private": true,
-  "version": "0.1.0",
   "repository": "https://github.com/amfa-team/picnic-sfu.git",
+  "version": "0.1.0",
+  "description": "",
   "license": "SEE LICENSE IN LICENSE.md",
-  "main": "src/index.js",
-  "types": "src/index.ts",
-  "devDependencies": {},
-  "scripts": {
-    "build": "tsc -b"
-  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "sideEffects": false,
   "dependencies": {
-    "mediasoup": "^3.6.16",
-    "mediasoup-client": "^3.6.12"
+    "mediasoup": "^3.6.24",
+    "mediasoup-client": "^3.6.21",
+    "ts.data.json": "^1.4.0"
   },
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com/"
+  "devDependencies": {
+    "typescript": "^4.0.5"
+  },
+  "peerDependencies": {},
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
   }
 }

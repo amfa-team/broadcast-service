@@ -1,17 +1,17 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
-    "target": "es2019",
     "module": "commonjs",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "target": "es2019",
     "outDir": "./dist",
     "rootDir": "./src",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "noEmit": false
+    "tsBuildInfoFile": "../../.build-cache/server.tsbuildinfo"
   },
-  "include": ["src"]
+  "include": ["src", "../types/src/types"],
+  "references": [
+    {
+      "path": "../types",
+      "prepend": false
+    }
+  ]
 }

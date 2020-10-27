@@ -1,7 +1,7 @@
+import { captureException } from "@sentry/node";
 import type { Response } from "express";
-import { JsonDecoder } from "ts.data.json";
-import { InvalidRequestError } from "./exceptions";
-import * as Sentry from "@sentry/node";
+import type { JsonDecoder } from "ts.data.json";
+import InvalidRequestError from "./exceptions/InvalidRequestError";
 
 export function parse(body: string | null): unknown {
   try {
@@ -13,7 +13,7 @@ export function parse(body: string | null): unknown {
 
 export function parseAndValidate<T>(
   body: string | null,
-  decoder: JsonDecoder.Decoder<T>
+  decoder: JsonDecoder.Decoder<T>,
 ): T {
   const data = parse(body);
   const result = decoder.decode(data);
@@ -33,7 +33,7 @@ export function handleErrorResponse(res: Response, e: unknown): Response {
     });
   }
 
-  Sentry.captureException(e);
+  captureException(e);
 
   return res.status(500).json({
     success: false,

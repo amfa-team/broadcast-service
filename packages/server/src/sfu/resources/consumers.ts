@@ -1,7 +1,7 @@
-import { types } from "mediasoup";
+import type { ConsumerState } from "@amfa-team/types";
 import debounce from "lodash.debounce";
+import type { types } from "mediasoup";
 import { requestApi } from "../../io/api";
-import { ConsumerState } from "../../../../types";
 
 type ConsumerMeta = {
   transportId: string;
@@ -12,10 +12,19 @@ const consumersMeta: WeakMap<types.Consumer, ConsumerMeta> = new Map();
 
 const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
 
+export function getConsumerState(consumer: types.Consumer): ConsumerState {
+  return {
+    score: consumer.score.score,
+    producerScore: consumer.score.producerScore,
+    paused: consumer.paused,
+    producerPaused: consumer.producerPaused,
+  };
+}
+
 export async function createConsumer(
   transport: types.Transport,
   producerId: string,
-  rtpCapabilities: types.RtpCapabilities
+  rtpCapabilities: types.RtpCapabilities,
 ): Promise<types.Consumer> {
   const consumer = await transport.consume({
     producerId,
@@ -58,15 +67,6 @@ export async function createConsumer(
   return consumer;
 }
 
-export function getConsumerState(consumer: types.Consumer): ConsumerState {
-  return {
-    score: consumer.score.score,
-    producerScore: consumer.score.producerScore,
-    paused: consumer.paused,
-    producerPaused: consumer.producerPaused,
-  };
-}
-
 export function getOptionalConsumer(consumerId: string): types.Consumer | null {
   const consumer = consumers.get(consumerId);
   return consumer ?? null;
@@ -94,24 +94,24 @@ export function getConsumerMeta(consumer: types.Consumer): ConsumerMeta {
 
 export function getTransportConsumers(transportId: string): types.Consumer[] {
   return [...consumers.values()].filter(
-    (consumer) => getConsumerMeta(consumer).transportId === transportId
+    (consumer) => getConsumerMeta(consumer).transportId === transportId,
   );
 }
 
 export function getProducerConsumers(
-  producer: types.Producer
+  producer: types.Producer,
 ): types.Consumer[] {
   return [...consumers.values()].filter(
-    (consumer) => consumer.producerId === producer.id
+    (consumer) => consumer.producerId === producer.id,
   );
 }
 
 export function getProducerConsumer(
   producer: types.Producer,
-  transport: types.Transport
+  transport: types.Transport,
 ): types.Consumer | null {
   const consumer = getTransportConsumers(transport.id).find(
-    (consumer) => consumer.producerId === producer.id
+    (c) => c.producerId === producer.id,
   );
 
   return consumer ?? null;

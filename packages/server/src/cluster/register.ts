@@ -1,5 +1,5 @@
-import { getServerToken } from "../security/security";
 import { requestApi } from "../io/api";
+import { getServerToken } from "../security/security";
 
 export function getPublicIP(): string {
   if (!process.env.PUBLIC_IP) {
@@ -21,7 +21,9 @@ export async function registerServer(): Promise<void> {
   } catch (e) {
     console.error("Unable to register, retrying in 10s", e);
     await new Promise((resolve, reject) => {
-      setTimeout(() => registerServer().then(resolve).catch(reject), 10000);
+      setTimeout(() => {
+        registerServer().then(resolve).catch(reject);
+      }, 10000);
     });
   }
 }

@@ -1,22 +1,22 @@
-import {
-  SendTransportKey,
-  SendTransport,
+import type {
   PatchSendTransport,
-} from "../types/sendTransport";
-import { sendTransportModel } from "../schema";
-import { PicnicError } from "../../io/exceptions";
+  SendTransport,
+  SendTransportKey,
+} from "@amfa-team/types";
+import PicnicError from "../../io/exceptions/PicnicError";
+import { SendTransportModel } from "../schema";
 
 export async function createSendTransport(
-  transport: SendTransportKey
+  transport: SendTransportKey,
 ): Promise<void> {
-  await sendTransportModel.create(transport);
+  await SendTransportModel.create(transport);
 }
 
 export async function deleteSendTransport({
   transportId,
 }: SendTransportKey): Promise<void> {
   try {
-    await sendTransportModel.delete({ transportId });
+    await SendTransportModel.delete({ transportId });
   } catch (e) {
     throw new PicnicError("deleteSendTransport: failed", e);
   }
@@ -25,19 +25,21 @@ export async function deleteSendTransport({
 export async function getSendTransport({
   transportId,
 }: SendTransportKey): Promise<SendTransport | null> {
-  const doc = await sendTransportModel.get({ transportId });
+  const doc = await SendTransportModel.get({ transportId });
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return (doc?.toJSON() ?? null) as SendTransport | null;
 }
 
 export async function patchSendTransport(
-  params: PatchSendTransport
+  params: PatchSendTransport,
 ): Promise<SendTransport> {
   const { transportId, ...rest } = params;
-  const doc = await sendTransportModel.update({ transportId }, rest);
-  return doc.toJSON() as SendTransport;
+  const doc = await SendTransportModel.update({ transportId }, rest);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return (doc?.toJSON() ?? null) as SendTransport;
 }
 
 export async function getAllSendTransport(): Promise<SendTransport[]> {
-  const results: unknown = await sendTransportModel.scan().exec();
+  const results: unknown = await SendTransportModel.scan().exec();
   return results as SendTransport[];
 }

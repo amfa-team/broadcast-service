@@ -1,0 +1,14 @@
+{
+  "extends": ["sbs", "sbs/typescript"],
+  "rules": {
+    "no-console": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**.stories.tsx"],
+      "rules": {
+        "react/function-component-definition": "off"
+      }
+    }
+  ]
+}

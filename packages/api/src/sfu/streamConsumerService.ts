@@ -1,22 +1,26 @@
-import type { Routes, ConsumerInfo, ConsumerState } from "../../../types";
-import {
-  getConnection,
-  findConnectionByRecvTransportId,
-} from "../db/repositories/connectionRepository";
-import { postToServer } from "./serverService";
+import type {
+  ConsumerInfo,
+  ConsumerState,
+  Routes,
+  StreamConsumerInfo,
+} from "@amfa-team/types";
 import { JsonDecoder } from "ts.data.json";
 import {
+  findConnectionByRecvTransportId,
+  getConnection,
+} from "../db/repositories/connectionRepository";
+import {
   createStreamConsumer,
-  getStreamConsumer,
   deleteStreamConsumer,
-  deleteStreamConsumerByTransportId,
   deleteStreamConsumerBySoourceTransportId,
+  deleteStreamConsumerByTransportId,
+  getStreamConsumer,
   patchStreamConsumer,
 } from "../db/repositories/streamConsumerRepository";
 import { getStream } from "../db/repositories/streamRepository";
 import { postToConnection } from "../io/io";
 import { getAllSettledValues } from "../io/promises";
-import { StreamConsumerInfo } from "../db/types/streamConsumer";
+import { postToServer } from "./serverService";
 
 type CreateStreamConsumerEvent = {
   connectionId: string;
@@ -32,11 +36,11 @@ export const decodeRecvParams: JsonDecoder.Decoder<
     producerId: JsonDecoder.string,
     rtpCapabilities: JsonDecoder.succeed,
   },
-  "ReceiveParams"
+  "ReceiveParams",
 );
 
 export async function onCreateStreamConsumer(
-  event: CreateStreamConsumerEvent
+  event: CreateStreamConsumerEvent,
 ): Promise<ConsumerInfo> {
   const { connectionId, data } = event;
 
@@ -47,7 +51,7 @@ export async function onCreateStreamConsumer(
 
   if (connection === null || connection.recvTransportId === null) {
     throw new Error(
-      "onCreateStreamConsumer: connection or recvTransportId does not exists"
+      "onCreateStreamConsumer: connection or recvTransportId does not exists",
     );
   }
   if (stream === null) {
@@ -81,7 +85,7 @@ export async function onCreateStreamConsumer(
     "/receive/state",
     {
       consumerId: payload.consumerId,
-    }
+    },
   );
 
   await patchStreamConsumer({
@@ -112,14 +116,14 @@ export const decodeChangeStreamConsumerStateData: JsonDecoder.Decoder<ChangeStre
     consumerId: JsonDecoder.string,
     state: JsonDecoder.oneOf(
       [JsonDecoder.isExactly("play"), JsonDecoder.isExactly("pause")],
-      "state"
+      "state",
     ),
   },
-  "ChangeStreamConsumerStateEventData"
+  "ChangeStreamConsumerStateEventData",
 );
 
 export async function onChangeStreamConsumerState(
-  event: ChangeStreamConsumerStateEvent
+  event: ChangeStreamConsumerStateEvent,
 ): Promise<null> {
   const {
     data: { state, transportId, consumerId },
@@ -148,7 +152,7 @@ interface CloseConsumerParams {
 }
 
 export async function closeConsumer(
-  params: CloseConsumerParams
+  params: CloseConsumerParams,
 ): Promise<void> {
   if (params.consumerId === null) {
     await deleteStreamConsumerByTransportId(params.transportId);
@@ -163,7 +167,7 @@ interface CloseConsumerOfParams {
 }
 
 export async function closeConsumerOf(
-  params: CloseConsumerOfParams
+  params: CloseConsumerOfParams,
 ): Promise<void> {
   await deleteStreamConsumerBySoourceTransportId(params.sourceTransportId);
 }
@@ -175,7 +179,7 @@ interface ConsumerStateChangeEvent {
 }
 
 export async function onConsumerStateChange(
-  event: ConsumerStateChangeEvent
+  event: ConsumerStateChangeEvent,
 ): Promise<boolean> {
   const {
     transportId,
@@ -201,7 +205,7 @@ export async function onConsumerStateChange(
       paused,
       producerPaused,
     }),
-    ...connections.map((connection) =>
+    ...connections.map(async (connection) =>
       postToConnection(
         connection.connectionId,
         JSON.stringify({
@@ -216,14 +220,14 @@ export async function onConsumerStateChange(
               producerPaused,
             },
           },
-        })
-      )
+        }),
+      ),
     ),
   ]);
 
   getAllSettledValues<void | StreamConsumerInfo>(
     results,
-    "onConsumerStateChange: Unexpected error"
+    "onConsumerStateChange: Unexpected error",
   );
 
   return true;
@@ -235,11 +239,11 @@ interface GetConsumerStateParams {
 }
 
 export async function getStreamConsumerState(
-  params: GetConsumerStateParams
+  params: GetConsumerStateParams,
 ): Promise<ConsumerState> {
   const consumer = await getStreamConsumer(
     params.consumerId,
-    params.transportId
+    params.transportId,
   );
 
   return {

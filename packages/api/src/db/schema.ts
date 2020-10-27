@@ -1,12 +1,13 @@
-import { Connection } from "./types/connection";
-import { Schema, model, aws } from "dynamoose";
+import { Schema, aws, model } from "dynamoose";
 import type { Document } from "dynamoose/dist/Document";
-import { Role, Participant } from "./types/participant";
-import { RecvTransport } from "./types/recvTransport";
-import { SendTransport } from "./types/sendTransport";
-import { Server } from "./types/server";
-import { StreamInfo } from "./types/stream";
-import { StreamConsumerInfo } from "./types/streamConsumer";
+import type { Connection } from "../../../types/src/db/connection";
+import type { Participant } from "../../../types/src/db/participant";
+import { Role } from "../../../types/src/db/participant";
+import type { RecvTransport } from "../../../types/src/db/recvTransport";
+import type { SendTransport } from "../../../types/src/db/sendTransport";
+import type { Server } from "../../../types/src/db/server";
+import type { StreamInfo } from "../../../types/src/db/stream";
+import type { StreamConsumerInfo } from "../../../types/src/db/streamConsumer";
 
 // Depends on serverless-offline plugin which adds IS_OFFLINE to process.env when running offline
 if (process.env.IS_OFFLINE) {
@@ -35,9 +36,9 @@ export const serverSchema = new Schema({
   },
 });
 
-export const serverModel = model<ServerDocument>(
+export const ServerModel = model<ServerDocument>(
   process.env.SERVER_TABLE ?? "",
-  serverSchema
+  serverSchema,
 );
 
 export type ParticipantDocument = Participant & Document;
@@ -55,9 +56,9 @@ export const participantSchema = new Schema({
   },
 });
 
-export const participantModel = model<ParticipantDocument>(
+export const ParticipantModel = model<ParticipantDocument>(
   process.env.PARTICIPANT_TABLE ?? "",
-  participantSchema
+  participantSchema,
 );
 
 export type ConnectionDocument = Connection & Document;
@@ -82,9 +83,9 @@ export const connectionSchema = new Schema({
   },
 });
 
-export const connectionModel = model<ConnectionDocument>(
+export const ConnectionModel = model<ConnectionDocument>(
   process.env.CONNECTION_TABLE ?? "",
-  connectionSchema
+  connectionSchema,
 );
 
 export type RecvTransportDocument = RecvTransport & Document;
@@ -97,9 +98,9 @@ export const recvTransportSchema = new Schema({
   },
 });
 
-export const recvTransportModel = model<RecvTransportDocument>(
+export const RecvTransportModel = model<RecvTransportDocument>(
   process.env.RECV_TRANSPORT_TABLE ?? "",
-  recvTransportSchema
+  recvTransportSchema,
 );
 
 export type SendTransportDocument = SendTransport & Document;
@@ -120,9 +121,9 @@ export const sendTransportSchema = new Schema({
   },
 });
 
-export const sendTransportModel = model<SendTransportDocument>(
+export const SendTransportModel = model<SendTransportDocument>(
   process.env.SEND_TRANSPORT_TABLE ?? "",
-  sendTransportSchema
+  sendTransportSchema,
 );
 
 export type StreamDocument = StreamInfo & Document;
@@ -149,9 +150,9 @@ export const streamSchema = new Schema({
   },
 });
 
-export const streamModel = model<StreamDocument>(
+export const StreamModel = model<StreamDocument>(
   process.env.STREAM_TABLE ?? "",
-  streamSchema
+  streamSchema,
 );
 
 export type StreamConsumerDocument = StreamConsumerInfo & Document;
@@ -190,7 +191,7 @@ export const streamConsumerSchema = new Schema({
   },
 });
 
-export const streamConsumerModel = model<StreamConsumerDocument>(
+export const StreamConsumerModel = model<StreamConsumerDocument>(
   process.env.STREAM_CONSUMER_TABLE ?? "",
-  streamConsumerSchema
+  streamConsumerSchema,
 );

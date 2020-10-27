@@ -1,0 +1,6 @@
+{
+  "extends": ["sbs/base", "sbs/typescript"],
+  "rules": {
+    "no-console": "off"
+  }
+}

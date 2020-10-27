@@ -1,7 +1,7 @@
-import { types } from "mediasoup";
+import type { ProducerState } from "@amfa-team/types";
 import debounce from "lodash.debounce";
+import type { types } from "mediasoup";
 import { requestApi } from "../../io/api";
-import { ProducerState } from "../../../../types";
 
 type ProducerMeta = {
   transportId: string;
@@ -12,10 +12,25 @@ const producersMeta: WeakMap<types.Producer, ProducerMeta> = new WeakMap();
 
 const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
 
+export function getProducerScore(producer: types.Producer): number {
+  const { score } = producer;
+
+  return score.length === 0
+    ? 0
+    : score.reduce((acc: number, s) => acc + s.score, 0) / score.length;
+}
+
+export function getProducerState(producer: types.Producer): ProducerState {
+  return {
+    paused: producer.paused,
+    score: getProducerScore(producer),
+  };
+}
+
 export async function createProducer(
   transport: types.Transport,
   kind: types.MediaKind,
-  rtpParameters: types.RtpParameters
+  rtpParameters: types.RtpParameters,
 ): Promise<types.Producer> {
   const producer = await transport.produce({
     kind,
@@ -52,21 +67,6 @@ export async function createProducer(
   return producer;
 }
 
-export function getProducerScore(producer: types.Producer): number {
-  const { score } = producer;
-
-  return score.length === 0
-    ? 0
-    : score.reduce((acc: number, s) => acc + s.score, 0) / score.length;
-}
-
-export function getProducerState(producer: types.Producer): ProducerState {
-  return {
-    paused: producer.paused,
-    score: getProducerScore(producer),
-  };
-}
-
 export function getProducers(): types.Producer[] {
   return [...producers.values()];
 }
@@ -97,9 +97,9 @@ export function getProducerMeta(producer: types.Producer): ProducerMeta {
 }
 
 export function getTransportProducers(
-  transport: types.Transport
+  transport: types.Transport,
 ): types.Producer[] {
   return [...producers.values()].filter(
-    (producer) => getProducerMeta(producer).transportId === transport.id
+    (producer) => getProducerMeta(producer).transportId === transport.id,
   );
 }

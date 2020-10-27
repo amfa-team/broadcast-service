@@ -1,1 +1,1 @@
-© 2020-2020 AMFA SAS All Rights Reserved
+Copyright (C) 2020 Side By Side SAS All Rights Reserved

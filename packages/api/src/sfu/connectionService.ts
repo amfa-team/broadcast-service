@@ -1,23 +1,63 @@
+import type { Connection, Routes } from "@amfa-team/types";
 import {
   createConnection,
-  getConnection,
   deleteConnection,
+  getConnection,
   getConnectionsByToken,
 } from "../db/repositories/connectionRepository";
-import { requestServer } from "./serverService";
-import type { Routes } from "../../../types";
 import { getAllSettledValues } from "../io/promises";
-import { closeSendTransport } from "./sendTransportService";
 import { closeRecvTransport } from "./recvTransportService";
-import { Connection } from "../db/types/connection";
+import { closeSendTransport } from "./sendTransportService";
+import { requestServer } from "./serverService";
 
 interface ConnectEvent {
   connectionId: string;
   token: string;
 }
 
+interface CloseConnectionParams {
+  connection: Connection | null;
+}
+
+async function closeConnection(params: CloseConnectionParams): Promise<void> {
+  const { connection } = params;
+
+  if (connection == null) {
+    return;
+  }
+
+  const results = await Promise.allSettled([
+    deleteConnection({ connectionId: connection.connectionId }),
+    closeSendTransport({
+      connectionId: connection.connectionId,
+      transportId: connection.sendTransportId ?? null,
+      skipConnectionPatch: true, // not needed as we remove the connection
+    }),
+    closeRecvTransport({
+      connectionId: connection.connectionId,
+      transportId: connection.recvTransportId ?? null,
+      skipConnectionPatch: true, // not needed as we remove the connection
+    }),
+  ]);
+
+  getAllSettledValues(results, "onDisconnect: Unexpected error");
+}
+
+async function removeOldConnections(event: ConnectEvent): Promise<void> {
+  const { connectionId, token } = event;
+  const connections = await getConnectionsByToken({ token });
+
+  const results = await Promise.allSettled(
+    connections
+      .filter((c) => c.connectionId !== connectionId)
+      .map(async (c) => closeConnection({ connection: c })),
+  );
+
+  getAllSettledValues(results, "removeOldConnections: Unexpected error");
+}
+
 export async function onConnect(
-  event: ConnectEvent
+  event: ConnectEvent,
 ): Promise<Routes["/router-capabilities"]["out"]> {
   const [routerCapabilities] = await Promise.all([
     requestServer<"/router-capabilities">("/router-capabilities", null),
@@ -35,7 +75,7 @@ interface RefreshConnectionEvent {
 
 // Refresh is done with a new connection to overcome AWS 2hours hard limit
 export async function onRefreshConnection(
-  event: RefreshConnectionEvent
+  event: RefreshConnectionEvent,
 ): Promise<boolean> {
   const { connectionId, token } = event;
   const connections = await getConnectionsByToken({ token });
@@ -55,49 +95,8 @@ export async function onRefreshConnection(
   return true;
 }
 
-async function removeOldConnections(event: ConnectEvent): Promise<void> {
-  const { connectionId, token } = event;
-  const connections = await getConnectionsByToken({ token });
-
-  const results = await Promise.allSettled(
-    connections
-      .filter((c) => c.connectionId !== connectionId)
-      .map((c) => closeConnection({ connection: c }))
-  );
-
-  getAllSettledValues(results, "removeOldConnections: Unexpected error");
-}
-
 export function onPing(): string {
   return "pong";
-}
-
-interface CloseConnectionParams {
-  connection: Connection | null;
-}
-
-async function closeConnection(params: CloseConnectionParams): Promise<void> {
-  const { connection } = params;
-
-  if (connection == null) {
-    return;
-  }
-
-  const results = await Promise.allSettled([
-    deleteConnection({ connectionId: connection.connectionId }),
-    closeSendTransport({
-      connectionId: connection.connectionId,
-      transportId: connection?.sendTransportId ?? null,
-      skipConnectionPatch: true, // not needed as we remove the connection
-    }),
-    closeRecvTransport({
-      connectionId: connection.connectionId,
-      transportId: connection?.recvTransportId ?? null,
-      skipConnectionPatch: true, // not needed as we remove the connection
-    }),
-  ]);
-
-  getAllSettledValues(results, "onDisconnect: Unexpected error");
 }
 
 interface DisconnectEvent {

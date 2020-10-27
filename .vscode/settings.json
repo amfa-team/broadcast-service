@@ -1,22 +1,21 @@
 {
-  "eslint.enable": true,
   "prettier.packageManager": "yarn",
   "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    // For ESLint
-    "source.fixAll.eslint": true,
-    // For TSLint
-    "source.fixAll.tslint": true,
-    // For Stylelint
-    "source.fixAll.stylelint": true
-  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.alwaysShowStatus": true,
-  "eslint.packageManager": "yarn",
   "typescript.validate.enable": true,
   "javascript.validate.enable": true,
-  "cSpell.words": [
-    "dynamoose",
-    "mediasoup"
+  "files.insertFinalNewline": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "files.associations": {
+    ".stylelintrc": "json"
+  },
+  "compareFolders.ignoreFileNameCase": false,
+  "compareFolders.excludeFilter": [
+    "**/node_modules",
+    "**/.svn",
+    "**/.git",
+    "**/dist",
+    "**/lib"
   ]
 }

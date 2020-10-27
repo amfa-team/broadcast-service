@@ -1,9 +1,9 @@
 import { captureException } from "@sentry/node";
-import { PicnicError } from "./exceptions";
+import PicnicError from "./exceptions/PicnicError";
 
 export function getAllSettledValues<T>(
   results: PromiseSettledResult<T>[],
-  errorMessage: string
+  errorMessage: string,
 ): T[] {
   const errorIndexes = [];
   const values = [];
@@ -21,7 +21,7 @@ export function getAllSettledValues<T>(
   if (errorIndexes.length > 0) {
     throw new PicnicError(
       `${errorMessage} at indexes [${errorIndexes.join(", ")}]`,
-      null
+      null,
     );
   }
 
