@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - improvment/sbs-template
 
 jobs:
   install: # Runs install once before everything to create & save cache
