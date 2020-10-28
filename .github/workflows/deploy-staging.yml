@@ -72,6 +72,8 @@ jobs:
           envPath: "packages/example/.env"
       - name: build
         run: yarn build
+        env:
+          SENTRY_ENVIRONMENT: "staging"
       - name: deploy
         working-directory: ./packages/example
         run: yarn aws:profile:set --stage staging && yarn deploy:staging
