@@ -1,6 +1,6 @@
-import type { StreamInfo } from "@amfa-team/types";
 import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
+import type { StreamInfo } from "@amfa-team/types";
 import type { SDKState, Settings } from "../types";
 import { PicnicDevice } from "./device/device";
 import type { Empty, ServerEvents } from "./events/event";

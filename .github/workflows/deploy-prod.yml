@@ -16,10 +16,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-production-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-production-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
   deploy-react:
@@ -33,10 +30,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-production-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-production-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: publish sdk
@@ -57,10 +51,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-production-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-production-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - uses: TickX/var-to-dotenv@v1.1.1
@@ -103,10 +94,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-production-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-production-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: serverless deploy
@@ -128,10 +116,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-production-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-production-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - name: Create SSH directory

@@ -34,7 +34,7 @@ jobs:
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - run: yarn lint
-  typescript-api:
+  build:
     runs-on: ubuntu-latest
     needs: install
     steps:
@@ -48,37 +48,5 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
-      - run: tsc --noEmit
+      - run: yarn build
         working-directory: ./packages/api
-  typescript-client:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
-      - run: tsc --noEmit
-        working-directory: ./packages/client
-  typescript-server:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
-      - run: tsc --noEmit
-        working-directory: ./packages/server

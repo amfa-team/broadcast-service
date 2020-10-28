@@ -1,6 +1,6 @@
-import { Loading } from "@amfa-team/picnic-sdk";
 import { Typography } from "@material-ui/core";
 import React, { useEffect } from "react";
+import { Loading } from "@amfa-team/picnic-sdk";
 import { useCreateParticipant } from "./useApi";
 
 interface CreateParticipantPageProps {

@@ -1,6 +1,6 @@
-import type { ProducerState } from "@amfa-team/types";
 import debounce from "lodash.debounce";
 import type { types } from "mediasoup";
+import type { ProducerState } from "@amfa-team/types";
 import { requestApi } from "../../io/api";
 
 type ProducerMeta = {

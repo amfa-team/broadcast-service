@@ -1,9 +1,9 @@
-import { ErrorBoundary } from "@amfa-team/picnic-sdk";
 import { init } from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
+import { ErrorBoundary } from "@amfa-team/picnic-sdk";
 import App from "./App";
 
 if (process.env.SENTRY_ENVIRONMENT !== "dev") {

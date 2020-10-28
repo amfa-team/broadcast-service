@@ -1,10 +1,10 @@
+import { EventTarget } from "event-target-shim";
+import type { types } from "mediasoup-client";
 import type {
   ConsumerInfo,
   ConsumerState,
   ReceiveParams,
 } from "@amfa-team/types";
-import { EventTarget } from "event-target-shim";
-import type { types } from "mediasoup-client";
 import type { PicnicDevice } from "../device/device";
 import type { Empty, ServerEvents } from "../events/event";
 import { PicnicEvent } from "../events/event";

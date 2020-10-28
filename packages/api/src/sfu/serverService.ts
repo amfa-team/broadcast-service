@@ -1,6 +1,6 @@
-import type { Routes, Server } from "@amfa-team/types";
 import type { RequestInit } from "node-fetch";
 import fetch from "node-fetch";
+import type { Routes, Server } from "@amfa-team/types";
 import { getAllServers } from "../db/repositories/serverRepository";
 
 async function getDestServer(): Promise<Server> {

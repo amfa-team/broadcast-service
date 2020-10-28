@@ -1,5 +1,5 @@
-import type { CreateParticipant, Participant } from "@amfa-team/types";
 import { v4 as uuid } from "uuid";
+import type { CreateParticipant, Participant } from "@amfa-team/types";
 import { ParticipantModel } from "../schema";
 
 export async function createParticipant(

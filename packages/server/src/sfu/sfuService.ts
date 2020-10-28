@@ -1,4 +1,5 @@
 import os from "os";
+import type { types } from "mediasoup";
 import type {
   ConnectParams,
   ConnectionInfo,
@@ -10,7 +11,6 @@ import type {
   SendDestroyParams,
   SendParams,
 } from "@amfa-team/types";
-import type { types } from "mediasoup";
 import {
   createConsumer,
   getConsumer,

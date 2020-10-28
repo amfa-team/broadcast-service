@@ -1,7 +1,7 @@
-import type { InitConnectionParams } from "@amfa-team/types";
 import { EventTarget } from "event-target-shim";
 import type { types } from "mediasoup-client";
 import { Device } from "mediasoup-client";
+import type { InitConnectionParams } from "@amfa-team/types";
 import PicnicError from "../../exceptions/PicnicError";
 import type { DeviceState } from "../../types";
 import type { Empty } from "../events/event";
