@@ -130,3 +130,5 @@ dist
 
 packages/*/lib
 packages/*/dist
+packages/*/build
+packages/*/.webpack

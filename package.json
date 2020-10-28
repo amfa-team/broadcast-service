@@ -13,6 +13,7 @@
     "@commitlint/config-conventional": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.12.1",
     "eslint-config-prettier": "^6.14.0",
     "eslint-config-sbs": "^1.0.0-beta.5",
@@ -32,6 +33,7 @@
     "stylelint-declaration-block-no-ignored-properties": "^2.3.0",
     "stylelint-no-unsupported-browser-features": "^4.1.3",
     "tslib": "^2.0.3",
+    "ttab": "^0.7.0",
     "typescript": "^4.0.5"
   },
   "scripts": {
@@ -39,9 +41,9 @@
     "lint:style": "stylelint '**/*.css'",
     "prettier:fix": "prettier --write .",
     "prettier:check": "prettier --check .",
-    "build": "(cd packages/react; yarn build) && yarn workspaces run build",
-    "clean": "yarn workspaces run clean",
-    "start": "ttab yarn start:react; ttab yarn start:api; ttab \"sleep 3 && yarn start:example\"; ttab yarn start:server; ttab yarn start:dynamo",
+    "build": "yarn workspaces foreach -pt run build",
+    "clean": "yarn workspaces foreach -pt run clean",
+    "start": "./node_modules/.bin/ttab \"yarn start:react\"; ./node_modules/.bin/ttab yarn start:api; ./node_modules/.bin/ttab \"sleep 3 && yarn start:example\"; ./node_modules/.bin/ttab yarn start:server; ./node_modules/.bin/ttab yarn start:dynamo",
     "start:api": "cd packages/api && yarn start",
     "start:dynamo": "cd packages/api && yarn dynamo:start",
     "start:server": "cd packages/server && yarn start",

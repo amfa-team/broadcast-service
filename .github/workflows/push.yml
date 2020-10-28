@@ -20,8 +20,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - uses: actions/cache@v2
+        with:
+          path: "~/.yarn/berry/cache/"
+          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - run: cp .yarnrc.yml.template .yarnrc.yml
       - run: yarn install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   lint:
     runs-on: ubuntu-latest
     needs: install
@@ -37,8 +46,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - uses: actions/cache@v2
+        with:
+          path: "~/.yarn/berry/cache/"
+          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - run: cp .yarnrc.yml.template .yarnrc.yml
       - run: yarn install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: yarn lint
   typescript-api:
     runs-on: ubuntu-latest
@@ -55,8 +73,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - uses: actions/cache@v2
+        with:
+          path: "~/.yarn/berry/cache/"
+          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - run: cp .yarnrc.yml.template .yarnrc.yml
       - run: yarn install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: tsc --noEmit
         working-directory: ./packages/api
   typescript-client:
@@ -74,8 +101,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - uses: actions/cache@v2
+        with:
+          path: "~/.yarn/berry/cache/"
+          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - run: cp .yarnrc.yml.template .yarnrc.yml
       - run: yarn install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: tsc --noEmit
         working-directory: ./packages/client
   typescript-server:
@@ -93,7 +129,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - uses: actions/cache@v2
+        with:
+          path: "~/.yarn/berry/cache/"
+          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - run: cp .yarnrc.yml.template .yarnrc.yml
       - run: yarn install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: tsc --noEmit
         working-directory: ./packages/server

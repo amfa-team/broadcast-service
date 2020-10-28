@@ -5,7 +5,7 @@
   "typescript.validate.enable": true,
   "javascript.validate.enable": true,
   "files.insertFinalNewline": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "files.associations": {
     ".stylelintrc": "json"
@@ -17,5 +17,12 @@
     "**/.git",
     "**/dist",
     "**/lib"
-  ]
+  ],
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  },
+  "eslint.nodePath": ".yarn/sdks",
+  "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
+  "stylelint.stylelintPath": ".yarn/sdks/stylelint/lib/index.js"
 }
