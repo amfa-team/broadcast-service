@@ -120,5 +120,13 @@ dist
 
 .DS_Store
 
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+.yarnrc.yml
+
 packages/*/lib
 packages/*/dist
