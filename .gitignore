@@ -122,3 +122,5 @@ dist
 
 packages/*/lib
 packages/*/dist
+packages/*/.webpack
+packages/*/build

@@ -106,3 +106,8 @@ packages/*/lib
 # CSS Files
 src/**/*.css
 src/**/*.css.map
+
+packages/*/dist
+packages/*/lib
+packages/*/.webpack
+packages/*/build
