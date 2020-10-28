@@ -6,6 +6,9 @@ provider:
   region: eu-west-3
   profile: picnic
   stage: ${opt:stage}
+  environment:
+    SENTRY_ENVIRONMENT: "${self:provider.stage}"
+    SENTRY_DNS: "${env:SENTRY_DNS}"
 
 plugins:
   - serverless-stage-manager
