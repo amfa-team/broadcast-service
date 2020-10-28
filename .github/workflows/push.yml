@@ -16,10 +16,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
   lint:
@@ -33,10 +30,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - run: yarn lint
@@ -51,10 +45,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - run: tsc --noEmit
@@ -70,10 +61,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - run: tsc --noEmit
@@ -89,10 +77,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
       - run: tsc --noEmit
