@@ -1,1 +1,0 @@
-{"version":3,"file":"Video.d.ts","sourceRoot":"","sources":["../../../../src/components/Stage/Video/Video.tsx"],"names":[],"mappings":"AAKA,OAAO,KAAK,EAAE,QAAQ,EAAE,MAAM,YAAY,CAAC;AAmD3C,MAAM,WAAW,mBAAoB,SAAQ,QAAQ;IACnD,QAAQ,CAAC,EAAE,GAAG,CAAC,OAAO,GAAG,IAAI,CAAC;CAC/B;AAED,wBAAgB,KAAK,CAAC,KAAK,EAAE,mBAAmB,GAAG,GAAG,CAAC,OAAO,GAAG,IAAI,CAuBpE"}

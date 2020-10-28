@@ -1,1 +1,0 @@
-{"version":3,"file":"PicnicError.d.ts","sourceRoot":"","sources":["../../src/exceptions/PicnicError.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,WAAY,SAAQ,KAAK;IAC5C,KAAK,EAAE,KAAK,GAAG,IAAI,CAAC;gBAER,OAAO,EAAE,MAAM,EAAE,KAAK,EAAE,KAAK,GAAG,IAAI;CASjD"}

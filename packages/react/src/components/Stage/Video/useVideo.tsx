@@ -29,49 +29,50 @@ export function useVideo({
   const refVideo = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (refVideo.current === null || media === null) {
+    setIsLoading(true);
+
+    const ref = refVideo.current;
+    if (ref === null || media === null) {
       return () => {
         // no-op
       };
     }
 
     const autoPlay = () => {
-      if (refVideo.current) {
-        document.removeEventListener("click", autoPlay);
+      document.removeEventListener("click", autoPlay);
 
-        refVideo.current.addEventListener("resize", () => {
-          onResize({
-            height: refVideo.current?.videoHeight ?? 0,
-            width: refVideo.current?.videoWidth ?? 0,
-          });
-        });
+      ref.addEventListener("resize", () => {
         onResize({
-          height: refVideo.current.videoHeight,
-          width: refVideo.current.videoWidth,
+          height: refVideo.current?.videoHeight ?? 0,
+          width: refVideo.current?.videoWidth ?? 0,
         });
-        refVideo.current
-          .play()
-          .then(() => {
-            setIsLoading(false);
-            setIsPlaying(true);
-          })
-          .catch((e) => {
-            setIsLoading(false);
-            if (e.name === "NotAllowedError") {
-              document.addEventListener("click", autoPlay, false);
-            } else {
-              captureException(e);
-            }
-          });
-      }
+      });
+      onResize({
+        height: ref.videoHeight,
+        width: ref.videoWidth,
+      });
+      ref
+        .play()
+        .then(() => {
+          setIsLoading(false);
+          setIsPlaying(true);
+        })
+        .catch((e) => {
+          setIsLoading(false);
+          if (e.name === "NotAllowedError") {
+            document.addEventListener("click", autoPlay, false);
+          } else {
+            captureException(e);
+          }
+        });
     };
 
     if (typeof media === "string") {
-      refVideo.current.src = media;
+      ref.src = media;
     } else {
-      refVideo.current.srcObject = media;
+      ref.srcObject = media;
     }
-    refVideo.current.onloadedmetadata = autoPlay;
+    ref.onloadedmetadata = autoPlay;
 
     return () => {
       document.removeEventListener("click", autoPlay);

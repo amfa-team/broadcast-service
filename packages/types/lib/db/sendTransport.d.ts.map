@@ -1,1 +1,0 @@
-{"version":3,"file":"sendTransport.d.ts","sourceRoot":"","sources":["../../src/db/sendTransport.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,gBAAgB;IAC/B,WAAW,EAAE,MAAM,CAAC;CACrB;AAED,MAAM,WAAW,aAAc,SAAQ,gBAAgB;IACrD,UAAU,EAAE,MAAM,GAAG,IAAI,CAAC;IAC1B,UAAU,EAAE,MAAM,GAAG,IAAI,CAAC;CAC3B;AAED,MAAM,WAAW,kBAAmB,SAAQ,OAAO,CAAC,aAAa,CAAC;IAChE,WAAW,EAAE,MAAM,CAAC;CACrB"}
