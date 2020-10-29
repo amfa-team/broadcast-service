@@ -11,7 +11,7 @@ const env = [
   `SENTRY_ENVIRONMENT=${process.env.SENTRY_ENVIRONMENT}`,
 ];
 
-const sshKey = "~/.ssh/aws-eb";
+const sshKey = "~/.ssh/picnic";
 
 console.log("Creating .env file");
 
