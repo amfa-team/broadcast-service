@@ -4,6 +4,7 @@ service:
 plugins:
   - serverless-dotenv-plugin
   - serverless-stage-manager
+  - serverless-pseudo-parameters
   - serverless-webpack
   - serverless-plugin-monorepo
   - serverless-dynamodb-local
