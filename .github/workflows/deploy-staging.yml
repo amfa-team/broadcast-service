@@ -6,6 +6,9 @@ on:
       - develop
       - improvment/sbs-template
 
+env:
+  ENVIRONMENT_NAME: staging
+
 jobs:
   install: # Runs install once before everything to create & save cache
     runs-on: ubuntu-latest
@@ -122,27 +125,39 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
-      - name: Create SSH directory
-        run: mkdir -p ~/.ssh
-      - name: Create SSH Private Key
-        run: echo "$SSH_KEY" > ~/.ssh/picnic && chmod 600 ~/.ssh/picnic
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-      - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/picnic
-        name: register ssh agent
       - run: node dumpEnv.js
         name: generate env file
         working-directory: ./packages/server
         env:
           CLUSTER_API: ${{ secrets.STAGING_CLUSTER_API }}
           CLUSTER_SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
-          PUBLIC_IP: "15.236.169.203"
-      - run: "scp -i ~/.ssh/picnic -o 'StrictHostKeyChecking=no' server-env ubuntu@15.236.169.203:~/server-env"
-        name: upload env vars
-        working-directory: ./packages/server
-      - name: pm2 deploy
-        working-directory: ./packages/server
-        run: yarn pm2 deploy staging --force
+          PUBLIC_IP: "15.236.169.203" # TODO
+      - run: yarn build
+        working-directory: packages/server
+      - name: Generate deployment package
+        working-directory: packages/server/dist
+        run: zip -r deploy.zip .
+      - name: Get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+      - name: Run string replace
+        uses: frabert/replace-string-action@master
+        id: format-time
+        with:
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: "-"
+          flags: "g"
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v13
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: picnic-sfu-server
+          environment_name: ${{ env.ENVIRONMENT_NAME }}
+          region: eu-west-3
+          version_label: "my-app-${{ steps.format-time.outputs.replaced }}"
+          deployment_package: ./packages/server/dist/deploy.zip
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@master
         env:

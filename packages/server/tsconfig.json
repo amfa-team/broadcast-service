@@ -1,13 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2019",
-    "outDir": "./dist",
+    "target": "ESNext",
+    "outDir": "./lib",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/server.tsbuildinfo"
   },
-  "include": ["src", "../types/src/types"],
+  "include": ["src"],
   "references": [
     {
       "path": "../types",

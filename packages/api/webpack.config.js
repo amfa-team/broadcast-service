@@ -36,6 +36,13 @@ module.exports = {
     },
   },
   plugins: [new webpack.WatchIgnorePlugin([/\.d\.ts$/])],
-  externals: [nodeExternals({ allowlist: ["@amfa-team/types"] })],
+  externals: [
+    nodeExternals({
+      allowlist: ["@amfa-team/types"],
+      additionalModuleDirs: [
+        path.resolve(__dirname, "..", "..", "node_modules"),
+      ],
+    }),
+  ],
   cache: false,
 };
