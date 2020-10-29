@@ -49,3 +49,5 @@ jobs:
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install --ignore-scripts
       - run: yarn build
+        env:
+          SENTRY_ENVIRONMENT: test

@@ -29,9 +29,9 @@
     "clean": "rm -rf .webpack lib",
     "aws:profile:set": "serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY --profile picnic -o",
     "deploy:staging": "serverless deploy --stage staging",
-    "deploy:staging:info": "serverless info --stage staging -v",
+    "deploy:staging:info": "serverless info --stage staging",
     "deploy:production": "serverless deploy --stage production",
-    "deploy:production:info": "serverless info --stage production -v",
+    "deploy:production:info": "serverless info --stage production",
     "dynamo:install": "serverless dynamodb install --stage dev",
     "dynamo:start": "serverless dynamodb start --stage dev",
     "dynamo:migrate": "serverless dynamodb migrate --stage dev"
