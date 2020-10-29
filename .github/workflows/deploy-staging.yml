@@ -125,6 +125,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
       - run: yarn install
+      - run: yarn build
+        working-directory: packages/server
       - run: node dumpEnv.js
         name: generate env file
         working-directory: ./packages/server
@@ -132,8 +134,6 @@ jobs:
           CLUSTER_API: ${{ secrets.STAGING_CLUSTER_API }}
           CLUSTER_SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
           PUBLIC_IP: "15.236.169.203" # TODO
-      - run: yarn build
-        working-directory: packages/server
       - name: Generate deployment package
         working-directory: packages/server/dist
         run: zip -r deploy.zip .

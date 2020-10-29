@@ -8,4 +8,4 @@ const env = [
   `PUBLIC_IP=${process.env.PUBLIC_IP}`,
 ];
 
-fs.writeFileSync("./server-env", env.join("\n"), "utf8");
+fs.writeFileSync("./dist/.env", env.join("\n"), "utf8");
