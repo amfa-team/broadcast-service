@@ -16,7 +16,7 @@ plugins:
 
 custom:
   client:
-    bucketName: "broadcast-service-test-${opt:stage}"
+    bucketName: "sbs-broadcast-service-test-${opt:stage}"
     distributionFolder: build/
     indexDocument: index.html
     errorDocument: index.html
