@@ -11,6 +11,8 @@ module.exports = {
           safari: 11,
         },
         loose: false,
+        useBuiltIns: "usage",
+        corejs: 3,
       },
     ],
   ],
