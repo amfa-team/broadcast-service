@@ -66,8 +66,9 @@ jobs:
       - uses: TickX/var-to-dotenv@v1.1.1
         with:
           key: "SENTRY_ENVIRONMENT"
-          value: test
+          value: ${{env.ENVIRONMENT_NAME}}
           envPath: "packages/example/.env"
-      - run: yarn build
+      - name: build
+        run: yarn build
         env:
           SENTRY_ENVIRONMENT: test
