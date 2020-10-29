@@ -8,7 +8,7 @@ on:
 
 env:
   ENVIRONMENT_NAME: production
-  SERVER_PUBLIC_IP: "15.236.168.171"
+  SERVER_PUBLIC_IP: "35.181.141.93"
 
 jobs:
   install: # Runs install once before everything to create & save cache
