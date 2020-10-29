@@ -15,6 +15,7 @@ provider:
   runtime: nodejs12.x
   region: eu-west-3
   memorySize: 512
+  stage: ${opt:stage}
   profile: picnic # aws credential profile name
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   environment:
@@ -23,7 +24,7 @@ provider:
     PARTICIPANT_TABLE: "${self:service.name}-${self:provider.stage}-participants"
     SERVER_TABLE: "${self:service.name}-${self:provider.stage}-server"
     STREAM_TABLE: "${self:service.name}-${self:provider.stage}-stream"
-    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-consumer-2"
+    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-consumer"
     SEND_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-send-transport"
     RECV_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-recv-transport"
     STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT: "${self:service.name}-${self:provider.stage}-src-transport"

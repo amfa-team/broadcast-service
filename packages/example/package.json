@@ -79,9 +79,9 @@
     "deploy:staging:stack": "serverless deploy --verbose --stage staging",
     "deploy:staging:website": "serverless client deploy --verbose --stage staging --no-confirm",
     "deploy:staging:info": "serverless info --verbose --stage staging",
-    "deploy:prod": "yarn deploy:prod:stack && yarn deploy:prod:website && yarn deploy:prod:info",
-    "deploy:prod:stack": "serverless deploy --verbose --stage production",
-    "deploy:prod:website": "serverless client deploy --verbose --stage production --no-confirm",
-    "deploy:prod:info": "serverless info --verbose --stage production"
+    "deploy:production": "yarn deploy:production:stack && yarn deploy:production:website && yarn deploy:production:info",
+    "deploy:production:stack": "serverless deploy --verbose --stage production",
+    "deploy:production:website": "serverless client deploy --verbose --stage production --no-confirm",
+    "deploy:production:info": "serverless info --verbose --stage production"
   }
 }
