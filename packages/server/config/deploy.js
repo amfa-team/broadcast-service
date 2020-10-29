@@ -39,8 +39,8 @@ spawnSync(
 );
 
 const commands = [
-  `cd /var/www/picnic-sfu; PYTHON=python3 yarn install --production`,
-  `cd /var/www/picnic-sfu; pm2 startOrReload ecosystem.config.js -u --env ${process.env.SENTRY_ENVIRONMENT}`,
+  `cd /var/www/picnic-sfu/dist; PYTHON=python3 yarn install --production`,
+  `cd /var/www/picnic-sfu/dist; pm2 startOrReload ecosystem.config.js -u --env ${process.env.SENTRY_ENVIRONMENT}`,
   `pm2 save`,
 ];
 
