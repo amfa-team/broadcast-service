@@ -63,7 +63,11 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: ["package.json", { from: "../../yarn.lock", to: "." }],
+      patterns: [
+        "ecosystem.config.js",
+        "package.json",
+        { from: "../../yarn.lock", to: "." },
+      ],
     }),
   ],
   externals: [
