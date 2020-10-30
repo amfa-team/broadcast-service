@@ -16,10 +16,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-push-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
-  lint:
+      - run: yarn install --ignore-scripts
+  lint_and_build:
     runs-on: ubuntu-latest
     needs: install
     steps:
@@ -30,24 +30,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-push-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
-      - run: yarn lint
-  build:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-push-${{ hashFiles('**/yarn.lock') }}
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
+      - run: yarn install --ignore-scripts
       - uses: TickX/var-to-dotenv@v1.1.1
         with:
           key: "SENTRY_DNS"
@@ -68,7 +53,7 @@ jobs:
           key: "SENTRY_ENVIRONMENT"
           value: ${{env.ENVIRONMENT_NAME}}
           envPath: "packages/example/.env"
-      - name: build
-        run: yarn build
+      - run: yarn build
         env:
           SENTRY_ENVIRONMENT: test
+      - run: yarn lint
