@@ -119,3 +119,8 @@ dist
 .pnp.*
 
 .DS_Store
+
+packages/*/lib
+packages/*/dist
+packages/*/.webpack
+packages/*/build

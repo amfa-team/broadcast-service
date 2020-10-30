@@ -1,0 +1,20 @@
+{
+  "extends": "sbs/script",
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./packages/*/tsconfig.json"]
+  },
+  "settings": {
+    "import/resolver": {
+      "workspaces": {
+        "extensions": [".mjs", ".js", ".ts", ".tsx", ".json", ".css"],
+        "sources": {
+          "@amfa-team/types": ["./packages/types/src"],
+          "@amfa-team/picnic-sdk": ["./packages/react/src"]
+        }
+      }
+    }
+  },
+  "rules": {
+    "no-console": "off"
+  }
+}

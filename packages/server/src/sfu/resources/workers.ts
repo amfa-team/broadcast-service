@@ -1,4 +1,5 @@
-import { createWorker as createMediaSoupWorker, types } from "mediasoup";
+import type { types } from "mediasoup";
+import { createWorker as createMediaSoupWorker } from "mediasoup";
 
 const workers: Map<number, types.Worker> = new Map();
 

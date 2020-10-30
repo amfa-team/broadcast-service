@@ -1,39 +1,39 @@
 import os from "os";
-import { createWorker } from "./resources/workers";
-import { createRouter, getRouter, getRouters } from "./resources/routers";
-import { types } from "mediasoup";
-import {
-  createTransport,
-  connectTransport,
-  destroyTransport,
-  getTransportMeta,
-  getTransport,
-  getTransportUsage,
-} from "./resources/transport";
-import {
-  createProducer,
-  getProducer,
-  getOptionalProducer,
-  getProducerState,
-} from "./resources/producers";
+import type {
+  ConnectParams,
+  ConnectionInfo,
+  ConsumerInfo,
+  DestroyConnectionParams,
+  InitConnectionParams,
+  ReceiveParams,
+  Routes,
+  SendDestroyParams,
+  SendParams,
+} from "@amfa-team/types";
+import type { types } from "mediasoup";
 import {
   createConsumer,
   getConsumer,
-  getProducerConsumer,
-  getOptionalConsumer,
   getConsumerState,
+  getOptionalConsumer,
+  getProducerConsumer,
 } from "./resources/consumers";
-import type {
-  InitConnectionParams,
-  ConnectionInfo,
-  ConnectParams,
-  SendParams,
-  ReceiveParams,
-  ConsumerInfo,
-  SendDestroyParams,
-  DestroyConnectionParams,
-  Routes,
-} from "../../../types";
+import {
+  createProducer,
+  getOptionalProducer,
+  getProducer,
+  getProducerState,
+} from "./resources/producers";
+import { createRouter, getRouter, getRouters } from "./resources/routers";
+import {
+  connectTransport,
+  createTransport,
+  destroyTransport,
+  getTransport,
+  getTransportMeta,
+  getTransportUsage,
+} from "./resources/transport";
+import { createWorker } from "./resources/workers";
 
 async function initWorker(): Promise<void> {
   const worker = await createWorker();
@@ -58,7 +58,7 @@ export function getLessUsedRouterId(type: "send" | "recv" = "recv"): string {
   const transportUsage = getTransportUsage();
   const routers = getRouters();
 
-  if (type === "send" || routers.length == 1) {
+  if (type === "send" || routers.length === 1) {
     return routers[0].id;
   }
 
@@ -88,7 +88,7 @@ export function getRouterCapabilities(): types.RtpCapabilities {
 }
 
 export async function initConnection(
-  request: InitConnectionParams
+  request: InitConnectionParams,
 ): Promise<ConnectionInfo> {
   const routerId = getLessUsedRouterId(request.type);
   const router = getRouter(routerId);
@@ -121,20 +121,25 @@ export async function send(params: SendParams): Promise<string> {
 
   const sourceRouter = getRouter(routerId);
   const routers = getRouters();
+  const tasks = [];
   for (const router of routers) {
     if (router.id !== sourceRouter.id) {
-      sourceRouter.pipeToRouter({
-        producerId: producer.id,
-        router,
-      });
+      tasks.push(
+        sourceRouter.pipeToRouter({
+          producerId: producer.id,
+          router,
+        }),
+      );
     }
   }
+
+  await Promise.all(tasks);
 
   return producer.id;
 }
 
 export async function sendState(
-  params: Routes["/send/state"]["in"]
+  params: Routes["/send/state"]["in"],
 ): Promise<Routes["/send/state"]["out"]> {
   const { producerId } = params;
   const producer = getProducer(producerId);
@@ -184,7 +189,7 @@ export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
   const consumer = await createConsumer(
     selfTransport,
     producer.id,
-    rtpCapabilities
+    rtpCapabilities,
   );
 
   if (producer.kind === "audio") {
@@ -200,7 +205,7 @@ export async function receive(params: ReceiveParams): Promise<ConsumerInfo> {
 }
 
 export async function receiveState(
-  params: Routes["/receive/state"]["in"]
+  params: Routes["/receive/state"]["in"],
 ): Promise<Routes["/receive/state"]["out"]> {
   const { consumerId } = params;
   const consumer = getConsumer(consumerId);

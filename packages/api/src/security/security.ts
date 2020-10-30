@@ -1,7 +1,7 @@
+import type { Participant, Role } from "../../../types/src/db/participant";
 import { getParticipant } from "../db/repositories/participantRepository";
-import { ForbiddenError } from "../io/exceptions";
-import { Participant, Role } from "../db/types/participant";
-import { WithToken } from "../io/types";
+import ForbiddenError from "../io/exceptions/ForbiddenError";
+import type { WithToken } from "../io/types";
 
 export function authAdmin({ token }: WithToken): void {
   if (!process.env.SECRET) {
@@ -15,7 +15,7 @@ export function authAdmin({ token }: WithToken): void {
 
 export async function authParticipant(
   { token }: WithToken,
-  roles: Role[]
+  roles: Role[],
 ): Promise<Participant> {
   const participant = await getParticipant(token);
 

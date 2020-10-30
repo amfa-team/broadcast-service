@@ -1,31 +1,32 @@
+import { captureException, flush, init } from "@sentry/node";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ApiGatewayManagementApi } from "aws-sdk";
-import type { APIGatewayProxyResult, APIGatewayProxyEvent } from "aws-lambda";
 import { JsonDecoder } from "ts.data.json";
-import { InvalidRequestError } from "./exceptions";
-import { authParticipant, authAdmin } from "../security/security";
-import {
+import type { Role } from "../../../types/src/db/participant";
+import { getAllConnections } from "../db/repositories/connectionRepository";
+import { authAdmin, authParticipant } from "../security/security";
+import InvalidRequestError from "./exceptions/InvalidRequestError";
+import { getAllSettledValues } from "./promises";
+import type {
   ParticipantRequest,
   Request,
-  WsRequest,
   WsParticipantRequest,
+  WsRequest,
 } from "./types";
-import { Role } from "../db/types/participant";
-import { getAllConnections } from "../db/repositories/connectionRepository";
-import { getAllSettledValues } from "./promises";
-import * as Sentry from "@sentry/node";
 
 const DOMAIN_NAME = process.env.WEBSOCKET_DOMAIN ?? "";
 
-Sentry.init({
-  dsn:
-    "https://2a21d2e5da45411aa305ee47379874d5@o443877.ingest.sentry.io/5418762",
-  environment: process.env.SENTRY_ENVIRONMENT,
-});
+if (process.env.SENTRY_ENVIRONMENT !== "dev") {
+  init({
+    dsn: process.env.SENTRY_DNS,
+    environment: process.env.SENTRY_ENVIRONMENT,
+  });
+}
 
 const apigwManagementApi: ApiGatewayManagementApi = new ApiGatewayManagementApi(
   process.env.IS_OFFLINE
     ? { apiVersion: "2018-11-29", endpoint: `http://localhost:3001` }
-    : { apiVersion: "2018-11-29", endpoint: `${DOMAIN_NAME}` }
+    : { apiVersion: "2018-11-29", endpoint: `${DOMAIN_NAME}` },
 );
 
 export function wsOnlyRoute(event: APIGatewayProxyEvent): string {
@@ -58,7 +59,7 @@ function decode<T>(data: unknown, decoder: JsonDecoder.Decoder<T>): T {
 
 function parseWsRequest<T>(
   event: APIGatewayProxyEvent,
-  decoder: JsonDecoder.Decoder<T>
+  decoder: JsonDecoder.Decoder<T>,
 ): WsRequest<T> {
   const body = parse(event.body);
 
@@ -68,7 +69,7 @@ function parseWsRequest<T>(
       data: decoder,
       msgId: JsonDecoder.string,
     },
-    "WebSocketRequest"
+    "WebSocketRequest",
   );
 
   return decode(body, requestDecoder);
@@ -76,9 +77,9 @@ function parseWsRequest<T>(
 
 function parseHttpRequest<T>(
   event: APIGatewayProxyEvent,
-  decoder: JsonDecoder.Decoder<T>
+  decoder: JsonDecoder.Decoder<T>,
 ): Request<T> {
-  const token = event?.headers?.["x-api-key"];
+  const token = event.headers["x-api-key"];
 
   if (!token) {
     throw new InvalidRequestError("Missing x-api-key header");
@@ -92,7 +93,7 @@ function parseHttpRequest<T>(
 export async function parseHttpParticipantRequest<T>(
   event: APIGatewayProxyEvent,
   roles: Role[],
-  decoder: JsonDecoder.Decoder<T>
+  decoder: JsonDecoder.Decoder<T>,
 ): Promise<ParticipantRequest<T>> {
   const result = parseHttpRequest(event, decoder);
   const participant = await authParticipant(result, roles);
@@ -105,7 +106,7 @@ export async function parseHttpParticipantRequest<T>(
 
 export async function parseHttpAdminRequest<T>(
   event: APIGatewayProxyEvent,
-  decoder: JsonDecoder.Decoder<T>
+  decoder: JsonDecoder.Decoder<T>,
 ): Promise<Request<T>> {
   const result = parseHttpRequest(event, decoder);
   await authAdmin(result);
@@ -116,7 +117,7 @@ export async function parseHttpAdminRequest<T>(
 export async function parseWsParticipantRequest<T>(
   event: APIGatewayProxyEvent,
   roles: Role[],
-  decoder: JsonDecoder.Decoder<T>
+  decoder: JsonDecoder.Decoder<T>,
 ): Promise<WsParticipantRequest<T>> {
   const result = parseWsRequest(event, decoder);
   const participant = await authParticipant(result, roles);
@@ -129,7 +130,7 @@ export async function parseWsParticipantRequest<T>(
 
 export async function handleHttpErrorResponse(
   e: unknown,
-  msgId: string | null = null
+  msgId: string | null = null,
 ): Promise<APIGatewayProxyResult> {
   if (e instanceof InvalidRequestError) {
     return {
@@ -142,8 +143,11 @@ export async function handleHttpErrorResponse(
     };
   }
 
-  Sentry.captureException(e);
-  await Sentry.flush(2000);
+  console.error(e);
+  captureException(e);
+  await flush(2000).catch(() => {
+    console.error("io.handleHttpErrorResponse: fail to flush errors");
+  });
 
   return {
     statusCode: 500,
@@ -156,7 +160,7 @@ export async function handleHttpErrorResponse(
 
 export function handleSuccessResponse(
   data: unknown,
-  msgId: string | null = null
+  msgId: string | null = null,
 ): APIGatewayProxyResult {
   return {
     statusCode: 200,
@@ -174,7 +178,7 @@ export function handleSuccessResponse(
 
 export async function postToConnection(
   connectionId: string,
-  data: string
+  data: string,
 ): Promise<void> {
   try {
     await apigwManagementApi
@@ -197,7 +201,7 @@ export async function postToConnection(
 export async function broadcastToConnections(data: string): Promise<void> {
   const connections = await getAllConnections();
   const results = await Promise.allSettled(
-    connections.map((c) => postToConnection(c.connectionId, data))
+    connections.map(async (c) => postToConnection(c.connectionId, data)),
   );
   getAllSettledValues(results, "broadcastToConnections: Unexpected Error");
 }
@@ -205,7 +209,7 @@ export async function broadcastToConnections(data: string): Promise<void> {
 export async function handleWebSocketSuccessResponse(
   connectionId: string,
   msgId: string,
-  data: unknown
+  data: unknown,
 ): Promise<APIGatewayProxyResult> {
   const result = handleSuccessResponse(data, msgId);
 
@@ -221,7 +225,7 @@ export async function handleWebSocketSuccessResponse(
 export async function handleWebSocketErrorResponse(
   connectionId: string,
   msgId: string | null,
-  e: unknown
+  e: unknown,
 ): Promise<APIGatewayProxyResult> {
   const result = await handleHttpErrorResponse(e, msgId);
 

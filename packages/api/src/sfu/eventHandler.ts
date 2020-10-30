@@ -1,16 +1,17 @@
+// eslint-disable-next-line import/no-unassigned-import
 import "source-map-support/register";
-import { JsonDecoder } from "ts.data.json";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { JsonDecoder } from "ts.data.json";
 import {
-  handleSuccessResponse,
   handleHttpErrorResponse,
+  handleSuccessResponse,
   parseHttpAdminRequest,
 } from "../io/io";
-import { onProducerStateChange } from "./streamService";
 import { onConsumerStateChange } from "./streamConsumerService";
+import { onProducerStateChange } from "./streamService";
 
 export async function producerStateChange(
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
     const { data } = await parseHttpAdminRequest(
@@ -24,11 +25,11 @@ export async function producerStateChange(
               score: JsonDecoder.number,
               paused: JsonDecoder.boolean,
             },
-            "ProducerState"
+            "ProducerState",
           ),
         },
-        "ProducerStateChange"
-      )
+        "ProducerStateChange",
+      ),
     );
     const payload = await onProducerStateChange(data);
 
@@ -39,7 +40,7 @@ export async function producerStateChange(
 }
 
 export async function consumerStateChange(
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
     const { data } = await parseHttpAdminRequest(
@@ -55,11 +56,11 @@ export async function consumerStateChange(
               paused: JsonDecoder.boolean,
               producerPaused: JsonDecoder.boolean,
             },
-            "ConsumerState"
+            "ConsumerState",
           ),
         },
-        "ConsumerStateChange"
-      )
+        "ConsumerStateChange",
+      ),
     );
     const payload = await onConsumerStateChange(data);
 

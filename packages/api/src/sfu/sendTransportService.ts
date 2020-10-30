@@ -1,13 +1,12 @@
-import { postToServer } from "./serverService";
-import type { ConnectionInfo, Routes } from "../../../types";
+import type { Connection, ConnectionInfo, Routes } from "@amfa-team/types";
 import { patchConnection } from "../db/repositories/connectionRepository";
 import {
-  deleteSendTransport,
   createSendTransport,
+  deleteSendTransport,
 } from "../db/repositories/sendTransportRepository";
 import { getAllSettledValues } from "../io/promises";
+import { postToServer } from "./serverService";
 import { closeStream } from "./streamService";
-import { Connection } from "../db/types/connection";
 
 interface InitSendTransportEvent {
   connectionId: string;
@@ -15,7 +14,7 @@ interface InitSendTransportEvent {
 }
 
 export async function onInitSendTransport(
-  event: InitSendTransportEvent
+  event: InitSendTransportEvent,
 ): Promise<ConnectionInfo> {
   const { connectionId, data } = event;
 
@@ -43,20 +42,9 @@ interface ConnectSendTransportEvent {
 }
 
 export async function onConnectSendTransport(
-  event: ConnectSendTransportEvent
+  event: ConnectSendTransportEvent,
 ): Promise<Routes["/connect/create"]["out"]> {
   return postToServer("/connect/create", event.data);
-}
-
-interface OnSendTransportCloseEvent {
-  connectionId: string;
-  transportId: string;
-}
-
-export async function onSendTransportClose(
-  event: OnSendTransportCloseEvent
-): Promise<void> {
-  await closeSendTransport({ ...event, skipConnectionPatch: false });
 }
 
 interface CloseSendTransportParams {
@@ -66,7 +54,7 @@ interface CloseSendTransportParams {
 }
 
 export async function closeSendTransport(
-  params: CloseSendTransportParams
+  params: CloseSendTransportParams,
 ): Promise<void> {
   if (params.transportId == null) {
     return;
@@ -97,6 +85,17 @@ export async function closeSendTransport(
 
   getAllSettledValues<void | null | Connection>(
     results,
-    "closeSendTransport: Unexpected error"
+    "closeSendTransport: Unexpected error",
   );
+}
+
+interface OnSendTransportCloseEvent {
+  connectionId: string;
+  transportId: string;
+}
+
+export async function onSendTransportClose(
+  event: OnSendTransportCloseEvent,
+): Promise<void> {
+  await closeSendTransport({ ...event, skipConnectionPatch: false });
 }

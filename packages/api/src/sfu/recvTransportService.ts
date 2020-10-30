@@ -1,13 +1,12 @@
-import { postToServer } from "./serverService";
-import type { ConnectionInfo, Routes } from "../../../types";
+import type { Connection, ConnectionInfo, Routes } from "@amfa-team/types";
+import { patchConnection } from "../db/repositories/connectionRepository";
 import {
-  deleteRecvTransport,
   createRecvTransport,
+  deleteRecvTransport,
 } from "../db/repositories/recvTransportRepository";
 import { getAllSettledValues } from "../io/promises";
-import { patchConnection } from "../db/repositories/connectionRepository";
+import { postToServer } from "./serverService";
 import { closeConsumer } from "./streamConsumerService";
-import { Connection } from "../db/types/connection";
 
 interface InitRecvTransportEvent {
   connectionId: string;
@@ -15,7 +14,7 @@ interface InitRecvTransportEvent {
 }
 
 export async function onInitRecvTransport(
-  event: InitRecvTransportEvent
+  event: InitRecvTransportEvent,
 ): Promise<ConnectionInfo> {
   const { connectionId, data } = event;
 
@@ -43,7 +42,7 @@ interface ConnectRecvTransportEvent {
 }
 
 export async function onConnectRecvTransport(
-  event: ConnectRecvTransportEvent
+  event: ConnectRecvTransportEvent,
 ): Promise<Routes["/connect/create"]["out"]> {
   return postToServer("/connect/create", event.data);
 }
@@ -53,12 +52,6 @@ interface OnRecvTransportCloseEvent {
   transportId: string;
 }
 
-export async function onRecvTransportClose(
-  event: OnRecvTransportCloseEvent
-): Promise<void> {
-  await closeRecvTransport({ ...event, skipConnectionPatch: false });
-}
-
 interface CloseRecvTransportParams {
   connectionId: string;
   transportId: string | null;
@@ -66,7 +59,7 @@ interface CloseRecvTransportParams {
 }
 
 export async function closeRecvTransport(
-  params: CloseRecvTransportParams
+  params: CloseRecvTransportParams,
 ): Promise<void> {
   if (params.transportId == null) {
     return;
@@ -98,6 +91,12 @@ export async function closeRecvTransport(
 
   getAllSettledValues<void | null | Connection>(
     results,
-    "closeRecvTransportClose: Unexpected error"
+    "closeRecvTransportClose: Unexpected error",
   );
+}
+
+export async function onRecvTransportClose(
+  event: OnRecvTransportCloseEvent,
+): Promise<void> {
+  await closeRecvTransport({ ...event, skipConnectionPatch: false });
 }

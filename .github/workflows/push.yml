@@ -1,0 +1,59 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: Lint & Test
+
+on: [push]
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - run: yarn install --ignore-scripts
+  lint_and_build:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - run: yarn install --ignore-scripts
+      - uses: TickX/var-to-dotenv@v1.1.1
+        with:
+          key: "SENTRY_DNS"
+          value: ${{secrets.SENTRY_EXAMPLE_DNS}}
+          envPath: "packages/example/.env"
+      - uses: TickX/var-to-dotenv@v1.1.1
+        with:
+          key: "WS_API"
+          value: ${{secrets.STAGING_WEBSOCKET}}
+          envPath: "packages/example/.env"
+      - uses: TickX/var-to-dotenv@v1.1.1
+        with:
+          key: "HTTP_API"
+          value: ${{secrets.STAGING_CLUSTER_API}}
+          envPath: "packages/example/.env"
+      - uses: TickX/var-to-dotenv@v1.1.1
+        with:
+          key: "SENTRY_ENVIRONMENT"
+          value: ${{env.ENVIRONMENT_NAME}}
+          envPath: "packages/example/.env"
+      - run: yarn build
+        env:
+          SENTRY_ENVIRONMENT: test
+      - run: yarn lint

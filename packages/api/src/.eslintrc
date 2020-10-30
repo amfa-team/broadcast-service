@@ -1,0 +1,7 @@
+{
+  "extends": ["sbs/base", "sbs/typescript"],
+  "rules": {
+    "no-console": "off",
+    "@typescript-eslint/no-invalid-void-type": "off"
+  }
+}

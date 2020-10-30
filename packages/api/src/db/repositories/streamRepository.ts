@@ -1,52 +1,54 @@
-import { StreamInfo, PatchStream } from "../types/stream";
-import { streamModel } from "../schema";
+import type { PatchStream, StreamInfo } from "@amfa-team/types";
+import { StreamModel } from "../schema";
 
 export async function createStream(stream: StreamInfo): Promise<StreamInfo> {
-  const doc = await streamModel.create(stream);
+  const doc = await StreamModel.create(stream);
   return doc.toJSON() as StreamInfo;
 }
 
 export async function deleteStream(
   transportId: string,
-  producerId: string
+  producerId: string,
 ): Promise<void> {
-  await streamModel.delete({ transportId, producerId });
+  await StreamModel.delete({ transportId, producerId });
 }
 
 export async function getStream(
   transportId: string,
-  producerId: string
+  producerId: string,
 ): Promise<StreamInfo | null> {
-  const doc = await streamModel.get({ transportId, producerId });
+  const doc = await StreamModel.get({ transportId, producerId });
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return (doc?.toJSON() ?? null) as StreamInfo | null;
 }
 
 export async function findStreamByTransportId(
-  transportId: string
+  transportId: string,
 ): Promise<StreamInfo[]> {
-  const results: unknown = await streamModel
-    .scan({ transportId: { eq: transportId } })
-    .exec();
+  const results: unknown = await StreamModel.scan({
+    transportId: { eq: transportId },
+  }).exec();
   return results as StreamInfo[];
 }
 
 export async function deleteStreamByTransportId(
-  transportId: string
+  transportId: string,
 ): Promise<void> {
   const items = await findStreamByTransportId(transportId);
 
   await Promise.all(
-    items.map((item) => deleteStream(item.transportId, item.producerId))
+    items.map(async (item) => deleteStream(item.transportId, item.producerId)),
   );
 }
 
 export async function getAllStreams(): Promise<StreamInfo[]> {
-  const results: unknown = await streamModel.scan().exec();
+  const results: unknown = await StreamModel.scan().exec();
   return results as StreamInfo[];
 }
 
 export async function patchStream(params: PatchStream): Promise<StreamInfo> {
   const { transportId, producerId, ...rest } = params;
-  const doc = await streamModel.update({ transportId, producerId }, rest);
-  return doc.toJSON() as StreamInfo;
+  const doc = await StreamModel.update({ transportId, producerId }, rest);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return (doc?.toJSON() ?? null) as StreamInfo;
 }

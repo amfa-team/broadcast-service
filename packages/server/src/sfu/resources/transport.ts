@@ -1,4 +1,4 @@
-import { types } from "mediasoup";
+import type { types } from "mediasoup";
 import { getPublicIP } from "../../cluster/register";
 
 type TransportMeta = {
@@ -13,7 +13,7 @@ const transportsMeta: WeakMap<
 
 export async function createTransport(
   router: types.Router,
-  sctpCapabilities: types.SctpCapabilities
+  sctpCapabilities: types.SctpCapabilities,
 ): Promise<types.WebRtcTransport> {
   const transport = await router.createWebRtcTransport({
     listenIps: [
@@ -41,6 +41,12 @@ export async function createTransport(
   return transport;
 }
 
+export function getOptionalTransport(
+  transportId: string,
+): types.WebRtcTransport | null {
+  return transports.get(transportId) ?? null;
+}
+
 export function getTransport(transportId: string): types.WebRtcTransport {
   const transport = getOptionalTransport(transportId);
 
@@ -49,12 +55,6 @@ export function getTransport(transportId: string): types.WebRtcTransport {
   }
 
   return transport;
-}
-
-export function getOptionalTransport<T extends boolean>(
-  transportId: string
-): types.WebRtcTransport | null {
-  return transports.get(transportId) ?? null;
 }
 
 export function getTransports(): types.WebRtcTransport[] {
@@ -72,8 +72,10 @@ export function getTransportMeta(transportId: string): TransportMeta {
   return meta;
 }
 
-export function getTransportUsage(): { [routerId: string]: number } {
-  const usage: { [routerId: string]: number } = {};
+export function getTransportUsage(): {
+  [routerId: string]: undefined | number;
+} {
+  const usage: { [routerId: string]: undefined | number } = {};
 
   for (const transportId of transports.keys()) {
     const { routerId } = getTransportMeta(transportId);
@@ -86,7 +88,7 @@ export function getTransportUsage(): { [routerId: string]: number } {
 
 export async function connectTransport(
   transportId: string,
-  dtlsParameters: types.DtlsParameters
+  dtlsParameters: types.DtlsParameters,
 ): Promise<types.WebRtcTransport> {
   const transport = getTransport(transportId);
   await transport.connect({ dtlsParameters });
@@ -100,6 +102,6 @@ export function destroyTransport(transportId: string): void {
 
 export function getRouterTransports(router: types.Router): types.Transport[] {
   return [...transports.values()].filter(
-    (transport) => getTransportMeta(transport.id).routerId === router.id
+    (transport) => getTransportMeta(transport.id).routerId === router.id,
   );
 }

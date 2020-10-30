@@ -1,17 +1,18 @@
-import express, { Express, Application } from "express";
+import { Handlers } from "@sentry/node";
 import cors from "cors";
-import { bindSceneController } from "./controllers/sfuController";
+import type { Application, Express } from "express";
+import express from "express";
 import { authMiddleware } from "../security/security";
-import * as Sentry from "@sentry/node";
+import { bindSceneController } from "./controllers/sfuController";
 
 function bind(app: Application): void {
   bindSceneController(app);
 }
 
-export function startApi(): Promise<Express> {
+export async function startApi(): Promise<Express> {
   const app = express();
 
-  app.use(Sentry.Handlers.requestHandler());
+  app.use(Handlers.requestHandler());
 
   app.use(cors());
   app.use(express.json());
@@ -20,7 +21,7 @@ export function startApi(): Promise<Express> {
   bind(app);
 
   // The error handler must be before any other error middleware and after all controllers
-  app.use(Sentry.Handlers.errorHandler());
+  app.use(Handlers.errorHandler());
 
   return new Promise((resolve, reject) => {
     app.listen(Number(process.env.PORT ?? 8080), (err) => {

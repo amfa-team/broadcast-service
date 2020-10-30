@@ -16,7 +16,7 @@ function getClusterApi() {
 
 export async function requestApi<T>(
   path: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): Promise<T> {
   const { api, key } = getClusterApi();
 
@@ -27,14 +27,11 @@ export async function requestApi<T>(
   });
 
   const response = await res.json().catch(() => null);
-  if (!res.ok || !response?.success) {
+  if (!res.ok || !response.success) {
     throw new Error(
-      'requestApi: failed with "' +
-        res.status +
-        '" and error ' +
-        response?.error
+      `requestApi: failed with "${res.status}" and error ${response.error}`,
     );
   }
 
-  return response;
+  return response as T;
 }
