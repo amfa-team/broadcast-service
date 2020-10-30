@@ -9565,10 +9565,10 @@ eslint-config-prettier@^6.14.0:
   dependencies:
     get-stdin "^6.0.0"
 
-eslint-config-sbs@^1.0.0-beta.5:
-  version "1.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/eslint-config-sbs/-/eslint-config-sbs-1.0.0-beta.5.tgz#20f5f205c2254c8d3d2a22e5620f4285de87e1af"
-  integrity sha512-r8LkcqKH41jE96cykfbRrSg1qjKohNCqWYXQoLsNs6KP8/utUIey9E9x27fNTXKnk6L4Vfe7YLFLAuP+NfvAbw==
+eslint-config-sbs@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-sbs/-/eslint-config-sbs-1.0.1.tgz#bcf06fc68129d9e395b9996d56a701753814d25f"
+  integrity sha512-FgYK726HqFLCP32XMs6xAMn8dHJacDir71aaBYserhCxLP6iXtAXTjNkGrwijIE42xyfZj4gCjHkEtIF3GfWHg==
   dependencies:
     confusing-browser-globals "^1.0.9"
 
