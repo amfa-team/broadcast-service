@@ -1,7 +1,17 @@
 {
   "extends": ["sbs", "sbs/typescript"],
   "rules": {
-    "no-console": "off"
+    "no-console": "off",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "@material-ui/*/*",
+          "!@material-ui/core/styles",
+          "!@material-ui/core/test-utils/*"
+        ]
+      }
+    ]
   },
   "overrides": [
     {

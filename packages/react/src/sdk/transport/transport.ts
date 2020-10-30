@@ -1,11 +1,11 @@
-import { captureException } from "@sentry/react";
-import { EventTarget } from "event-target-shim";
-import type { types } from "mediasoup-client";
 import type {
   ConnectParams,
   ConnectionInfo,
   SendParams,
 } from "@amfa-team/types";
+import { captureException } from "@sentry/react";
+import { EventTarget } from "event-target-shim";
+import type { types } from "mediasoup-client";
 import PicnicError from "../../exceptions/PicnicError";
 import type { TransportState } from "../../types";
 import type { PicnicDevice } from "../device/device";

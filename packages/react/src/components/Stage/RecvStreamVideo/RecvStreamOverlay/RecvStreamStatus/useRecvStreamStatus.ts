@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import type { ConsumerState } from "@amfa-team/types";
+import { useEffect, useState } from "react";
 import type {
   RecvStream,
   RecvStreamEvents,
