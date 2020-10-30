@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-unassigned-import
 import "source-map-support/register";
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { JsonDecoder } from "ts.data.json";
 import type { ReceiveParams, SendParams } from "@amfa-team/types";
 import { Role } from "@amfa-team/types";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { JsonDecoder } from "ts.data.json";
 import { getAllStreams } from "../db/repositories/streamRepository";
 import {
   handleHttpErrorResponse,

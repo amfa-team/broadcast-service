@@ -1,10 +1,10 @@
-import { JsonDecoder } from "ts.data.json";
 import type {
   ConsumerInfo,
   ConsumerState,
   Routes,
   StreamConsumerInfo,
 } from "@amfa-team/types";
+import { JsonDecoder } from "ts.data.json";
 import {
   findConnectionByRecvTransportId,
   getConnection,

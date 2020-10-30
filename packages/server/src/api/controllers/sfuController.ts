@@ -1,4 +1,3 @@
-import type { Application } from "express";
 import type {
   ConnectParams,
   DestroyConnectionParams,
@@ -8,6 +7,7 @@ import type {
   SendDestroyParams,
   SendParams,
 } from "@amfa-team/types";
+import type { Application } from "express";
 import { handleErrorResponse, handleSuccessResponse } from "../../io/io";
 import {
   connect,

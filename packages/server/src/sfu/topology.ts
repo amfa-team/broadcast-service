@@ -1,4 +1,3 @@
-import type { types } from "mediasoup";
 import type {
   ConsumerTopology,
   ProducerTopology,
@@ -7,6 +6,7 @@ import type {
   TransportTopology,
   WorkerTopology,
 } from "@amfa-team/types";
+import type { types } from "mediasoup";
 import {
   getProducerConsumers,
   getTransportConsumers,

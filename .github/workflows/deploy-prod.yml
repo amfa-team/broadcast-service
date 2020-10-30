@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - improvment/sbs-template
 
 env:
   ENVIRONMENT_NAME: production

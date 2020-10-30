@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - improvment/sbs-template
 
 env:
   ENVIRONMENT_NAME: staging

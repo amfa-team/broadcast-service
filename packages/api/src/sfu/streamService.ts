@@ -1,5 +1,5 @@
-import { JsonDecoder } from "ts.data.json";
 import type { ProducerState, Routes, StreamInfo } from "@amfa-team/types";
+import { JsonDecoder } from "ts.data.json";
 import { getConnection } from "../db/repositories/connectionRepository";
 import {
   createStream,
