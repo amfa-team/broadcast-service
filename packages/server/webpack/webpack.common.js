@@ -1,16 +1,13 @@
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
+const paths = require("./common-paths");
 
 module.exports = {
-  entry: "./src/index.ts",
-  mode: "production",
-  optimization: {
-    minimize: false,
-  },
+  entry: paths.entry,
   target: "node",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: paths.dist,
   },
   module: {
     rules: [
@@ -74,7 +71,7 @@ module.exports = {
     nodeExternals({
       allowlist: ["@amfa-team/types"],
       additionalModuleDirs: [
-        path.resolve(__dirname, "..", "..", "node_modules"),
+        path.resolve(__dirname, "..", "..", "..", "node_modules"),
       ],
     }),
   ],

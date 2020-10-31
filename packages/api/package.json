@@ -24,7 +24,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "scripts": {
-    "start": "serverless offline",
+    "start": "serverless offline --stage dev",
     "build": "echo \"api: No build script\"",
     "clean": "rm -rf .webpack lib",
     "aws:profile:set": "serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY --profile picnic -o",

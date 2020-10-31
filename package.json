@@ -44,10 +44,10 @@
     "prettier:check": "prettier --check .",
     "build": "(cd packages/react; yarn build) && yarn workspaces run build",
     "clean": "yarn workspaces run clean",
-    "start": "ttab yarn start:react; ttab yarn start:api; ttab \"sleep 3 && yarn start:example\"; ttab yarn start:server; ttab yarn start:dynamo",
+    "start": "ttab yarn -t 'React' start:react; ttab yarn -t 'API' start:api; ttab -t 'Example' \"sleep 3 && yarn start:example\"; ttab -t 'Server' yarn start:server; ttab -t 'Dynamo' yarn start:dynamo",
     "start:api": "cd packages/api && yarn start",
     "start:dynamo": "cd packages/api && yarn dynamo:start",
-    "start:server": "cd packages/server && yarn start",
+    "start:server": "cd packages/server && yarn start:dev",
     "start:react": "cd packages/react && yarn start",
     "start:example": "cd packages/example && yarn start"
   },
