@@ -1,4 +1,7 @@
-import type { PatchStream, StreamInfo } from "@amfa-team/types";
+import type {
+  PatchStream,
+  StreamInfo,
+} from "@amfa-team/broadcast-service-types";
 import { StreamModel } from "../schema";
 
 export async function createStream(stream: StreamInfo): Promise<StreamInfo> {

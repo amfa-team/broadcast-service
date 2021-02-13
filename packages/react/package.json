@@ -1,33 +1,84 @@
 {
-  "name": "@amfa-team/picnic-sdk",
+  "name": "@amfa-team/broadcast-service",
   "version": "0.0.0",
-  "repository": "https://github.com/amfa-team/picnic-sfu.git",
+  "repository": "https://github.com/amfa-team/broadcast-service.git",
   "license": "SEE LICENSE IN LICENSE.md",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "lib/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "dependencies": {
-    "@babel/runtime": "^7.12.1",
-    "core-js": "^3.6.5",
+    "@babel/runtime": "^7.12.13",
+    "core-js": "^3.8.3",
     "event-target-shim": "^5.0.1",
-    "lodash-es": "^4.17.15",
-    "mediasoup-client": "^3.6.21",
-    "react-resize-detector": "^5.2.0",
-    "uuid": "^8.3.1",
-    "whatwg-fetch": "^3.4.1"
+    "lodash-es": "^4.17.20",
+    "mediasoup-client": "^3.6.28",
+    "react-resize-detector": "^6.5.0",
+    "uuid": "^8.3.2",
+    "whatwg-fetch": "^3.5.0"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/plugin-transform-runtime": "^7.12.15",
+    "@babel/preset-env": "^7.12.16",
+    "@babel/preset-react": "^7.12.13",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.56",
+    "@rollup/plugin-alias": "^3.1.2",
+    "@rollup/plugin-babel": "^5.2.3",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.1.1",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/exec": "^5.0.0",
+    "@semantic-release/git": "^9.0.0",
+    "@sentry/react": "^6.1.0",
+    "@storybook/addon-actions": "^6.1.17",
+    "@storybook/addon-essentials": "^6.1.17",
+    "@storybook/addon-knobs": "^6.1.17",
+    "@storybook/addon-links": "^6.1.17",
+    "@storybook/react": "^6.1.17",
+    "@types/lodash-es": "^4.17.4",
+    "@types/react": "^16.14.4",
+    "@types/react-dom": "^16.9.11",
+    "@types/webrtc": "^0.0.26",
+    "babel-plugin-transform-imports": "^2.0.0",
+    "concurrently": "^5.3.0",
+    "cpx": "^1.5.0",
+    "css-loader": "^5.0.2",
+    "postcss-loader": "^4.2.0",
+    "postcss-modules-values": "^3.0.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "rollup": "^2.38.1",
+    "rollup-plugin-postcss": "^3.1.8",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "semantic-release-slack-bot": "^1.7.0",
+    "style-loader": "^2.0.0",
+    "tslib": "^2.1.0",
+    "typescript": "^4.1.5",
+    "typescript-plugin-css-modules": "^3.2.0"
   },
   "peerDependencies": {
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.56",
-    "@sentry/react": "^5.27.1",
-    "@types/lodash-es": "^4.17.3",
-    "@types/react": "^16.9.53",
-    "@types/react-resize-detector": "^5.0.0",
-    "@types/webrtc": "^0.0.26",
+    "@sentry/react": "^6.1.0",
+    "@types/lodash-es": "^4.17.4",
+    "@types/react": "^16.14.4",
+    "@types/react-dom": "^16.9.11",
+    "abortcontroller-polyfill": "^1.7.1",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "resize-observer-polyfill": "^1.5.1",
+    "webrtc-adapter": "^7.7.0"
   },
   "peerDependenciesMeta": {
     "@types/lodash-es": {
@@ -36,72 +87,25 @@
     "@types/react": {
       "optional": true
     },
-    "@types/react-resize-detector": {
+    "@types/react-dom": {
       "optional": true
     },
     "@types/webrtc": {
       "optional": true
     }
   },
-  "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-transform-runtime": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
-    "@babel/preset-react": "^7.12.1",
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.56",
-    "@rollup/plugin-babel": "^5.2.1",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
-    "@types/react-resize-detector": "^5.0.0",
-    "@sentry/react": "^5.27.1",
-    "@sentry/tracing": "^5.27.1",
-    "@storybook/addon-actions": "^6.0.27",
-    "@storybook/addon-essentials": "^6.0.27",
-    "@storybook/addon-links": "^6.0.27",
-    "@storybook/react": "^6.0.27",
-    "@types/lodash-es": "^4.17.3",
-    "@types/react": "^16.9.53",
-    "@types/react-dom": "^16.9.8",
-    "@types/webrtc": "^0.0.26",
-    "concurrently": "^5.3.0",
-    "cpx": "^1.5.0",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "rollup": "^2.32.1",
-    "rollup-plugin-postcss": "^3.1.8",
-    "rollup-plugin-terser": "^7.0.2",
-    "semantic-release": "^17.2.1",
-    "semantic-release-slack-bot": "^1.6.2",
-    "tslib": "^2.0.3",
-    "typescript": "^4.0.5",
-    "typescript-plugin-css-modules": "^2.7.0"
-  },
   "scripts": {
     "build": "yarn build:tsc && yarn build:css && yarn build:rollup",
     "build:tsc": "tsc -b",
     "build:rollup": "rollup -c rollup.config.js",
     "build:css": "cpx 'src/**/*.css' lib",
-    "clean": "tsc -b --clean && rm -rf dist",
-    "start": "yarn build:tsc && yarn build:css && concurrently \"yarn start:tsc\" \"yarn start:rollup\" \"yarn start:css\"",
+    "clean": "tsc -b --clean && rm -rf dist && rm -rf lib",
+    "start": "yarn build:css && concurrently \"yarn start:tsc\" \"yarn start:rollup\" \"yarn start:css\"",
     "start:rollup": "yarn build:rollup -w",
     "start:tsc": "yarn build:tsc -w",
     "start:css": "yarn build:css --watch",
-    "deploy": "semantic-release",
     "prepublishOnly": "yarn build",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
-  },
-  "browserslist": [
-    "Chrome >= 55",
-    "Edge > 13",
-    "Firefox >= 60",
-    "Safari > 14"
-  ],
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com/"
   }
 }

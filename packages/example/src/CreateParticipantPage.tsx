@@ -1,4 +1,4 @@
-import { Loading } from "@amfa-team/picnic-sdk";
+import { Loading } from "@amfa-team/broadcast-service";
 import { Typography } from "@material-ui/core";
 import React, { useEffect } from "react";
 import { useCreateParticipant } from "./useApi";

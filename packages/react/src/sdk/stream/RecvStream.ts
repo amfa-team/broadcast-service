@@ -2,7 +2,7 @@ import type {
   ConsumerInfo,
   ConsumerState,
   ReceiveParams,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import { EventTarget } from "event-target-shim";
 import type { types } from "mediasoup-client";
 import type { PicnicDevice } from "../device/device";

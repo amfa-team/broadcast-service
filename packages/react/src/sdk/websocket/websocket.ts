@@ -122,7 +122,7 @@ export class PicnicWebSocket extends EventTarget<
         ws.addEventListener("open", async () => {
           ws.removeEventListener("error", reject);
           await this.#ping();
-          resolve();
+          resolve(null);
         });
         ws.addEventListener("error", reject);
       });
@@ -217,7 +217,7 @@ export class PicnicWebSocket extends EventTarget<
         this.#ws.removeEventListener("error", reject);
         this.#ping().catch(console.error);
         this.#scheduleRefresh();
-        resolve();
+        resolve(null);
       });
       this.#ws.addEventListener("error", reject);
     });

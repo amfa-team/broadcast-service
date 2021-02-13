@@ -1,4 +1,4 @@
-import type { InitConnectionParams } from "@amfa-team/types";
+import type { InitConnectionParams } from "@amfa-team/broadcast-service-types";
 import { EventTarget } from "event-target-shim";
 import type { types } from "mediasoup-client";
 import { Device } from "mediasoup-client";

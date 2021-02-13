@@ -1,4 +1,7 @@
-import type { PatchStreamConsumer, StreamConsumerInfo } from "@amfa-team/types";
+import type {
+  PatchStreamConsumer,
+  StreamConsumerInfo,
+} from "@amfa-team/broadcast-service-types";
 import PicnicError from "../../io/exceptions/PicnicError";
 import { getAllSettledValues } from "../../io/promises";
 import { StreamConsumerModel } from "../schema";

@@ -1,4 +1,8 @@
-import type { ProducerState, Routes, StreamInfo } from "@amfa-team/types";
+import type {
+  ProducerState,
+  Routes,
+  StreamInfo,
+} from "@amfa-team/broadcast-service-types";
 import { JsonDecoder } from "ts.data.json";
 import { getConnection } from "../db/repositories/connectionRepository";
 import {

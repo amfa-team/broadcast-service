@@ -11,13 +11,8 @@ module.exports = merge(common, {
 
   optimization: {
     minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        sourceMap: true,
-      }),
-    ],
+    minimizer: [new TerserPlugin({})],
   },
-
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,

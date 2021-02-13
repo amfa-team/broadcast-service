@@ -1,4 +1,4 @@
-import { ErrorBoundary } from "@amfa-team/picnic-sdk";
+import { ErrorBoundary } from "@amfa-team/broadcast-service";
 import {
   StylesProvider,
   createGenerateClassName,

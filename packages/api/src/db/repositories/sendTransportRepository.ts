@@ -2,7 +2,7 @@ import type {
   PatchSendTransport,
   SendTransport,
   SendTransportKey,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import PicnicError from "../../io/exceptions/PicnicError";
 import { SendTransportModel } from "../schema";
 

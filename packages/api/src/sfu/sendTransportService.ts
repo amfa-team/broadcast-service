@@ -1,4 +1,8 @@
-import type { Connection, ConnectionInfo, Routes } from "@amfa-team/types";
+import type {
+  Connection,
+  ConnectionInfo,
+  Routes,
+} from "@amfa-team/broadcast-service-types";
 import { patchConnection } from "../db/repositories/connectionRepository";
 import {
   createSendTransport,

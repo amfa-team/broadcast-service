@@ -3,7 +3,7 @@ import type {
   ConnectionKey,
   CreateConnection,
   PatchConnection,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import PicnicError from "../../io/exceptions/PicnicError";
 import { ConnectionModel } from "../schema";
 

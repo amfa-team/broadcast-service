@@ -1,8 +1,8 @@
 {
-  "name": "@amfa-team/picnic-sfu",
+  "name": "broadcast-service",
+  "repository": "https://github.com/amfa-team/broadcast-service.git",
   "version": "0.0.0-development",
   "main": "index.js",
-  "repository": "https://github.com/amfa-team/picnic-sfu.git",
   "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
   "workspaces": [
@@ -14,28 +14,33 @@
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.6.0",
-    "@typescript-eslint/parser": "^4.6.0",
-    "eslint": "^7.12.1",
-    "eslint-config-prettier": "^6.14.0",
-    "eslint-config-sbs": "^1.0.0-beta.5",
+    "multi-semantic-release": "^2.6.0",
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "@typescript-eslint/parser": "^4.15.0",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-config-sbs": "^1.0.1",
     "eslint-import-resolver-workspaces": "^1.0.11",
-    "eslint-plugin-compat": "^3.8.0",
+    "eslint-plugin-compat": "^3.9.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^4.3.0",
-    "lint-staged": "^10.5.0",
-    "prettier": "^2.1.2",
-    "stylelint": "^13.7.2",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "stylelint": "^13.10.0",
+    "stylelint-config-css-modules": "^2.2.0",
     "stylelint-config-recommended": "^3.0.0",
     "stylelint-css-modules": "^1.2.0-globals",
     "stylelint-declaration-block-no-ignored-properties": "^2.3.0",
-    "stylelint-no-unsupported-browser-features": "^4.1.3",
-    "tslib": "^2.0.3",
-    "typescript": "^4.0.5"
+    "stylelint-no-unsupported-browser-features": "^4.1.4",
+    "tslib": "^2.1.0",
+    "typescript": "^4.1.5"
+  },
+  "optionalDependencies": {
+    "ttab": "^0.7.0"
   },
   "scripts": {
     "lint": "eslint --cache . --ext .js,.jsx,.ts,.tsx .",
@@ -44,12 +49,14 @@
     "prettier:check": "prettier --check .",
     "build": "(cd packages/react; yarn build) && yarn workspaces run build",
     "clean": "yarn workspaces run clean",
-    "start": "ttab yarn start:react; ttab yarn start:api; ttab \"sleep 3 && yarn start:example\"; ttab yarn start:server; ttab yarn start:dynamo",
+    "start": "ttab yarn -t 'React' start:react; ttab yarn -t 'API' start:api; ttab -t 'Example' \"sleep 3 && yarn start:example\"; ttab -t 'Server' yarn start:server; ttab -t 'Dynamo' yarn start:dynamo",
     "start:api": "cd packages/api && yarn start",
     "start:dynamo": "cd packages/api && yarn dynamo:start",
-    "start:server": "cd packages/server && yarn start",
+    "start:server": "cd packages/server && yarn start:dev",
     "start:react": "cd packages/react && yarn start",
-    "start:example": "cd packages/example && yarn start"
+    "start:example": "cd packages/example && yarn start",
+    "npm:release": "multi-semantic-release --deps.bump=inherit",
+    "npm:release:local": "CI=true LOCAL_RELEASE=true multi-semantic-release --deps.bump=inherit"
   },
   "husky": {
     "hooks": {
@@ -58,11 +65,11 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,css,md,json,html}": "prettier --write",
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --cache .",
+      "prettier --write"
+    ],
     "*.{css}": "stylelint",
-    "*.{js,jsx,ts,tsx}": "eslint --cache ."
-  },
-  "optionalDependencies": {
-    "ttab": "^0.7.0"
+    "*.{css,md,json,html}": "prettier --write"
   }
 }

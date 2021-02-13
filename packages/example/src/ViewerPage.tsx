@@ -1,10 +1,10 @@
-import { Loading, StageContainer, useSDK } from "@amfa-team/picnic-sdk";
+import { Loading, StageContainer, useSDK } from "@amfa-team/broadcast-service";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useApi } from "./useApi";
 
 export default function ViewerPage(): JSX.Element {
-  const { token } = useParams();
+  const { token } = useParams<{ token: string }>();
   const endpoint = useApi().ws;
   const settings = { endpoint, token };
 

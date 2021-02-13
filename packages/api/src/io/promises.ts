@@ -1,4 +1,4 @@
-import { captureException } from "@sentry/node";
+import { captureException } from "@sentry/serverless";
 import PicnicError from "./exceptions/PicnicError";
 
 export function getAllSettledValues<T>(

@@ -5,7 +5,7 @@ import type {
   ServerTopology,
   TransportTopology,
   WorkerTopology,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import type { types } from "mediasoup";
 import {
   getProducerConsumers,

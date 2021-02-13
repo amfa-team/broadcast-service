@@ -10,6 +10,7 @@ const host = process.env.HOST || "localhost";
 
 module.exports = merge(common, {
   mode: "development",
+  devtool: "inline-source-map",
   output: {
     pathinfo: true,
   },

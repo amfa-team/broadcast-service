@@ -1,4 +1,4 @@
-import type { Routes, Server } from "@amfa-team/types";
+import type { Routes, Server } from "@amfa-team/broadcast-service-types";
 import type { RequestInit } from "node-fetch";
 import fetch from "node-fetch";
 import { getAllServers } from "../db/repositories/serverRepository";

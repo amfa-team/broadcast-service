@@ -1,4 +1,4 @@
-service: broadcast-service-test
+service: broadcast-service-example
 
 provider:
   name: aws
@@ -15,8 +15,14 @@ plugins:
   - serverless-finch
 
 custom:
+  sbs:
+    domains:
+      production: "broadcast.test.sidebyside.live"
+      staging: "broadcast.test.dev.sidebyside.live"
+      dev: "localhost"
+
   client:
-    bucketName: "sbs-broadcast-service-test-${opt:stage}"
+    bucketName: "sbs-broadcast-service-${opt:stage}"
     distributionFolder: build/
     indexDocument: index.html
     errorDocument: index.html
@@ -33,6 +39,18 @@ custom:
 
 resources:
   Resources:
+    HostedZone:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        AliasTarget:
+          DNSName:
+            Fn::GetAtt:
+              - ApiDistribution
+              - DomainName
+          HostedZoneId: Z2FDTNDATAQYW2
+        HostedZoneName: "sidebyside.live."
+        Name: ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
+        Type: A
     ClientBucketResource:
       Type: AWS::S3::Bucket
       Properties:
@@ -63,11 +81,18 @@ resources:
       Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
       Properties:
         CloudFrontOriginAccessIdentityConfig:
-          Comment: Serverless managed web app S3 bucket origin-access-identity
+          Comment: Serverless managed (broadcast-service)
     ApiDistribution:
       Type: AWS::CloudFront::Distribution
       Properties:
         DistributionConfig:
+          Aliases:
+            - ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
+          ViewerCertificate:
+            AcmCertificateArn: arn:aws:acm:us-east-1:449140100597:certificate/85494f64-658b-49b5-bd58-3fd0565b175b
+            # CloudFrontDefaultCertificate: false
+            MinimumProtocolVersion: TLSv1.2_2018
+            SslSupportMethod: sni-only
           Origins:
             - Id: WebApp
               DomainName:

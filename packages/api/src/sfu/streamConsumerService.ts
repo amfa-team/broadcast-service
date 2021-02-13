@@ -3,7 +3,7 @@ import type {
   ConsumerState,
   Routes,
   StreamConsumerInfo,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import { JsonDecoder } from "ts.data.json";
 import {
   findConnectionByRecvTransportId,
