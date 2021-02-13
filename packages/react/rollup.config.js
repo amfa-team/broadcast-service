@@ -31,7 +31,7 @@ export default [
         browser: true,
         preferBuiltins: false,
         modulesOnly: true,
-        resolveOnly: [/^@amfa-team\/room-service.*$/],
+        resolveOnly: [/^@amfa-team\/broadcast-service.*$/],
       }),
       sourcemaps(),
       postcss({
