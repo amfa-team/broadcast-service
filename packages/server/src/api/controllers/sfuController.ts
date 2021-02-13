@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 import type {
   ConnectParams,
   DestroyConnectionParams,
