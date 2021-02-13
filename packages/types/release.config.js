@@ -3,7 +3,7 @@ const mainConfig = {
     "master",
     { name: "develop", channel: "beta", prerelease: "beta" },
   ],
-  repositoryUrl: "https://github.com/amfa-team/room-service.git",
+  repositoryUrl: "https://github.com/amfa-team/broadcast-service.git",
   plugins: [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -57,7 +57,7 @@ const localConfig = {
       prerelease: channel,
     },
   ],
-  repositoryUrl: "https://github.com/amfa-team/room-service.git",
+  repositoryUrl: "https://github.com/amfa-team/broadcast-service.git",
   plugins: ["@semantic-release/commit-analyzer", "@semantic-release/npm"],
 };
 
