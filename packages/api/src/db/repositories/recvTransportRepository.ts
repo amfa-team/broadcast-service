@@ -1,4 +1,7 @@
-import type { RecvTransport, RecvTransportKey } from "@amfa-team/types";
+import type {
+  RecvTransport,
+  RecvTransportKey,
+} from "@amfa-team/broadcast-service-types";
 import { RecvTransportModel } from "../schema";
 
 export async function createRecvTransport(

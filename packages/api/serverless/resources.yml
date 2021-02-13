@@ -8,9 +8,6 @@ participantTable:
     KeySchema:
       - AttributeName: token
         KeyType: HASH
-    ProvisionedThroughput:
-      ReadCapacityUnits: 25
-      WriteCapacityUnits: 5
 serverTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -25,9 +22,6 @@ serverTable:
         KeyType: HASH
       - AttributeName: port
         KeyType: RANGE
-    ProvisionedThroughput:
-      ReadCapacityUnits: 5
-      WriteCapacityUnits: 5
 connectionTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -38,9 +32,6 @@ connectionTable:
     KeySchema:
       - AttributeName: connectionId
         KeyType: HASH
-    ProvisionedThroughput:
-      ReadCapacityUnits: 25
-      WriteCapacityUnits: 5
 streamTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -55,9 +46,6 @@ streamTable:
         KeyType: HASH
       - AttributeName: producerId
         KeyType: RANGE
-    ProvisionedThroughput:
-      ReadCapacityUnits: 5
-      WriteCapacityUnits: 5
 streamConsumerTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -74,9 +62,6 @@ streamConsumerTable:
         KeyType: HASH
       - AttributeName: consumerId
         KeyType: RANGE
-    ProvisionedThroughput:
-      ReadCapacityUnits: 25
-      WriteCapacityUnits: 5
     GlobalSecondaryIndexes:
       - IndexName: ${self:provider.environment.STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT}
         KeySchema:
@@ -84,9 +69,6 @@ streamConsumerTable:
             KeyType: HASH
         Projection:
           ProjectionType: ALL
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
 participantSendTransport:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -97,9 +79,6 @@ participantSendTransport:
     KeySchema:
       - AttributeName: transportId
         KeyType: HASH
-    ProvisionedThroughput:
-      ReadCapacityUnits: 5
-      WriteCapacityUnits: 5
 participantRecvTransport:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -110,6 +89,3 @@ participantRecvTransport:
     KeySchema:
       - AttributeName: transportId
         KeyType: HASH
-    ProvisionedThroughput:
-      ReadCapacityUnits: 5
-      WriteCapacityUnits: 5

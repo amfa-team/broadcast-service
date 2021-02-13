@@ -6,7 +6,7 @@ import type {
   Routes,
   SendDestroyParams,
   SendParams,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import type { Application } from "express";
 import { handleErrorResponse, handleSuccessResponse } from "../../io/io";
 import {

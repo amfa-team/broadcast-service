@@ -9,7 +9,7 @@ import type {
   Routes,
   SendDestroyParams,
   SendParams,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import type { types } from "mediasoup";
 import {
   createConsumer,

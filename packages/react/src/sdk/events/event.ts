@@ -1,4 +1,7 @@
-import type { StreamConsumerInfo, StreamInfo } from "@amfa-team/types";
+import type {
+  StreamConsumerInfo,
+  StreamInfo,
+} from "@amfa-team/broadcast-service-types";
 
 export class PicnicEvent<T> extends Event {
   data: T;

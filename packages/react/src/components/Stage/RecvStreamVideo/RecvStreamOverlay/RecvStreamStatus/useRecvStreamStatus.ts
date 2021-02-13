@@ -1,4 +1,4 @@
-import type { ConsumerState } from "@amfa-team/types";
+import type { ConsumerState } from "@amfa-team/broadcast-service-types";
 import { useEffect, useState } from "react";
 import type {
   RecvStream,

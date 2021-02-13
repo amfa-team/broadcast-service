@@ -1,4 +1,4 @@
-import type { Server, ServerKey } from "@amfa-team/types";
+import type { Server, ServerKey } from "@amfa-team/broadcast-service-types";
 import { ServerModel } from "../schema";
 
 export async function createServer(server: Server): Promise<Server> {

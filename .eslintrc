@@ -8,11 +8,13 @@
       "workspaces": {
         "extensions": [".mjs", ".js", ".ts", ".tsx", ".json", ".css"],
         "sources": {
-          "@amfa-team/types": ["./packages/types/src"],
-          "@amfa-team/picnic-sdk": ["./packages/react/src"]
+          "@amfa-team/broadcast-service-types": ["./packages/types/src"],
+          "@amfa-team/broadcast-service": ["./packages/react/src"]
         }
       }
-    }
+    },
+    "targets": ["Chrome >= 70", "Edge >= 18", "Firefox >= 64", "Safari >= 12"],
+    "polyfills": ["navigator.mediaDevices"]
   },
   "rules": {
     "no-console": "off"

@@ -1,4 +1,4 @@
-import { withKnobs, number, select } from "@storybook/addon-knobs";
+import { number, select, withKnobs } from "@storybook/addon-knobs";
 import React from "react";
 import track from "./fixtures/outfoxing.mp3";
 import { Audio } from ".";

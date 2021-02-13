@@ -2,7 +2,7 @@ import type {
   ConnectParams,
   ConnectionInfo,
   SendParams,
-} from "@amfa-team/types";
+} from "@amfa-team/broadcast-service-types";
 import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
 import type { types } from "mediasoup-client";

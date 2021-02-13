@@ -1,4 +1,4 @@
-import type { Connection, Routes } from "@amfa-team/types";
+import type { Connection, Routes } from "@amfa-team/broadcast-service-types";
 import {
   createConnection,
   deleteConnection,

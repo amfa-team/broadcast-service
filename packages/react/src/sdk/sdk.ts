@@ -1,4 +1,4 @@
-import type { StreamInfo } from "@amfa-team/types";
+import type { StreamInfo } from "@amfa-team/broadcast-service-types";
 import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
 import type { SDKState, Settings } from "../types";

@@ -1,4 +1,4 @@
-import { captureException, flush, init } from "@sentry/node";
+import { captureException, flush, init } from "@sentry/serverless";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ApiGatewayManagementApi } from "aws-sdk";
 import { JsonDecoder } from "ts.data.json";

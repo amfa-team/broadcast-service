@@ -1,4 +1,7 @@
-import type { CreateParticipant, Participant } from "@amfa-team/types";
+import type {
+  CreateParticipant,
+  Participant,
+} from "@amfa-team/broadcast-service-types";
 import { v4 as uuid } from "uuid";
 import { ParticipantModel } from "../schema";
 

@@ -107,6 +107,8 @@ packages/*/lib
 src/**/*.css
 src/**/*.css.map
 
+packages/*/CHANGELOG.md
+
 packages/*/dist
 packages/*/lib
 packages/*/.webpack

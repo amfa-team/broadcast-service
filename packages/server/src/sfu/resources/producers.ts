@@ -1,4 +1,4 @@
-import type { ProducerState } from "@amfa-team/types";
+import type { ProducerState } from "@amfa-team/broadcast-service-types";
 import debounce from "lodash.debounce";
 import type { types } from "mediasoup";
 import { requestApi } from "../../io/api";

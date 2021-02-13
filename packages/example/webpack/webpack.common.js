@@ -1,17 +1,19 @@
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const DotEnv = require("dotenv-webpack");
+const { ProvidePlugin } = require("webpack");
 const commonPaths = require("./common-paths");
 
 const config = {
   target: "web",
   entry: {
-    bundle: "./src/index.tsx",
+    polyfills: "./src/polyfills.ts",
+    index: "./src/index.tsx",
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
   },
   output: {
-    filename: "static/js/[name].[hash].js",
+    filename: "static/js/[name].[contenthash].js",
     path: commonPaths.outputPath,
 
     // There are also additional JS chunk files if you use code splitting.
@@ -26,6 +28,7 @@ const config = {
     },
   },
   plugins: [
+    new ProvidePlugin({ process: "process" }),
     new DotEnv({
       safe: true,
       allowEmptyValues: true,
@@ -49,15 +52,8 @@ const config = {
       // this way we will get the source file exactly as we see it in our code editor.
       {
         enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader",
-        exclude: "/node_modules/",
-      },
-      {
-        enforce: "pre",
-        test: /\.tsx?$/,
+        test: /\.(js|mjs|jsx|ts|tsx|css)$/,
         use: "source-map-loader",
-        exclude: "/node_modules/",
       },
       {
         test: /\.ts(x?)$/,
@@ -85,9 +81,7 @@ const config = {
       },
     ],
   },
-  stats: {
-    warningsFilter: [/Failed to parse source map/],
-  },
+  // ignoreWarnings: [/Failed to parse source map/],
 };
 
 module.exports = config;

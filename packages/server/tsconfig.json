@@ -1,16 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
+    "module": "es6",
+    "target": "esnext",
+    "lib": ["es2020", "dom"],
+    "tsBuildInfoFile": "../../.build-cache/server.tsbuildinfo",
     "outDir": "./lib",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/server.tsbuildinfo"
+    "sourceMap": false
   },
   "include": ["src"],
-  "references": [
-    {
-      "path": "../types",
-      "prepend": false
-    }
-  ]
+  "references": [{ "path": "../types", "prepend": false }]
 }
