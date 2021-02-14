@@ -11,6 +11,7 @@ if (!slsw.lib.webpack.isLocal) {
   plugins.push(
     new SentryWebpackPlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
+      release: process.env.GITHUB_SHA,
       org: "side-by-side-sas",
       project: "broadcast-service-api",
       include: "./src",
