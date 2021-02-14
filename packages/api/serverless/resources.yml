@@ -8,6 +8,9 @@ participantTable:
     KeySchema:
       - AttributeName: token
         KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 serverTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -22,6 +25,9 @@ serverTable:
         KeyType: HASH
       - AttributeName: port
         KeyType: RANGE
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 connectionTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -32,6 +38,9 @@ connectionTable:
     KeySchema:
       - AttributeName: connectionId
         KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 streamTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -46,6 +55,9 @@ streamTable:
         KeyType: HASH
       - AttributeName: producerId
         KeyType: RANGE
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 streamConsumerTable:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -69,6 +81,9 @@ streamConsumerTable:
             KeyType: HASH
         Projection:
           ProjectionType: ALL
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 participantSendTransport:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -79,6 +94,9 @@ participantSendTransport:
     KeySchema:
       - AttributeName: transportId
         KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 participantRecvTransport:
   Type: AWS::DynamoDB::Table
   Properties:
@@ -89,3 +107,6 @@ participantRecvTransport:
     KeySchema:
       - AttributeName: transportId
         KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
