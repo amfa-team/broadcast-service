@@ -1,12 +1,14 @@
-name: Deploy Staging
+name: Deploy Production
 
 on:
   push:
     branches:
-      - develop
+      - master
+      - bugfix/build
 
 env:
-  SERVER_PUBLIC_IP: "15.236.168.171"
+  ENVIRONMENT_NAME: production
+  SERVER_PUBLIC_IP: "35.181.141.93"
 
 jobs:
   deploy:
@@ -31,17 +33,17 @@ jobs:
           SENTRY_DNS: ${{ secrets.SENTRY_EXAMPLE_DNS }}
       - run: echo -e "WS_API=$WS_API" >> packages/example/.env
         env:
-          WS_API: ${{ secrets.STAGING_WEBSOCKET }}
+          WS_API: ${{ secrets.PRODUCTION_WEBSOCKET }}
       - run: echo -e "HTTP_API=$HTTP_API" >> packages/example/.env
         env:
-          HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
+          HTTP_API: ${{ secrets.PRODUCTION_CLUSTER_API }}
       - run: echo -e "SENTRY_ENVIRONMENT=$ENVIRONMENT_NAME" >> packages/example/.env
         env:
-          SENTRY_ENVIRONMENT: staging
+          SENTRY_ENVIRONMENT: production
       - name: build
         run: yarn build
         env:
-          SENTRY_ENVIRONMENT: staging
+          SENTRY_ENVIRONMENT: production
       - name: publish sdk
         run: yarn npm:release
         env:
@@ -50,7 +52,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
       - name: deploy
         working-directory: ./packages/example
-        run: yarn aws:profile:set --stage staging && yarn deploy:staging
+        run: yarn aws:profile:set --stage production && yarn deploy:production
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -62,12 +64,12 @@ jobs:
           SLACK_TITLE: broadcast-service/example deployed
       - name: serverless deploy
         working-directory: ./packages/api
-        run: yarn aws:profile:set --stage staging && yarn deploy:staging
+        run: yarn aws:profile:set --stage production && yarn deploy:production
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SENTRY_DNS: ${{ secrets.SENTRY_API_DNS }}
-          SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
+          SECRET: ${{ secrets.PRODUCTION_CLUSTER_SECRET }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
@@ -82,10 +84,10 @@ jobs:
       - run: yarn deploy
         working-directory: ./packages/server
         env:
-          CLUSTER_API: ${{ secrets.STAGING_CLUSTER_API }}
-          CLUSTER_SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
+          CLUSTER_API: ${{ secrets.PRODUCTION_CLUSTER_API }}
+          CLUSTER_SECRET: ${{ secrets.PRODUCTION_CLUSTER_SECRET }}
           PUBLIC_IP: ${{ env.SERVER_PUBLIC_IP }}
-          SENTRY_ENVIRONMENT: staging
+          SENTRY_ENVIRONMENT: production
           NODE_ENV: production
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@master
