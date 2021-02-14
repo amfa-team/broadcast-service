@@ -41,9 +41,9 @@ jobs:
       - run: echo -e "HTTP_API=$HTTP_API" >> packages/example/.env
         env:
           HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
-      - run: echo -e "ENVIRONMENT_NAME=$ENVIRONMENT_NAME" >> packages/example/.env
+      - run: echo -e "SENTRY_ENVIRONMENT=$ENVIRONMENT_NAME" >> packages/example/.env
         env:
-          ENVIRONMENT_NAME: staging
+          SENTRY_ENVIRONMENT: staging
       - name: build
         run: yarn build
         env:
