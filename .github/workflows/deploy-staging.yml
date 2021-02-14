@@ -86,7 +86,8 @@ jobs:
           CLUSTER_API: ${{ secrets.STAGING_CLUSTER_API }}
           CLUSTER_SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
           PUBLIC_IP: ${{ env.SERVER_PUBLIC_IP }}
-          SENTRY_ENVIRONMENT: ${{env.ENVIRONMENT_NAME}}
+          SENTRY_ENVIRONMENT: staging
+          NODE_ENV: production
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@master
         env:
