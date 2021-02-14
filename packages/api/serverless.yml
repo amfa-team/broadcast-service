@@ -95,11 +95,21 @@ custom:
     - staging
 
   customDomain:
-    domainName: ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
-    stage: ${opt:stage}
-    basePath: api
-    certificateName: "*.sidebyside.live"
-    createRoute53Record: true
-    endpointType: "regional"
-    apiType: rest
-    autoDomain: true
+    rest:
+      domainName: ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
+      stage: ${opt:stage}
+      basePath: api
+      certificateName: "*.sidebyside.live"
+      createRoute53Record: true
+      endpointType: "regional"
+      apiType: rest
+      autoDomain: true
+    websocket:
+      domainName: "ws.${self:custom.sbs.domains.${opt:stage, self:provider.stage}}"
+      stage: ${opt:stage}
+      basePath: api
+      certificateName: "*.sidebyside.live"
+      createRoute53Record: true
+      endpointType: "regional"
+      apiType: websocket
+      autoDomain: true
