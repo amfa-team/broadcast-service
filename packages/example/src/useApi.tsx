@@ -16,7 +16,7 @@ export function useApi(): {
     "HTTP_API",
     process.env.HTTP_API
       ? process.env.HTTP_API
-      : `http://${window.location.hostname}:4000/dev`,
+      : `http://${window.location.hostname}:4009/dev`,
   );
   const [ws, setWs] = useLocalStorage(
     "WS_API",
