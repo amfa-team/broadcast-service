@@ -32,16 +32,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
-      - run: echo -e "SENTRY_DNS=$SENTRY_DNS" > packages/example/.env
+      - run: echo -e "SENTRY_DNS=$SENTRY_DNS" >> packages/example/.env
         env:
           SENTRY_DNS: ${{ secrets.SENTRY_EXAMPLE_DNS }}
-      - run: echo -e "WS_API=$WS_API" > packages/example/.env
+      - run: echo -e "WS_API=$WS_API" >> packages/example/.env
         env:
           WS_API: ${{ secrets.STAGING_WEBSOCKET }}
-      - run: echo -e "HTTP_API=$HTTP_API" > packages/example/.env
+      - run: echo -e "HTTP_API=$HTTP_API" >> packages/example/.env
         env:
           HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
-      - run: echo -e "ENVIRONMENT_NAME=$ENVIRONMENT_NAME" > packages/example/.env
+      - run: echo -e "ENVIRONMENT_NAME=$ENVIRONMENT_NAME" >> packages/example/.env
         env:
           ENVIRONMENT_NAME: staging
       - name: build
