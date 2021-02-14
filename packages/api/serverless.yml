@@ -71,6 +71,10 @@ custom:
       production: "broadcast.sidebyside.live"
       staging: "broadcast.dev.sidebyside.live"
       dev: "localhost"
+    wsDomains:
+      production: "broadcast-ws.sidebyside.live"
+      staging: "broadcast-ws.dev.sidebyside.live"
+      dev: "localhost"
   serverless-offline:
     useChildProcesses: true
     httpPort: 4009
@@ -95,11 +99,20 @@ custom:
     - staging
 
   customDomain:
-    domainName: ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
-    stage: ${opt:stage}
-    basePath: api
-    certificateName: "*.sidebyside.live"
-    createRoute53Record: true
-    endpointType: "regional"
-    apiType: rest
-    autoDomain: true
+    rest:
+      domainName: ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
+      stage: ${opt:stage}
+      basePath: api
+      certificateName: "*.sidebyside.live"
+      createRoute53Record: true
+      endpointType: "regional"
+      apiType: rest
+      autoDomain: true
+    websocket:
+      domainName: ${self:custom.sbs.wsDomains.${opt:stage, self:provider.stage}}
+      stage: ${opt:stage}
+      certificateName: "*.sidebyside.live"
+      createRoute53Record: true
+      endpointType: "regional"
+      apiType: websocket
+      autoDomain: true
