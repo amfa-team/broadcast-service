@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - bugfix/build
 
 env:
   SERVER_PUBLIC_IP: "15.236.168.171"
@@ -26,12 +27,6 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn install --ignore-scripts
-      - name: publish sdk
-        run: yarn npm:release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
       - run: echo -e "SENTRY_DNS=$SENTRY_DNS" >> packages/example/.env
         env:
           SENTRY_DNS: ${{ secrets.SENTRY_EXAMPLE_DNS }}
@@ -48,6 +43,12 @@ jobs:
         run: yarn build
         env:
           SENTRY_ENVIRONMENT: staging
+      - name: publish sdk
+        run: yarn npm:release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
       - name: deploy
         working-directory: ./packages/example
         run: yarn aws:profile:set --stage staging && yarn deploy:staging
@@ -59,7 +60,7 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
           SLACK_CHANNEL: deploys
-          SLACK_TITLE: picnic-sfu/example deployed
+          SLACK_TITLE: broadcast-service/example deployed
       - name: serverless deploy
         working-directory: ./packages/api
         run: yarn aws:profile:set --stage staging && yarn deploy:staging
@@ -68,6 +69,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SENTRY_DNS: ${{ secrets.SENTRY_API_DNS }}
           SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key
