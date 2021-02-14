@@ -6,7 +6,6 @@ on:
       - develop
 
 env:
-  ENVIRONMENT_NAME: staging
   SERVER_PUBLIC_IP: "15.236.168.171"
 
 jobs:
@@ -33,30 +32,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
-      - uses: TickX/var-to-dotenv@v1.1.1
-        with:
-          key: "SENTRY_DNS"
-          value: ${{secrets.SENTRY_EXAMPLE_DNS}}
-          envPath: "packages/example/.env"
-      - uses: TickX/var-to-dotenv@v1.1.1
-        with:
-          key: "WS_API"
-          value: ${{secrets.STAGING_WEBSOCKET}}
-          envPath: "packages/example/.env"
-      - uses: TickX/var-to-dotenv@v1.1.1
-        with:
-          key: "HTTP_API"
-          value: ${{secrets.STAGING_CLUSTER_API}}
-          envPath: "packages/example/.env"
-      - uses: TickX/var-to-dotenv@v1.1.1
-        with:
-          key: "SENTRY_ENVIRONMENT"
-          value: ${{env.ENVIRONMENT_NAME}}
-          envPath: "packages/example/.env"
+      - run: echo -e "SENTRY_DNS=$SENTRY_DNS" > packages/example/.env
+        env:
+          SENTRY_DNS: ${{ secrets.SENTRY_EXAMPLE_DNS }}
+      - run: echo -e "WS_API=$WS_API" > packages/example/.env
+        env:
+          WS_API: ${{ secrets.STAGING_WEBSOCKET }}
+      - run: echo -e "HTTP_API=$HTTP_API" > packages/example/.env
+        env:
+          HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
+      - run: echo -e "ENVIRONMENT_NAME=$ENVIRONMENT_NAME" > packages/example/.env
+        env:
+          ENVIRONMENT_NAME: staging
       - name: build
         run: yarn build
         env:
-          SENTRY_ENVIRONMENT: ${{env.ENVIRONMENT_NAME}}
+          SENTRY_ENVIRONMENT: staging
       - name: deploy
         working-directory: ./packages/example
         run: yarn aws:profile:set --stage staging && yarn deploy:staging
