@@ -38,6 +38,12 @@ jobs:
       - run: echo -e "SENTRY_ENVIRONMENT=$ENVIRONMENT_NAME" >> packages/example/.env
         env:
           SENTRY_ENVIRONMENT: staging
+      - run: echo -e "SPACE_SERVICE_API_ENDPOINT=$SPACE_SERVICE_API_ENDPOINT" >> packages/example/.env
+        env:
+          SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_STAGING }}
+      - run: echo -e "USER_API_ENDPOINT=$USER_API_ENDPOINT" >> packages/example/.env
+        env:
+          USER_API_ENDPOINT: ${{ secrets.USER_API_ENDPOINT_STAGING }}
       - name: build
         run: yarn build
         env:
@@ -70,6 +76,9 @@ jobs:
           SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           MONGO_DB_URL: ${{ secrets.MONGO_DB_STAGING }}
+          USER_SERVICE_API_SECRET: ${{ secrets.USER_SERVICE_API_SECRET_STAGING }}
+          USER_SERVICE_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_STAGING }}
+          SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_STAGING }}
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key

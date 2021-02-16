@@ -26,6 +26,8 @@ jobs:
       - run: echo "WS_API=${{secrets.STAGING_WEBSOCKET}}" >> packages/example/.env
       - run: echo "HTTP_API=${{secrets.STAGING_CLUSTER_API}}" >> packages/example/.env
       - run: echo "SENTRY_ENVIRONMENT=${{env.ENVIRONMENT_NAME}}" >> packages/example/.env
+      - run: echo "SPACE_SERVICE_API_ENDPOINT=${{env.SPACE_SERVICE_API_ENDPOINT_STAGING}}" >> packages/example/.env
+      - run: echo "USER_API_ENDPOINT=${{env.USER_SERVICE_API_ENDPOINT_STAGING}}" >> packages/example/.env
       - run: yarn install --ignore-scripts
       - run: yarn build
         env:
