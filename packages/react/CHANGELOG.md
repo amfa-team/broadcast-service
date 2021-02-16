@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.0.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0-beta.2...@amfa-team/broadcast-service@1.0.0-beta.3) (2021-02-16)
+
+
+### Features
+
+* add viewer page ([3761b50](https://github.com/amfa-team/broadcast-service/commit/3761b5067e2d9768e84c6586182553681f35dcb1))
+
 # @amfa-team/broadcast-service [1.0.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0-beta.1...@amfa-team/broadcast-service@1.0.0-beta.2) (2021-02-16)
 
 
