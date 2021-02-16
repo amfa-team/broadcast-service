@@ -12,7 +12,7 @@ plugins:
   - serverless-offline
 
 provider:
-  name: awssrc/sdk/request.ts
+  name: aws
   runtime: nodejs12.x
   region: eu-west-3
   memorySize: 512
