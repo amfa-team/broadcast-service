@@ -12,7 +12,7 @@ import React, { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useApi } from "../../useApi";
 
-function BroadcastFeature(): ReactElement {
+function ViewFeature(): ReactElement {
   const { spaceId } = useParams<{ spaceId: string }>();
   const { ws } = useApi();
 
@@ -22,16 +22,14 @@ function BroadcastFeature(): ReactElement {
         return <p>Not found</p>;
       }
 
-      return (
-        <StagePage settings={{ endpoint: ws, spaceId }} broadcastEnabled />
-      );
+      return <StagePage settings={{ endpoint: ws, spaceId }} />;
     },
     [ws, spaceId],
   );
 
   return (
     <div style={{ height: "calc(100% - 250px)" }}>
-      <h3>Broadcast Feature</h3>
+      <h3>View Feature</h3>
       <SpacePage
         slug={spaceId}
         loginDictionary={defaultLoginDictionary.fr}
@@ -46,4 +44,4 @@ function BroadcastFeature(): ReactElement {
   );
 }
 
-export default BroadcastFeature;
+export default ViewFeature;

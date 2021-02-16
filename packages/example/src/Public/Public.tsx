@@ -6,6 +6,7 @@ import BroadcastFeature from "./BroadcastFeature/BroadcastFeature";
 import HomeFeature from "./HomeFeature/HomeFeature";
 import Menu from "./Menu/Menu";
 import { SpaceForm } from "./SpaceForm";
+import ViewFeature from "./ViewFeature/ViewFeature";
 
 const endpoint = process.env.SPACE_SERVICE_API_ENDPOINT ?? "";
 const settings = { endpoint };
@@ -23,6 +24,9 @@ function Public(): ReactElement | null {
         </Route>
         <Route path="/space/:spaceId/broadcast">
           <BroadcastFeature />
+        </Route>
+        <Route path="/space/:spaceId/view">
+          <ViewFeature />
         </Route>
       </Switch>
     </SpaceServiceSettings>
