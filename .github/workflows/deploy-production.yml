@@ -44,7 +44,7 @@ jobs:
           SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_PRODUCTION }}
       - run: echo -e "USER_API_ENDPOINT=$USER_API_ENDPOINT" >> packages/example/.env
         env:
-          USER_API_ENDPOINT: ${{ secrets.USER_API_ENDPOINT_PRODUCTION }}
+          USER_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_PRODUCTION }}
       - name: build
         run: yarn build
         env:
