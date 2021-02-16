@@ -1,10 +1,9 @@
 export interface ConnectionKey {
-  connectionId: string;
+  _id: string;
 }
 
-export interface CreateConnection {
+export interface CreateConnection extends ConnectionKey {
   token: string;
-  connectionId: string;
 }
 
 export interface Connection extends CreateConnection {
@@ -13,5 +12,5 @@ export interface Connection extends CreateConnection {
 }
 
 export interface PatchConnection extends Partial<Connection> {
-  connectionId: string; // connectionId is required
+  _id: string; // connectionId is required
 }

@@ -1,3 +1,4 @@
+import { useToken } from "@amfa-team/user-service";
 import { useEffect, useState } from "react";
 import { Picnic } from "../sdk/sdk";
 import type { Settings } from "../types";
@@ -15,20 +16,28 @@ type SDKState = SDKLoadingState | SDKLoadedState;
 
 export function useSDK(settings: Settings): SDKState {
   const [state, setSDKState] = useState<SDKState>({ loaded: false });
-  const { endpoint, token } = settings;
+  const { endpoint, spaceId } = settings;
   const [error, setError] = useState<Error | null>(null);
+  const token = useToken();
 
   useEffect(() => {
-    const sdk = new Picnic({ endpoint, token });
-    sdk
-      .load()
-      .then(() => setSDKState({ loaded: true, sdk }))
-      // TODO: handle error
-      .catch(setError);
-    return (): void => {
-      sdk.destroy().catch(console.error);
+    if (token) {
+      const sdk = new Picnic(token, { endpoint, spaceId });
+      sdk
+        .load()
+        .then(() => setSDKState({ loaded: true, sdk }))
+        // TODO: handle error
+        .catch(setError);
+
+      return (): void => {
+        sdk.destroy().catch(console.error);
+      };
+    }
+
+    return () => {
+      // no-op
     };
-  }, [endpoint, token]);
+  }, [endpoint, token, spaceId]);
 
   if (error !== null) {
     throw error;

@@ -4,15 +4,13 @@ import type {
 } from "@amfa-team/broadcast-service-types";
 import PicnicError from "../../io/exceptions/PicnicError";
 import { getAllSettledValues } from "../../io/promises";
-import { StreamConsumerModel } from "../schema";
-
-const INDEX_SOURCE_TRANSPORT =
-  process.env.STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT ?? "";
+import { getModels } from "../../services/mongo/client";
 
 export async function createStreamConsumer(
   stream: StreamConsumerInfo,
 ): Promise<StreamConsumerInfo> {
   try {
+    const { StreamConsumerModel } = await getModels();
     const doc = await StreamConsumerModel.create(stream);
     return doc.toJSON() as StreamConsumerInfo;
   } catch (e) {
@@ -22,8 +20,9 @@ export async function createStreamConsumer(
 
 export async function getAllStreamConsumers(): Promise<StreamConsumerInfo[]> {
   try {
-    const results: unknown = await StreamConsumerModel.scan().exec();
-    return results as StreamConsumerInfo[];
+    const { StreamConsumerModel } = await getModels();
+    const results = await StreamConsumerModel.find();
+    return results;
   } catch (e) {
     throw new PicnicError("getAllStreamConsumers: failed", e);
   }
@@ -33,9 +32,10 @@ export async function findStreamConsumerByTransportId(
   transportId: string,
 ): Promise<StreamConsumerInfo[]> {
   try {
-    const results: unknown = await StreamConsumerModel.query({
-      transportId: { eq: transportId },
-    }).exec();
+    const { StreamConsumerModel } = await getModels();
+    const results = await StreamConsumerModel.find({
+      transportId,
+    });
     return results as StreamConsumerInfo[];
   } catch (e) {
     throw new PicnicError("findStreamConsumerByTransportId: failed", e);
@@ -46,11 +46,10 @@ export async function findStreamConsumerBySourceTransportId(
   sourceTransportId: string,
 ): Promise<StreamConsumerInfo[]> {
   try {
-    const results: unknown = await StreamConsumerModel.query({
-      sourceTransportId: { eq: sourceTransportId },
-    })
-      .using(INDEX_SOURCE_TRANSPORT)
-      .exec();
+    const { StreamConsumerModel } = await getModels();
+    const results = await StreamConsumerModel.find({
+      sourceTransportId,
+    });
     return results as StreamConsumerInfo[];
   } catch (e) {
     throw new PicnicError("findStreamConsumerBySourceTransportId: failed", e);
@@ -62,8 +61,11 @@ export async function getStreamConsumer(
   consumerId: string,
 ): Promise<StreamConsumerInfo | null> {
   try {
-    const result = await StreamConsumerModel.get({ transportId, consumerId });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const { StreamConsumerModel } = await getModels();
+    const result = await StreamConsumerModel.findOne({
+      transportId,
+      consumerId,
+    });
     return (result?.toJSON() ?? null) as StreamConsumerInfo | null;
   } catch (e) {
     throw new PicnicError("getStreamConsumer: failed", e);
@@ -75,7 +77,8 @@ export async function deleteStreamConsumer(
   consumerId: string,
 ): Promise<void> {
   try {
-    await StreamConsumerModel.delete({ consumerId, transportId });
+    const { StreamConsumerModel } = await getModels();
+    await StreamConsumerModel.deleteOne({ consumerId, transportId });
   } catch (e) {
     throw new PicnicError("deleteStreamConsumer: failed", e);
   }
@@ -119,10 +122,8 @@ export async function patchStreamConsumer(
   params: PatchStreamConsumer,
 ): Promise<StreamConsumerInfo> {
   const { transportId, consumerId, ...rest } = params;
-  const doc = await StreamConsumerModel.update(
-    { transportId, consumerId },
-    rest,
-  );
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const { StreamConsumerModel } = await getModels();
+  await StreamConsumerModel.updateOne({ transportId, consumerId }, rest);
+  const doc = await StreamConsumerModel.findOne({ transportId, consumerId });
   return (doc?.toJSON() ?? null) as StreamConsumerInfo;
 }

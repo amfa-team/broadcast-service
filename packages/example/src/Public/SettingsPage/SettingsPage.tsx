@@ -1,8 +1,8 @@
 import { Container, TextField } from "@material-ui/core";
 import React from "react";
-import { useApi } from "./useApi";
+import { useApi } from "../../useApi";
 
-export default function HomePage(): JSX.Element {
+export default function SettingsPage(): JSX.Element {
   const { secret, setSecret, http, setHttp, ws, setWs } = useApi();
 
   return (

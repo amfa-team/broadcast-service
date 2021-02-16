@@ -1,23 +1,27 @@
-import { captureException, flush, init } from "@sentry/serverless";
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  captureException,
+  flush,
+  init as initSentry,
+} from "@sentry/serverless";
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from "aws-lambda";
 import { ApiGatewayManagementApi } from "aws-sdk";
 import { JsonDecoder } from "ts.data.json";
 import type { Role } from "../../../types/src/db/participant";
 import { getAllConnections } from "../db/repositories/connectionRepository";
 import { authAdmin, authParticipant } from "../security/security";
+import { connect } from "../services/mongo/client";
 import InvalidRequestError from "./exceptions/InvalidRequestError";
 import { getAllSettledValues } from "./promises";
-import type {
-  ParticipantRequest,
-  Request,
-  WsParticipantRequest,
-  WsRequest,
-} from "./types";
+import type { Request, WsParticipantRequest, WsRequest } from "./types";
 
 const DOMAIN_NAME = process.env.WEBSOCKET_DOMAIN ?? "";
 
 if (process.env.SENTRY_ENVIRONMENT !== "dev") {
-  init({
+  initSentry({
     dsn: process.env.SENTRY_DNS,
     environment: process.env.SENTRY_ENVIRONMENT,
   });
@@ -66,6 +70,7 @@ function parseWsRequest<T>(
   const requestDecoder = JsonDecoder.object<WsRequest<T>>(
     {
       token: JsonDecoder.string,
+      spaceId: JsonDecoder.string,
       data: decoder,
       msgId: JsonDecoder.string,
     },
@@ -90,18 +95,8 @@ function parseHttpRequest<T>(
   return { token, data: decode(body, decoder) };
 }
 
-export async function parseHttpParticipantRequest<T>(
-  event: APIGatewayProxyEvent,
-  roles: Role[],
-  decoder: JsonDecoder.Decoder<T>,
-): Promise<ParticipantRequest<T>> {
-  const result = parseHttpRequest(event, decoder);
-  const participant = await authParticipant(result, roles);
-
-  return {
-    ...result,
-    participant,
-  };
+export async function init(context: Context | null) {
+  await connect(context);
 }
 
 export async function parseHttpAdminRequest<T>(
@@ -116,11 +111,11 @@ export async function parseHttpAdminRequest<T>(
 
 export async function parseWsParticipantRequest<T>(
   event: APIGatewayProxyEvent,
-  roles: Role[],
+  role: Role,
   decoder: JsonDecoder.Decoder<T>,
 ): Promise<WsParticipantRequest<T>> {
   const result = parseWsRequest(event, decoder);
-  const participant = await authParticipant(result, roles);
+  const participant = await authParticipant(result, role, event.requestContext);
 
   return {
     ...result,
@@ -201,7 +196,7 @@ export async function postToConnection(
 export async function broadcastToConnections(data: string): Promise<void> {
   const connections = await getAllConnections();
   const results = await Promise.allSettled(
-    connections.map(async (c) => postToConnection(c.connectionId, data)),
+    connections.map(async (c) => postToConnection(c._id, data)),
   );
   getAllSettledValues(results, "broadcastToConnections: Unexpected Error");
 }

@@ -69,6 +69,7 @@ jobs:
           SENTRY_DNS: ${{ secrets.SENTRY_API_DNS }}
           SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          MONGO_DB_URL: ${{ secrets.MONGO_DB_STAGING }}
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key
