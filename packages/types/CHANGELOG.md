@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service-types [1.0.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.0.0-beta.1...@amfa-team/broadcast-service-types@1.0.0-beta.2) (2021-02-16)
+
+
+### Features
+
+* use user-service ([0d46ab4](https://github.com/amfa-team/broadcast-service/commit/0d46ab4bb8be21e7a9a02045b17a8a9ca1c5717b))
+
 # @amfa-team/broadcast-service-types 1.0.0-beta.1 (2021-02-14)
 
 
