@@ -3,7 +3,7 @@ import { EventTarget } from "event-target-shim";
 import { v4 as uuid } from "uuid";
 import PicnicError from "../../exceptions/PicnicError";
 import type { Settings, WebSocketState } from "../../types";
-import type { Empty, ServerEvents } from "../events/event";
+import type { ServerEvents } from "../events/event";
 import { PicnicEvent } from "../events/event";
 
 type PendingReq = {
@@ -65,14 +65,10 @@ async function sendToWs<T>(
 }
 
 export type WebSocketEvents = ServerEvents & {
-  "state:change": PicnicEvent<WebSocketState>;
+  "state:change": PicnicEvent<"state:change", WebSocketState>;
 };
 
-export class PicnicWebSocket extends EventTarget<
-  WebSocketEvents,
-  Empty,
-  "strict"
-> {
+export class PicnicWebSocket extends EventTarget<WebSocketEvents, "strict"> {
   #ws: WebSocket;
 
   #state: WebSocketState = "initial";
@@ -262,7 +258,12 @@ export class PicnicWebSocket extends EventTarget<
     }
 
     if (msg.type === "event") {
-      const e = new PicnicEvent(msg.payload.type, msg.payload.data);
+      type T = keyof ServerEvents;
+      const e = new PicnicEvent<T, WebSocketEvents[T]>(
+        msg.payload.type,
+        msg.payload.data as WebSocketEvents[T],
+      );
+      // @ts-ignore
       this.dispatchEvent(e);
     }
 

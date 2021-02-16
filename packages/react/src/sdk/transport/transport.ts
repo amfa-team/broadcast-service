@@ -9,21 +9,16 @@ import type { types } from "mediasoup-client";
 import PicnicError from "../../exceptions/PicnicError";
 import type { TransportState } from "../../types";
 import type { PicnicDevice } from "../device/device";
-import type { Empty } from "../events/event";
 import { PicnicEvent } from "../events/event";
 import type { PicnicWebSocket } from "../websocket/websocket";
 
 type TransportType = "send" | "recv";
 
 export type TransportEvents = {
-  "state:change": PicnicEvent<TransportState>;
+  "state:change": PicnicEvent<"state:change", TransportState>;
 };
 
-export class PicnicTransport extends EventTarget<
-  TransportEvents,
-  Empty,
-  "strict"
-> {
+export class PicnicTransport extends EventTarget<TransportEvents, "strict"> {
   #ws: PicnicWebSocket;
 
   #device: PicnicDevice;

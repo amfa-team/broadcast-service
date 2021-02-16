@@ -2,7 +2,6 @@ import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
 import type { types } from "mediasoup-client";
 import PicnicError from "../../exceptions/PicnicError";
-import type { Empty } from "../events/event";
 import { PicnicEvent } from "../events/event";
 import type { PicnicTransport } from "../transport/transport";
 import type { PicnicWebSocket } from "../websocket/websocket";
@@ -83,7 +82,7 @@ async function createVideoProducer(
       {
         rid: "r2",
         dtx: true,
-        scaleResolutionDownBy: 720 / 540, // 540
+        scaleResolutionDownBy: 1, // 540
         maxBitrate: 700_000,
         scalabilityMode: "S1T3",
       },
@@ -142,16 +141,15 @@ async function pauseProducer(
 }
 
 export type SendStreamEvents = {
-  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
-  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
-  "media:change": PicnicEvent<null>;
-  start: PicnicEvent<null>;
-  stop: PicnicEvent<null>;
+  "stream:pause": PicnicEvent<"stream:pause", { kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<"stream:resume", { kind: "audio" | "video" }>;
+  "media:change": PicnicEvent<"media:change", null>;
+  start: PicnicEvent<"start", null>;
+  stop: PicnicEvent<"stop", null>;
 };
 
 export default class SendStream extends EventTarget<
   SendStreamEvents,
-  Empty,
   "strict"
 > {
   #transport: PicnicTransport;

@@ -1,4 +1,4 @@
-import { debounce } from "lodash-es";
+import debounce from "lodash.debounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSDKState } from "../../hooks/useSDKState";
 import type { Picnic } from "../../sdk/sdk";
