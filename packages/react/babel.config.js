@@ -17,17 +17,17 @@ module.exports = {
       {
         "@material-ui/core": {
           // eslint-disable-next-line no-template-curly-in-string
-          transform: "@material-ui/core/esm/${member}",
+          transform: "@material-ui/core/${member}",
           preventFullImport: true,
         },
         "@material-ui/icons": {
           // eslint-disable-next-line no-template-curly-in-string
-          transform: "@material-ui/icons/esm/${member}",
+          transform: "@material-ui/icons/${member}",
           preventFullImport: true,
         },
         "@material-ui/lab": {
           // eslint-disable-next-line no-template-curly-in-string
-          transform: "@material-ui/lab/esm/${member}",
+          transform: "@material-ui/lab/${member}",
           preventFullImport: true,
         },
       },

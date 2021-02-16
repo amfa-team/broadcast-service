@@ -4,15 +4,14 @@ import type { types } from "mediasoup-client";
 import { Device } from "mediasoup-client";
 import PicnicError from "../../exceptions/PicnicError";
 import type { DeviceState } from "../../types";
-import type { Empty } from "../events/event";
 import { PicnicEvent } from "../events/event";
 import type { PicnicWebSocket } from "../websocket/websocket";
 
 export type DeviceEvents = {
-  "state:change": PicnicEvent<DeviceState>;
+  "state:change": PicnicEvent<"state:change", DeviceState>;
 };
 
-export class PicnicDevice extends EventTarget<DeviceEvents, Empty, "strict"> {
+export class PicnicDevice extends EventTarget<DeviceEvents, "strict"> {
   #state: DeviceState = "initial";
 
   #device: types.Device = new Device();

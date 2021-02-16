@@ -3,7 +3,7 @@ import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
 import type { SDKState, Settings } from "../types";
 import { PicnicDevice } from "./device/device";
-import type { Empty, ServerEvents } from "./events/event";
+import type { ServerEvents } from "./events/event";
 import { PicnicEvent } from "./events/event";
 import { RecvStream } from "./stream/RecvStream";
 import SendStream from "./stream/SendStream";
@@ -18,14 +18,14 @@ export const initialState: SDKState = {
 };
 
 export type SdkEvents = {
-  "state:change": PicnicEvent<SDKState>;
-  "stream:update": PicnicEvent<Map<string, RecvStream>>;
-  "broadcast:start": PicnicEvent<null>;
-  "broadcast:stop": PicnicEvent<null>;
-  destroy: PicnicEvent<null>;
+  "state:change": PicnicEvent<"state:change", SDKState>;
+  "stream:update": PicnicEvent<"stream:update", Map<string, RecvStream>>;
+  "broadcast:start": PicnicEvent<"broadcast:start", null>;
+  "broadcast:stop": PicnicEvent<"broadcast:stop", null>;
+  destroy: PicnicEvent<"destroy", null>;
 };
 
-export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
+export class Picnic extends EventTarget<SdkEvents, "strict"> {
   #state: SDKState = initialState;
 
   #recvStreams: Map<string, RecvStream> = new Map();
@@ -64,7 +64,10 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
       sendTransport: this.#sendTransport?.getState() ?? "initial",
     };
 
-    const event = new PicnicEvent("state:change", this.#state);
+    const event = new PicnicEvent<"state:change", SDKState>(
+      "state:change",
+      this.#state,
+    );
     this.dispatchEvent(event);
   };
 

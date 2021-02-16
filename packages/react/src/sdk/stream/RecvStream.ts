@@ -6,7 +6,7 @@ import type {
 import { EventTarget } from "event-target-shim";
 import type { types } from "mediasoup-client";
 import type { PicnicDevice } from "../device/device";
-import type { Empty, ServerEvents } from "../events/event";
+import type { ServerEvents } from "../events/event";
 import { PicnicEvent } from "../events/event";
 import type { PicnicTransport } from "../transport/transport";
 import type { PicnicWebSocket } from "../websocket/websocket";
@@ -79,18 +79,21 @@ const audioKind = "audio" as const;
 const videoKind = "video" as const;
 
 export type RecvStreamEvents = {
-  state: PicnicEvent<{
-    state: Pick<
-      ServerEvents["streamConsumer:state"]["data"],
-      "score" | "producerScore" | "paused" | "producerPaused"
-    >;
-    kind: "audio" | "video";
-  }>;
-  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
-  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
+  state: PicnicEvent<
+    "state",
+    {
+      state: Pick<
+        ServerEvents["streamConsumer:state"]["data"],
+        "score" | "producerScore" | "paused" | "producerPaused"
+      >;
+      kind: "audio" | "video";
+    }
+  >;
+  "stream:pause": PicnicEvent<"stream:pause", { kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<"stream:resume", { kind: "audio" | "video" }>;
 };
 
-export class RecvStream extends EventTarget<RecvStreamEvents, Empty, "strict"> {
+export class RecvStream extends EventTarget<RecvStreamEvents, "strict"> {
   #ws: PicnicWebSocket;
 
   #stream: MediaStream = new MediaStream();

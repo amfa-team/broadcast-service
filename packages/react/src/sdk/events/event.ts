@@ -2,25 +2,26 @@ import type {
   StreamConsumerInfo,
   StreamInfo,
 } from "@amfa-team/broadcast-service-types";
+import { Event as EventShim } from "event-target-shim";
 
-export class PicnicEvent<T> extends Event {
-  data: T;
+export class PicnicEvent<T extends string, D> extends EventShim<T> {
+  data: D;
 
-  constructor(type: string, data: T) {
+  constructor(type: T, data: D) {
     super(type);
     this.data = data;
   }
 }
 
 export type ServerEvents = {
-  "stream:add": PicnicEvent<StreamInfo>;
-  "stream:remove": PicnicEvent<string>;
-  "media:change": PicnicEvent<null>;
-  "stream:pause": PicnicEvent<{ kind: "audio" | "video" }>;
-  "stream:resume": PicnicEvent<{ kind: "audio" | "video" }>;
-  "stream:state": PicnicEvent<StreamInfo>;
-  "streamConsumer:state": PicnicEvent<StreamConsumerInfo>;
+  "stream:add": PicnicEvent<"stream:add", StreamInfo>;
+  "stream:remove": PicnicEvent<"stream:remove", string>;
+  "media:change": PicnicEvent<"media:change", null>;
+  "stream:pause": PicnicEvent<"stream:pause", { kind: "audio" | "video" }>;
+  "stream:resume": PicnicEvent<"stream:resume", { kind: "audio" | "video" }>;
+  "stream:state": PicnicEvent<"stream:state", StreamInfo>;
+  "streamConsumer:state": PicnicEvent<
+    "streamConsumer:state",
+    StreamConsumerInfo
+  >;
 };
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type Empty = {};
