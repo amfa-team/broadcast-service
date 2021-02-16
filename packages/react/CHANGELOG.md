@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.0.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0-beta.3...@amfa-team/broadcast-service@1.0.0-beta.4) (2021-02-16)
+
+
+### Bug Fixes
+
+* nextjs support ([31fd2a4](https://github.com/amfa-team/broadcast-service/commit/31fd2a4e6ef7d0a88952079d3d3b4a62a6fb4c28))
+
 # @amfa-team/broadcast-service [1.0.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0-beta.2...@amfa-team/broadcast-service@1.0.0-beta.3) (2021-02-16)
 
 
