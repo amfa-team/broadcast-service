@@ -128,12 +128,14 @@ export class Picnic extends EventTarget<SdkEvents, "strict"> {
 
     this.#ws.addEventListener(
       "stream:add",
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async ({ data }: ServerEvents["stream:add"]) => {
         await this.#addStream(data);
       },
     );
     this.#ws.addEventListener(
       "stream:remove",
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async ({ data }: ServerEvents["stream:remove"]) => {
         await this.#removeStream(data);
       },
