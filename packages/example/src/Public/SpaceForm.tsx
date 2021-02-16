@@ -9,7 +9,7 @@ export function SpaceForm() {
     history.push(`/space/${spaceName}/broadcast`);
   }, [history, spaceName]);
   const onFollow = useCallback(() => {
-    history.push(`/space/${spaceName}/follow`);
+    history.push(`/space/${spaceName}/view`);
   }, [history, spaceName]);
   const onSubmit = useCallback((e) => {
     e.preventDefault();

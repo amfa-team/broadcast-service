@@ -25,7 +25,7 @@ function Public(): ReactElement | null {
         <Route path="/space/:spaceId/broadcast">
           <BroadcastFeature />
         </Route>
-        <Route path="/space/:spaceId/broadcast">
+        <Route path="/space/:spaceId/view">
           <ViewFeature />
         </Route>
       </Switch>
