@@ -7,10 +7,11 @@ import type { Settings } from "../types";
 
 interface StagePageProps {
   settings: Settings;
+  broadcastEnabled: boolean;
 }
 
 export function StagePage(props: StagePageProps) {
-  const { settings } = props;
+  const { settings, broadcastEnabled } = props;
   const token = useToken();
   const state = useSDK(settings);
   const { isConnecting, isReady, connect } = useConnect();
@@ -31,5 +32,5 @@ export function StagePage(props: StagePageProps) {
     return <DotLoader />;
   }
 
-  return <StageContainer sdk={state.sdk} broadcastEnabled />;
+  return <StageContainer sdk={state.sdk} broadcastEnabled={broadcastEnabled} />;
 }
