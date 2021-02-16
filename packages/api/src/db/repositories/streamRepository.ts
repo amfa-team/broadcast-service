@@ -2,9 +2,10 @@ import type {
   PatchStream,
   StreamInfo,
 } from "@amfa-team/broadcast-service-types";
-import { StreamModel } from "../schema";
+import { getModels } from "../../services/mongo/client";
 
 export async function createStream(stream: StreamInfo): Promise<StreamInfo> {
+  const { StreamModel } = await getModels();
   const doc = await StreamModel.create(stream);
   return doc.toJSON() as StreamInfo;
 }
@@ -13,24 +14,24 @@ export async function deleteStream(
   transportId: string,
   producerId: string,
 ): Promise<void> {
-  await StreamModel.delete({ transportId, producerId });
+  const { StreamModel } = await getModels();
+  await StreamModel.deleteOne({ transportId, producerId });
 }
 
 export async function getStream(
   transportId: string,
   producerId: string,
 ): Promise<StreamInfo | null> {
-  const doc = await StreamModel.get({ transportId, producerId });
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const { StreamModel } = await getModels();
+  const doc = await StreamModel.findOne({ transportId, producerId });
   return (doc?.toJSON() ?? null) as StreamInfo | null;
 }
 
 export async function findStreamByTransportId(
   transportId: string,
 ): Promise<StreamInfo[]> {
-  const results: unknown = await StreamModel.scan({
-    transportId: { eq: transportId },
-  }).exec();
+  const { StreamModel } = await getModels();
+  const results = await StreamModel.find({ transportId });
   return results as StreamInfo[];
 }
 
@@ -45,13 +46,15 @@ export async function deleteStreamByTransportId(
 }
 
 export async function getAllStreams(): Promise<StreamInfo[]> {
-  const results: unknown = await StreamModel.scan().exec();
+  const { StreamModel } = await getModels();
+  const results = await StreamModel.find();
   return results as StreamInfo[];
 }
 
 export async function patchStream(params: PatchStream): Promise<StreamInfo> {
   const { transportId, producerId, ...rest } = params;
-  const doc = await StreamModel.update({ transportId, producerId }, rest);
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const { StreamModel } = await getModels();
+  await StreamModel.updateOne({ transportId, producerId }, rest);
+  const doc = await StreamModel.findOne({ transportId, producerId });
   return (doc?.toJSON() ?? null) as StreamInfo;
 }

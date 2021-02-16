@@ -1,4 +1,4 @@
-import type { Participant } from "../../../types/src/db/participant";
+import type { IPublicUserData } from "@amfa-team/user-service-types";
 
 export interface Request<T> {
   token: string;
@@ -12,12 +12,13 @@ export interface RequestContext {
 
 export interface WsRequest<T> {
   token: string;
+  spaceId: string;
   data: T;
   msgId: string;
 }
 
 export interface ParticipantRequest<T> extends Request<T> {
-  participant: Participant;
+  participant: IPublicUserData;
 }
 
 export interface WsParticipantRequest<T>
@@ -26,4 +27,5 @@ export interface WsParticipantRequest<T>
 
 export interface WithToken {
   token: string;
+  spaceId: string;
 }

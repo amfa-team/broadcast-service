@@ -41,7 +41,7 @@ export async function onCreateStream(
 ): Promise<string> {
   const { connectionId, data } = event;
 
-  const connection = await getConnection({ connectionId });
+  const connection = await getConnection({ _id: connectionId });
   if (connection === null || connection.sendTransportId === null) {
     throw new Error(
       "onCreateStream: connection or sendTransportId does not exists",

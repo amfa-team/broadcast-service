@@ -1,5 +1,5 @@
 export interface SendTransportKey {
-  transportId: string;
+  _id: string;
 }
 
 export interface SendTransport extends SendTransportKey {

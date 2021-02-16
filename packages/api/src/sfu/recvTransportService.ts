@@ -31,10 +31,10 @@ export async function onInitRecvTransport(
   // TODO: Handle connection removed in between
   await Promise.all([
     patchConnection({
-      connectionId,
+      _id: connectionId,
       recvTransportId: connectionInfo.transportId,
     }),
-    createRecvTransport({ transportId: connectionInfo.transportId }),
+    createRecvTransport({ _id: connectionInfo.transportId }),
   ]);
 
   return connectionInfo;
@@ -78,7 +78,7 @@ export async function closeRecvTransport(
       transportId: params.transportId,
       delay: 30000,
     }),
-    deleteRecvTransport({ transportId: params.transportId }),
+    deleteRecvTransport({ _id: params.transportId }),
     // No need to destroy mediasoup consumer as it will be done automatically when closing transport
     closeConsumer({
       transportId: params.transportId,
@@ -88,7 +88,7 @@ export async function closeRecvTransport(
     params.skipConnectionPatch
       ? Promise.resolve(null)
       : patchConnection({
-          connectionId: params.connectionId,
+          _id: params.connectionId,
           recvTransportId: null,
         }),
   ]);

@@ -31,10 +31,10 @@ export async function onInitSendTransport(
   // TODO: Handle connection removed in between
   await Promise.all([
     patchConnection({
-      connectionId,
+      _id: connectionId,
       sendTransportId: connectionInfo.transportId,
     }),
-    createSendTransport({ transportId: connectionInfo.transportId }),
+    createSendTransport({ _id: connectionInfo.transportId }),
   ]);
 
   return connectionInfo;
@@ -73,7 +73,7 @@ export async function closeSendTransport(
       transportId: params.transportId,
       delay: 30000,
     }),
-    deleteSendTransport({ transportId: params.transportId }),
+    deleteSendTransport({ _id: params.transportId }),
     closeStream({
       transportId: params.transportId,
       producerId: null,
@@ -82,7 +82,7 @@ export async function closeSendTransport(
     params.skipConnectionPatch
       ? Promise.resolve(null)
       : patchConnection({
-          connectionId: params.connectionId,
+          _id: params.connectionId,
           sendTransportId: null,
         }),
   ]);

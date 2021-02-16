@@ -5,7 +5,11 @@ import type {
   SendParams,
 } from "@amfa-team/broadcast-service-types";
 import { Role } from "@amfa-team/broadcast-service-types";
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from "aws-lambda";
 import { JsonDecoder } from "ts.data.json";
 import { getAllStreams } from "../db/repositories/streamRepository";
 import {
@@ -13,6 +17,7 @@ import {
   handleSuccessResponse,
   handleWebSocketErrorResponse,
   handleWebSocketSuccessResponse,
+  init,
   parseWsParticipantRequest,
   wsOnlyRoute,
 } from "../io/io";
@@ -46,13 +51,15 @@ import {
 
 export async function routerCapabilities(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       JsonDecoder.isNull(null),
     );
 
@@ -73,13 +80,15 @@ export async function routerCapabilities(
 
 export async function refreshConnection(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       JsonDecoder.isNull(null),
     );
 
@@ -100,13 +109,15 @@ export async function refreshConnection(
 
 export async function ping(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       JsonDecoder.isNull(null),
     );
 
@@ -122,11 +133,13 @@ export async function ping(
 
 export async function disconnect(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
     try {
+      await init(context);
       await onDisconnect({
         connectionId,
       });
@@ -141,13 +154,15 @@ export async function disconnect(
 
 export async function initConnect(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       // No validation, it's just a pipe
       JsonDecoder.succeed,
     );
@@ -173,13 +188,15 @@ export async function initConnect(
 
 export async function createConnect(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       // No validation, it's just a pipe
       JsonDecoder.succeed,
     );
@@ -202,13 +219,15 @@ export async function createConnect(
 
 export async function createSend(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest<SendParams>(
       event,
-      [Role.host],
+      Role.host,
       decodeSendParams,
     );
 
@@ -233,13 +252,15 @@ export async function createSend(
 
 export async function getStreams(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest<null>(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       JsonDecoder.isNull(null),
     );
 
@@ -257,13 +278,15 @@ export async function getStreams(
 
 export async function createReceive(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest<ReceiveParams>(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       decodeRecvParams,
     );
 
@@ -284,13 +307,15 @@ export async function createReceive(
 
 export async function handleOnChangeStreamState(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       decodeOnChangeStreamStateData,
     );
 
@@ -311,13 +336,15 @@ export async function handleOnChangeStreamState(
 
 export async function handleOnChangeConsumerStreamState(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       decodeChangeStreamConsumerStateData,
     );
 
@@ -337,13 +364,15 @@ export async function handleOnChangeConsumerStreamState(
 
 export async function handleGetConsumerStreamState(
   event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   const connectionId = wsOnlyRoute(event);
 
   try {
+    await init(context);
     const req = await parseWsParticipantRequest(
       event,
-      [Role.host, Role.guest],
+      Role.guest,
       JsonDecoder.object(
         {
           consumerId: JsonDecoder.string,

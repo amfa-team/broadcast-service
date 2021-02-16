@@ -27,14 +27,14 @@ async function closeConnection(params: CloseConnectionParams): Promise<void> {
   }
 
   const results = await Promise.allSettled([
-    deleteConnection({ connectionId: connection.connectionId }),
+    deleteConnection({ _id: connection._id }),
     closeSendTransport({
-      connectionId: connection.connectionId,
+      connectionId: connection._id,
       transportId: connection.sendTransportId ?? null,
       skipConnectionPatch: true, // not needed as we remove the connection
     }),
     closeRecvTransport({
-      connectionId: connection.connectionId,
+      connectionId: connection._id,
       transportId: connection.recvTransportId ?? null,
       skipConnectionPatch: true, // not needed as we remove the connection
     }),
@@ -49,7 +49,7 @@ async function removeOldConnections(event: ConnectEvent): Promise<void> {
 
   const results = await Promise.allSettled(
     connections
-      .filter((c) => c.connectionId !== connectionId)
+      .filter((c) => c._id !== connectionId)
       .map(async (c) => closeConnection({ connection: c })),
   );
 
@@ -61,7 +61,7 @@ export async function onConnect(
 ): Promise<Routes["/router-capabilities"]["out"]> {
   const [routerCapabilities] = await Promise.all([
     requestServer<"/router-capabilities">("/router-capabilities", null),
-    createConnection(event),
+    createConnection({ _id: event.connectionId, token: event.token }),
     removeOldConnections(event),
   ]);
 
@@ -88,8 +88,8 @@ export async function onRefreshConnection(
   const oldConnection = connections[0];
 
   await Promise.allSettled([
-    createConnection({ ...oldConnection, connectionId }),
-    deleteConnection({ connectionId: oldConnection.connectionId }),
+    createConnection({ ...oldConnection, _id: connectionId }),
+    deleteConnection({ _id: oldConnection._id }),
   ]);
 
   return true;
@@ -116,6 +116,6 @@ export async function onDisconnect(event: DisconnectEvent): Promise<void> {
   // TODO: do not destroy directly the transport
   // Try to handle reconnect via a new websocket for 30s?
 
-  const connection = await getConnection({ connectionId });
+  const connection = await getConnection({ _id: connectionId });
   await closeConnection({ connection });
 }

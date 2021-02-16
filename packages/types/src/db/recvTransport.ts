@@ -1,5 +1,5 @@
 export interface RecvTransportKey {
-  transportId: string;
+  _id: string;
 }
 
 export type RecvTransport = RecvTransportKey;

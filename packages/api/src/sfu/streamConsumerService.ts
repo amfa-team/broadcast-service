@@ -45,7 +45,7 @@ export async function onCreateStreamConsumer(
   const { connectionId, data } = event;
 
   const [connection, stream] = await Promise.all([
-    getConnection({ connectionId }),
+    getConnection({ _id: connectionId }),
     getStream(data.sourceTransportId, data.producerId),
   ]);
 
@@ -207,7 +207,7 @@ export async function onConsumerStateChange(
     }),
     ...connections.map(async (connection) =>
       postToConnection(
-        connection.connectionId,
+        connection._id,
         JSON.stringify({
           type: "event",
           payload: {

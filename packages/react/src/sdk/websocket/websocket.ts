@@ -20,6 +20,7 @@ async function sendToWs<T>(
   ws: WebSocket,
   pendingReq: WsPendingReq,
   token: string,
+  spaceId: string,
   action: string,
   data: Record<string, unknown> | null,
 ): Promise<T> {
@@ -58,7 +59,7 @@ async function sendToWs<T>(
     ) {
       reject(new Error("Websocket is closed"));
     } else {
-      ws.send(JSON.stringify({ action, data, token, msgId }));
+      ws.send(JSON.stringify({ action, data, token, spaceId, msgId }));
     }
   });
 }
@@ -82,12 +83,15 @@ export class PicnicWebSocket extends EventTarget<
 
   #settings: Settings;
 
+  #token: string;
+
   #pendingReq: WsPendingReq = new Map();
 
-  constructor(settings: Settings) {
+  constructor(token: string, settings: Settings) {
     super();
 
     this.#settings = settings;
+    this.#token = token;
 
     this.#ws = new WebSocket(settings.endpoint);
 
@@ -142,7 +146,8 @@ export class PicnicWebSocket extends EventTarget<
       const success = await sendToWs<boolean>(
         ws,
         this.#pendingReq,
-        this.#settings.token,
+        this.#token,
+        this.#settings.spaceId,
         "/sfu/refresh",
         null,
       );
@@ -230,7 +235,8 @@ export class PicnicWebSocket extends EventTarget<
     return sendToWs(
       this.#ws,
       this.#pendingReq,
-      this.#settings.token,
+      this.#token,
+      this.#settings.spaceId,
       action,
       data,
     );

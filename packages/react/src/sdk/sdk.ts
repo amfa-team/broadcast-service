@@ -40,10 +40,10 @@ export class Picnic extends EventTarget<SdkEvents, Empty, "strict"> {
 
   #broadcastStream: SendStream | null = null;
 
-  constructor(settings: Settings) {
+  constructor(token: string, settings: Settings) {
     super();
 
-    this.#ws = new PicnicWebSocket(settings);
+    this.#ws = new PicnicWebSocket(token, settings);
     this.#device = new PicnicDevice(this.#ws);
     this.#recvTransport = new PicnicTransport(this.#ws, this.#device, "recv");
 

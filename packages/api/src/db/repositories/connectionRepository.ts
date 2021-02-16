@@ -5,53 +5,54 @@ import type {
   PatchConnection,
 } from "@amfa-team/broadcast-service-types";
 import PicnicError from "../../io/exceptions/PicnicError";
-import { ConnectionModel } from "../schema";
+import { getModels } from "../../services/mongo/client";
 
 export async function createConnection(
   data: CreateConnection,
 ): Promise<Connection> {
+  const { ConnectionModel } = await getModels();
   const connection = new ConnectionModel(data);
   await connection.save();
   return connection.toJSON() as Connection;
 }
 
-export async function deleteConnection({
-  connectionId,
-}: ConnectionKey): Promise<void> {
-  await ConnectionModel.delete({ connectionId });
+export async function deleteConnection({ _id }: ConnectionKey): Promise<void> {
+  const { ConnectionModel } = await getModels();
+  await ConnectionModel.deleteOne({ _id });
 }
 
 export async function getConnection({
-  connectionId,
+  _id,
 }: ConnectionKey): Promise<Connection | null> {
-  const doc = await ConnectionModel.get({ connectionId });
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const { ConnectionModel } = await getModels();
+  const doc = await ConnectionModel.findById(_id);
   return (doc?.toJSON() ?? null) as Connection | null;
 }
 
 export async function getConnectionsByToken({
   token,
 }: Pick<Connection, "token">): Promise<Connection[]> {
-  // TODO: Add index to use query instead
-  // TODO: fix typing
-  const results: unknown = await ConnectionModel.scan({
-    token: { eq: token },
-  }).exec();
+  const { ConnectionModel } = await getModels();
+  const results = await ConnectionModel.find({
+    token,
+  });
   return results as Connection[];
 }
 
 export async function getAllConnections(): Promise<Connection[]> {
-  const results: unknown = await ConnectionModel.scan().exec();
+  const { ConnectionModel } = await getModels();
+  const results: unknown = await ConnectionModel.find();
   return results as Connection[];
 }
 
 export async function patchConnection(
   params: PatchConnection,
 ): Promise<Connection> {
-  const { connectionId, ...rest } = params;
+  const { _id, ...rest } = params;
   try {
-    const doc = await ConnectionModel.update({ connectionId }, rest);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const { ConnectionModel } = await getModels();
+    await ConnectionModel.updateOne({ _id }, rest);
+    const doc = await ConnectionModel.findById(_id);
     return (doc?.toJSON() ?? null) as Connection;
   } catch (e) {
     throw new PicnicError("patchConnection: fail", e);
@@ -62,9 +63,10 @@ export async function findConnectionByRecvTransportId(
   recvTransportId: string,
 ): Promise<Connection[]> {
   try {
-    const results: unknown = await ConnectionModel.scan({
-      recvTransportId: { eq: recvTransportId },
-    }).exec();
+    const { ConnectionModel } = await getModels();
+    const results: unknown = await ConnectionModel.find({
+      recvTransportId,
+    });
     return results as Connection[];
   } catch (e) {
     throw new PicnicError("findConnectionByRecvTransportId: failed", e);

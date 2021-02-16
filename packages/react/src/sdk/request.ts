@@ -1,8 +1,8 @@
 import PicnicError from "../exceptions/PicnicError";
 import type { Settings } from "../types";
 
-function getAuthHeaders(settings: Settings) {
-  return { "x-api-key": settings.token };
+function getAuthHeaders(token: string) {
+  return { "x-api-key": token };
 }
 
 function getUrl(settings: Settings, path: string): string {
@@ -15,9 +15,13 @@ function getUrl(settings: Settings, path: string): string {
   return settings.endpoint + sfu + path;
 }
 
-export async function get<T>(settings: Settings, path: string): Promise<T> {
+export async function get<T>(
+  token: string,
+  settings: Settings,
+  path: string,
+): Promise<T> {
   const res = await fetch(getUrl(settings, path), {
-    headers: getAuthHeaders(settings),
+    headers: getAuthHeaders(token),
   });
 
   if (!res.ok) {
@@ -36,6 +40,7 @@ export async function get<T>(settings: Settings, path: string): Promise<T> {
 }
 
 export async function post<T>(
+  token: string,
   settings: Settings,
   path: string,
   data: Record<string, unknown>,
@@ -45,7 +50,7 @@ export async function post<T>(
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
-      ...getAuthHeaders(settings),
+      ...getAuthHeaders(token),
     },
   });
 

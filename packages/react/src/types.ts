@@ -19,10 +19,9 @@ export type SFUState = {
     resources: { [producerId: string]: RecvResource };
   };
 };
-
 export type Settings = {
   endpoint: string;
-  token: string;
+  spaceId: string;
 };
 
 export type WebSocketState =
