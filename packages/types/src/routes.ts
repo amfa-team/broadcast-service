@@ -1,4 +1,4 @@
-import type { types } from "mediasoup";
+import type { types } from "mediasoup-client";
 import type {
   ConnectParams,
   ConnectionInfo,

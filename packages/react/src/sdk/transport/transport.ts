@@ -81,7 +81,7 @@ export class PicnicTransport extends EventTarget<TransportEvents, "strict"> {
       const params = {
         id: transportId,
         iceParameters,
-        iceCandidates: iceCandidates as types.IceCandidate[],
+        iceCandidates,
         dtlsParameters,
         sctpParameters,
         iceServers: [],

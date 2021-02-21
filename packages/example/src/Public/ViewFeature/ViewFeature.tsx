@@ -22,7 +22,16 @@ function ViewFeature(): ReactElement {
         return <p>Not found</p>;
       }
 
-      return <StagePage settings={{ endpoint: ws, spaceId }} />;
+      return (
+        <StagePage
+          settings={{ endpoint: ws, spaceId }}
+          dictionary={{
+            join: "Join",
+            cgu:
+              "By joining you accept the terms and policy of SideBySide.live",
+          }}
+        />
+      );
     },
     [ws, spaceId],
   );
