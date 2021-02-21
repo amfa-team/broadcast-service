@@ -1,4 +1,4 @@
-import type { types } from "mediasoup";
+import type { types } from "mediasoup-client";
 
 export type InitConnectionParams = {
   type: "send" | "recv";

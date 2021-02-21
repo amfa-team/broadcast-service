@@ -1,6 +1,5 @@
 export * from "./routes";
 export * from "./mediasoup";
-export * from "./topology";
 export * from "./db/connection";
 export * from "./db/participant";
 export * from "./db/recvTransport";
