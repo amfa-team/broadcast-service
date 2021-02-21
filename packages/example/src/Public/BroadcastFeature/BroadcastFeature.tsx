@@ -23,7 +23,15 @@ function BroadcastFeature(): ReactElement {
       }
 
       return (
-        <StagePage settings={{ endpoint: ws, spaceId }} broadcastEnabled />
+        <StagePage
+          settings={{ endpoint: ws, spaceId }}
+          dictionary={{
+            join: "Join",
+            cgu:
+              "By joining you accept the terms and policy of SideBySide.live",
+          }}
+          broadcastEnabled
+        />
       );
     },
     [ws, spaceId],

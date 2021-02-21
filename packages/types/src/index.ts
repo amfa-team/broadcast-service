@@ -8,3 +8,4 @@ export * from "./db/sendTransport";
 export * from "./db/server";
 export * from "./db/stream";
 export * from "./db/streamConsumer";
+export * from "./dictionary";
