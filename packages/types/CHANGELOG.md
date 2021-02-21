@@ -1,3 +1,15 @@
+# @amfa-team/broadcast-service-types [1.0.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.0.0-beta.2...@amfa-team/broadcast-service-types@1.0.0-beta.3) (2021-02-21)
+
+
+### Bug Fixes
+
+* remove mediasoup dependency on types ([8f104d4](https://github.com/amfa-team/broadcast-service/commit/8f104d413e6474267d70e54e37237288f00fca00))
+
+
+### Features
+
+* add dictionary ([4007990](https://github.com/amfa-team/broadcast-service/commit/40079907784ac03c00cce771cab03848f68a48a1))
+
 # @amfa-team/broadcast-service-types [1.0.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.0.0-beta.1...@amfa-team/broadcast-service-types@1.0.0-beta.2) (2021-02-16)
 
 
