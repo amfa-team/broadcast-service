@@ -1,3 +1,15 @@
+# @amfa-team/broadcast-service [1.0.0-beta.5](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0-beta.4...@amfa-team/broadcast-service@1.0.0-beta.5) (2021-02-21)
+
+
+### Bug Fixes
+
+* lint ([b5144ce](https://github.com/amfa-team/broadcast-service/commit/b5144cea6b8c09939a8cbf99027d6dffb9e9dee4))
+
+
+### Features
+
+* add dictionary ([4007990](https://github.com/amfa-team/broadcast-service/commit/40079907784ac03c00cce771cab03848f68a48a1))
+
 # @amfa-team/broadcast-service [1.0.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0-beta.3...@amfa-team/broadcast-service@1.0.0-beta.4) (2021-02-16)
 
 
