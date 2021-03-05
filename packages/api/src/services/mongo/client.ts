@@ -35,19 +35,11 @@ async function getClient(url: string): Promise<Mongoose> {
 
   let cachedClient = cachedClientMap.get(url) ?? null;
   if (cachedClient) {
-    const client: Promise<Mongoose> = cachedClient
-      .then((c) => {
-        if (c.connection.readyState === 1) {
-          return c;
-        }
-        discardClient(url, c);
-        return getClient(url);
-      })
-      .catch(async (e) => {
-        logger.error(e, "[mongo/client:connect]: cache failed");
-        discardClient(url);
-        return getClient(url);
-      });
+    const client: Promise<Mongoose> = cachedClient.catch(async (e) => {
+      logger.error(e, "[mongo/client:connect]: cache failed");
+      discardClient(url);
+      return getClient(url);
+    });
     logger.info("[mongo/client:getClient]: using cached mongodb client");
     return client;
   }
@@ -56,20 +48,24 @@ async function getClient(url: string): Promise<Mongoose> {
     const instance = new mongoose.Mongoose();
     cachedClient = instance.connect(url, {
       appname: `broadcast-service-${getEnvName()}`,
+      autoReconnect: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      connectTimeoutMS: 10_000,
-      poolSize: 2, // Maintain up to 2 socket connections
-      maxPoolSize: Number(process.env.MAX_POOL_SIZE ?? 5),
-      minPoolSize: Number(process.env.MIN_POOL_SIZE ?? 1),
-      serverSelectionTimeoutMS: 5_000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 30_000, // Close sockets after 30 seconds of inactivity
+      connectTimeoutMS: 5_000, // How long to wait for a connection to be established before timing out
+      poolSize: Number(process.env.POOL_SIZE ?? 10), // Maintain up to 10 socket connections
+      maxPoolSize: Number(process.env.MAX_POOL_SIZE ?? 20),
+      minPoolSize: Number(process.env.MIN_POOL_SIZE ?? 2),
+      maxIdleTimeMS: 600_000,
+      serverSelectionTimeoutMS: 5_000, // How long to block for server selection before throwing an error
+      heartbeatFrequencyMS: 2_000, // The frequency with which topology updates are scheduled
+      socketTimeoutMS: 30_000, // How long a send or receive on a socket can take before timing out
+      connectWithNoPrimary: true,
       keepAlive: true,
-      keepAliveInitialDelay: 30_000,
+      keepAliveInitialDelay: 10_000, // The number of milliseconds to wait before initiating keepAlive on the TCP socket
       useFindAndModify: false,
       useCreateIndex: true,
-      bufferCommands: false, // Disable mongoose buffering
-      bufferMaxEntries: 0, // and MongoDB driver buffering
+      bufferCommands: true,
+      bufferMaxEntries: 20, // Sets a cap on how many operations the driver will buffer up before giving up on getting a working connection, default is -1 which is unlimited
       readPreference: "primaryPreferred",
     });
 

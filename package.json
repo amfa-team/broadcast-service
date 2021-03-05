@@ -49,7 +49,7 @@
     "prettier:check": "prettier --check .",
     "build": "(cd packages/react; yarn build) && yarn workspaces run build",
     "clean": "yarn workspaces run clean",
-    "start": "ttab yarn -t 'React' start:react; ttab yarn -t 'API' start:api; ttab -t 'Example' \"sleep 3 && yarn start:example\"; ttab -t 'Server' yarn start:server;",
+    "start": "ttab -t 'React' yarn start:react; ttab -t 'API' yarn start:api; ttab -t 'Example' \"sleep 3 && yarn start:example\"; ttab -t 'Server' yarn start:server;",
     "start:api": "cd packages/api && yarn start",
     "start:server": "cd packages/server && yarn start:dev",
     "start:react": "cd packages/react && yarn start",
