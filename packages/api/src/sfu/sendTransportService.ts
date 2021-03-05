@@ -1,13 +1,16 @@
-import { postToServer } from "./serverService";
-import type { ConnectionInfo, Routes } from "../../../types";
+import type {
+  Connection,
+  ConnectionInfo,
+  Routes,
+} from "@amfa-team/broadcast-service-types";
 import { patchConnection } from "../db/repositories/connectionRepository";
 import {
-  deleteSendTransport,
   createSendTransport,
+  deleteSendTransport,
 } from "../db/repositories/sendTransportRepository";
 import { getAllSettledValues } from "../io/promises";
+import { postToServer } from "./serverService";
 import { closeStream } from "./streamService";
-import { Connection } from "../db/types/connection";
 
 interface InitSendTransportEvent {
   connectionId: string;
@@ -15,7 +18,7 @@ interface InitSendTransportEvent {
 }
 
 export async function onInitSendTransport(
-  event: InitSendTransportEvent
+  event: InitSendTransportEvent,
 ): Promise<ConnectionInfo> {
   const { connectionId, data } = event;
 
@@ -28,10 +31,10 @@ export async function onInitSendTransport(
   // TODO: Handle connection removed in between
   await Promise.all([
     patchConnection({
-      connectionId,
+      _id: connectionId,
       sendTransportId: connectionInfo.transportId,
     }),
-    createSendTransport({ transportId: connectionInfo.transportId }),
+    createSendTransport({ _id: connectionInfo.transportId }),
   ]);
 
   return connectionInfo;
@@ -43,20 +46,9 @@ interface ConnectSendTransportEvent {
 }
 
 export async function onConnectSendTransport(
-  event: ConnectSendTransportEvent
+  event: ConnectSendTransportEvent,
 ): Promise<Routes["/connect/create"]["out"]> {
   return postToServer("/connect/create", event.data);
-}
-
-interface OnSendTransportCloseEvent {
-  connectionId: string;
-  transportId: string;
-}
-
-export async function onSendTransportClose(
-  event: OnSendTransportCloseEvent
-): Promise<void> {
-  await closeSendTransport({ ...event, skipConnectionPatch: false });
 }
 
 interface CloseSendTransportParams {
@@ -66,7 +58,7 @@ interface CloseSendTransportParams {
 }
 
 export async function closeSendTransport(
-  params: CloseSendTransportParams
+  params: CloseSendTransportParams,
 ): Promise<void> {
   if (params.transportId == null) {
     return;
@@ -81,7 +73,7 @@ export async function closeSendTransport(
       transportId: params.transportId,
       delay: 30000,
     }),
-    deleteSendTransport({ transportId: params.transportId }),
+    deleteSendTransport({ _id: params.transportId }),
     closeStream({
       transportId: params.transportId,
       producerId: null,
@@ -90,13 +82,24 @@ export async function closeSendTransport(
     params.skipConnectionPatch
       ? Promise.resolve(null)
       : patchConnection({
-          connectionId: params.connectionId,
+          _id: params.connectionId,
           sendTransportId: null,
         }),
   ]);
 
   getAllSettledValues<void | null | Connection>(
     results,
-    "closeSendTransport: Unexpected error"
+    "closeSendTransport: Unexpected error",
   );
+}
+
+interface OnSendTransportCloseEvent {
+  connectionId: string;
+  transportId: string;
+}
+
+export async function onSendTransportClose(
+  event: OnSendTransportCloseEvent,
+): Promise<void> {
+  await closeSendTransport({ ...event, skipConnectionPatch: false });
 }

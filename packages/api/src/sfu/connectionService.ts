@@ -1,75 +1,18 @@
+import type { Connection, Routes } from "@amfa-team/broadcast-service-types";
 import {
   createConnection,
-  getConnection,
   deleteConnection,
+  getConnection,
   getConnectionsByToken,
 } from "../db/repositories/connectionRepository";
-import { requestServer } from "./serverService";
-import type { Routes } from "../../../types";
 import { getAllSettledValues } from "../io/promises";
-import { closeSendTransport } from "./sendTransportService";
 import { closeRecvTransport } from "./recvTransportService";
-import { Connection } from "../db/types/connection";
+import { closeSendTransport } from "./sendTransportService";
+import { requestServer } from "./serverService";
 
 interface ConnectEvent {
   connectionId: string;
   token: string;
-}
-
-export async function onConnect(
-  event: ConnectEvent
-): Promise<Routes["/router-capabilities"]["out"]> {
-  const [routerCapabilities] = await Promise.all([
-    requestServer<"/router-capabilities">("/router-capabilities", null),
-    createConnection(event),
-    removeOldConnections(event),
-  ]);
-
-  return routerCapabilities;
-}
-
-interface RefreshConnectionEvent {
-  connectionId: string;
-  token: string;
-}
-
-// Refresh is done with a new connection to overcome AWS 2hours hard limit
-export async function onRefreshConnection(
-  event: RefreshConnectionEvent
-): Promise<boolean> {
-  const { connectionId, token } = event;
-  const connections = await getConnectionsByToken({ token });
-
-  if (connections.length !== 1) {
-    // We expect to have only one connection
-    return false;
-  }
-
-  const oldConnection = connections[0];
-
-  await Promise.allSettled([
-    createConnection({ ...oldConnection, connectionId }),
-    deleteConnection({ connectionId: oldConnection.connectionId }),
-  ]);
-
-  return true;
-}
-
-async function removeOldConnections(event: ConnectEvent): Promise<void> {
-  const { connectionId, token } = event;
-  const connections = await getConnectionsByToken({ token });
-
-  const results = await Promise.allSettled(
-    connections
-      .filter((c) => c.connectionId !== connectionId)
-      .map((c) => closeConnection({ connection: c }))
-  );
-
-  getAllSettledValues(results, "removeOldConnections: Unexpected error");
-}
-
-export function onPing(): string {
-  return "pong";
 }
 
 interface CloseConnectionParams {
@@ -84,20 +27,76 @@ async function closeConnection(params: CloseConnectionParams): Promise<void> {
   }
 
   const results = await Promise.allSettled([
-    deleteConnection({ connectionId: connection.connectionId }),
+    deleteConnection({ _id: connection._id }),
     closeSendTransport({
-      connectionId: connection.connectionId,
-      transportId: connection?.sendTransportId ?? null,
+      connectionId: connection._id,
+      transportId: connection.sendTransportId ?? null,
       skipConnectionPatch: true, // not needed as we remove the connection
     }),
     closeRecvTransport({
-      connectionId: connection.connectionId,
-      transportId: connection?.recvTransportId ?? null,
+      connectionId: connection._id,
+      transportId: connection.recvTransportId ?? null,
       skipConnectionPatch: true, // not needed as we remove the connection
     }),
   ]);
 
   getAllSettledValues(results, "onDisconnect: Unexpected error");
+}
+
+async function removeOldConnections(event: ConnectEvent): Promise<void> {
+  const { connectionId, token } = event;
+  const connections = await getConnectionsByToken({ token });
+
+  const results = await Promise.allSettled(
+    connections
+      .filter((c) => c._id !== connectionId)
+      .map(async (c) => closeConnection({ connection: c })),
+  );
+
+  getAllSettledValues(results, "removeOldConnections: Unexpected error");
+}
+
+export async function onConnect(
+  event: ConnectEvent,
+): Promise<Routes["/router-capabilities"]["out"]> {
+  const [routerCapabilities] = await Promise.all([
+    requestServer<"/router-capabilities">("/router-capabilities", null),
+    createConnection({ _id: event.connectionId, token: event.token }),
+    removeOldConnections(event),
+  ]);
+
+  return routerCapabilities;
+}
+
+interface RefreshConnectionEvent {
+  connectionId: string;
+  token: string;
+}
+
+// Refresh is done with a new connection to overcome AWS 2hours hard limit
+export async function onRefreshConnection(
+  event: RefreshConnectionEvent,
+): Promise<boolean> {
+  const { connectionId, token } = event;
+  const connections = await getConnectionsByToken({ token });
+
+  if (connections.length !== 1) {
+    // We expect to have only one connection
+    return false;
+  }
+
+  const oldConnection = connections[0];
+
+  await Promise.allSettled([
+    createConnection({ ...oldConnection, _id: connectionId }),
+    deleteConnection({ _id: oldConnection._id }),
+  ]);
+
+  return true;
+}
+
+export function onPing(): string {
+  return "pong";
 }
 
 interface DisconnectEvent {
@@ -117,6 +116,6 @@ export async function onDisconnect(event: DisconnectEvent): Promise<void> {
   // TODO: do not destroy directly the transport
   // Try to handle reconnect via a new websocket for 30s?
 
-  const connection = await getConnection({ connectionId });
+  const connection = await getConnection({ _id: connectionId });
   await closeConnection({ connection });
 }

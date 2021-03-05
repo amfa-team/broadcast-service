@@ -1,49 +1,42 @@
-org: moroine
-app: broadcast-service-api
-service:
-  name: broadcast-service-api
+service: broadcast-service-api
+
+frameworkVersion: ^2.11.0
 
 plugins:
-  # - serverless-dotenv-plugin
+  - serverless-dotenv-plugin
   - serverless-stage-manager
+  - serverless-domain-manager
   - serverless-pseudo-parameters
+  - serverless-webpack
   - serverless-plugin-monorepo
-  - serverless-plugin-typescript
-  - serverless-plugin-include-dependencies
-  - serverless-dynamodb-local
   - serverless-offline
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: ${opt:stage}
   region: eu-west-3
   memorySize: 512
+  timeout: 30
+  stage: ${opt:stage}
   profile: picnic # aws credential profile name
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   environment:
     SECRET: ${env:SECRET, 'super-SECRET'}
-    CONNECTION_TABLE: "${self:service.name}-${self:provider.stage}-connection"
-    PARTICIPANT_TABLE: "${self:service.name}-${self:provider.stage}-participants"
-    SERVER_TABLE: "${self:service.name}-${self:provider.stage}-server"
-    STREAM_TABLE: "${self:service.name}-${self:provider.stage}-stream"
-    STREAM_CONSUMER_TABLE: "${self:service.name}-${self:provider.stage}-consumer-2"
-    SEND_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-send-transport"
-    RECV_TRANSPORT_TABLE: "${self:service.name}-${self:provider.stage}-recv-transport"
-    STREAM_CONSUMER_TABLE_INDEX_SOURCE_TRANSPORT: "${self:service.name}-${self:provider.stage}-src-transport"
+    MONGO_DB_URL: "${env:MONGO_DB_URL}"
     WEBSOCKET_DOMAIN: "#{WebsocketsApi}.execute-api.#{AWS::Region}.amazonaws.com/${self:provider.stage}"
     SENTRY_ENVIRONMENT: "${self:provider.stage}"
-  iamRoleStatements: # permissions for all of your functions can be set here
-    - Effect: Allow
-      Action: # Gives permission to DynamoDB tables in a specific region
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service.name}-${self:provider.stage}-*"
+    USER_SERVICE_API_SECRET: "${env:USER_SERVICE_API_SECRET}"
+    USER_SERVICE_API_ENDPOINT: "${env:USER_SERVICE_API_ENDPOINT}"
+    SPACE_SERVICE_API_ENDPOINT: "${env:SPACE_SERVICE_API_ENDPOINT}"
+    SENTRY_DNS: "${env:SENTRY_DNS}"
+    MAX_POOL_SIZE: ${env:MAX_POOL_SIZE, 20}
+    MIN_POOL_SIZE: ${env:MIN_POOL_SIZE, 2}
+    POOL_SIZE: ${env:POOL_SIZE, 10}
+  apiGateway:
+    shouldStartNameWithService: true
+  tracing:
+    apiGateway: true
+  iamRoleStatements:
     - Effect: Allow
       Action:
         - execute-api:Invoke
@@ -57,20 +50,47 @@ functions:
   - ${file(./serverless/eventRoutes.yml)}
   - ${file(./serverless/websocket.yml)}
 
-resources:
-  Resources: ${file(./serverless/resources.yml)}
-
 custom:
+  sbs:
+    domains:
+      production: "broadcast.sidebyside.live"
+      staging: "broadcast.dev.sidebyside.live"
+      dev: "localhost"
+    wsDomains:
+      production: "broadcast-ws.sidebyside.live"
+      staging: "broadcast-ws.dev.sidebyside.live"
+      dev: "localhost"
   serverless-offline:
     useChildProcesses: true
-  dynamodb:
-    stages:
-      - dev
-    start:
-      port: 9005
-      isMemory: true
-      migrate: true
+    httpPort: 4009
+    lambdaPort: 3009
+  webpack:
+    webpackConfig: "webpack.config.js"
+    keepOutputDirectory: true
+    includeModules: true
+    packager: "yarn"
+    excludeFiles: src/**/*.test.js
+
   stages:
     - dev
     - production
     - staging
+
+  customDomain:
+    rest:
+      domainName: ${self:custom.sbs.domains.${opt:stage, self:provider.stage}}
+      stage: ${opt:stage}
+      basePath: api
+      certificateName: "*.sidebyside.live"
+      createRoute53Record: true
+      endpointType: "regional"
+      apiType: rest
+      autoDomain: true
+    websocket:
+      domainName: ${self:custom.sbs.wsDomains.${opt:stage, self:provider.stage}}
+      stage: ${opt:stage}
+      certificateName: "*.sidebyside.live"
+      createRoute53Record: true
+      endpointType: "regional"
+      apiType: websocket
+      autoDomain: true

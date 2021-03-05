@@ -1,43 +1,49 @@
-import {
-  SendTransportKey,
-  SendTransport,
+import type {
   PatchSendTransport,
-} from "../types/sendTransport";
-import { sendTransportModel } from "../schema";
-import { PicnicError } from "../../io/exceptions";
+  SendTransport,
+  SendTransportKey,
+} from "@amfa-team/broadcast-service-types";
+import PicnicError from "../../io/exceptions/PicnicError";
+import { getModels } from "../../services/mongo/client";
 
 export async function createSendTransport(
-  transport: SendTransportKey
+  transport: SendTransportKey,
 ): Promise<void> {
-  await sendTransportModel.create(transport);
+  const { SendTransportModel } = await getModels();
+  await SendTransportModel.create(transport);
 }
 
 export async function deleteSendTransport({
-  transportId,
+  _id,
 }: SendTransportKey): Promise<void> {
   try {
-    await sendTransportModel.delete({ transportId });
+    const { SendTransportModel } = await getModels();
+    await SendTransportModel.deleteOne({ _id });
   } catch (e) {
     throw new PicnicError("deleteSendTransport: failed", e);
   }
 }
 
 export async function getSendTransport({
-  transportId,
+  _id,
 }: SendTransportKey): Promise<SendTransport | null> {
-  const doc = await sendTransportModel.get({ transportId });
+  const { SendTransportModel } = await getModels();
+  const doc = await SendTransportModel.findById(_id);
   return (doc?.toJSON() ?? null) as SendTransport | null;
 }
 
 export async function patchSendTransport(
-  params: PatchSendTransport
+  params: PatchSendTransport,
 ): Promise<SendTransport> {
-  const { transportId, ...rest } = params;
-  const doc = await sendTransportModel.update({ transportId }, rest);
-  return doc.toJSON() as SendTransport;
+  const { SendTransportModel } = await getModels();
+  const { _id, ...rest } = params;
+  await SendTransportModel.updateOne({ _id }, rest);
+  const doc = await SendTransportModel.findById(_id);
+  return (doc?.toJSON() ?? null) as SendTransport;
 }
 
 export async function getAllSendTransport(): Promise<SendTransport[]> {
-  const results: unknown = await sendTransportModel.scan().exec();
-  return results as SendTransport[];
+  const { SendTransportModel } = await getModels();
+  const results = await SendTransportModel.find();
+  return results;
 }

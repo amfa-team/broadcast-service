@@ -1,26 +1,33 @@
-import { RecvTransportKey, RecvTransport } from "../types/recvTransport";
-import { recvTransportModel } from "../schema";
+import type {
+  RecvTransport,
+  RecvTransportKey,
+} from "@amfa-team/broadcast-service-types";
+import { getModels } from "../../services/mongo/client";
 
 export async function createRecvTransport(
-  transport: RecvTransport
+  transport: RecvTransport,
 ): Promise<void> {
-  await recvTransportModel.create(transport);
+  const { RecvTransportModel } = await getModels();
+  await RecvTransportModel.create(transport);
 }
 
 export async function deleteRecvTransport({
-  transportId,
+  _id,
 }: RecvTransportKey): Promise<void> {
-  await recvTransportModel.delete({ transportId });
+  const { RecvTransportModel } = await getModels();
+  await RecvTransportModel.deleteOne({ _id });
 }
 
 export async function getRecvTransport({
-  transportId,
+  _id,
 }: RecvTransportKey): Promise<RecvTransport | null> {
-  const doc = await recvTransportModel.get({ transportId });
+  const { RecvTransportModel } = await getModels();
+  const doc = await RecvTransportModel.findById(_id);
   return (doc?.toJSON() ?? null) as RecvTransport | null;
 }
 
 export async function getAllRecvTransport(): Promise<RecvTransport[]> {
-  const results: unknown = await recvTransportModel.scan().exec();
-  return results as RecvTransport[];
+  const { RecvTransportModel } = await getModels();
+  const results = await RecvTransportModel.find();
+  return results;
 }

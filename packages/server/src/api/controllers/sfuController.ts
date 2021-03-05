@@ -1,30 +1,32 @@
-import { Application } from "express";
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 import type {
-  InitConnectionParams,
   ConnectParams,
   DestroyConnectionParams,
-  SendParams,
+  InitConnectionParams,
   ReceiveParams,
-  SendDestroyParams,
   Routes,
-} from "../../../../types";
+  SendDestroyParams,
+  SendParams,
+} from "@amfa-team/broadcast-service-types";
+import type { Application } from "express";
+import { handleErrorResponse, handleSuccessResponse } from "../../io/io";
 import {
+  connect,
+  destroySend,
+  disconnect,
   getRouterCapabilities,
   initConnection,
-  connect,
-  disconnect,
-  send,
-  receive,
-  play,
-  destroySend,
   pause,
+  play,
+  receive,
   receiveState,
-  sendState,
-  sendPlay,
+  send,
   sendPause,
+  sendPlay,
+  sendState,
 } from "../../sfu/sfuService";
-import { getServerTopology, cleanup } from "../../sfu/topology";
-import { handleSuccessResponse, handleErrorResponse } from "../../io/io";
+import { cleanup, getServerTopology } from "../../sfu/topology";
 
 export function bindSceneController(app: Application): void {
   app.get("/topology", async (req, res) => {

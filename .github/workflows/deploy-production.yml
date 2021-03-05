@@ -1,0 +1,114 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  ENVIRONMENT_NAME: production
+  SERVER_PUBLIC_IP: "35.181.141.93"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-
+      - run: echo -e "//npm.pkg.github.com/:_authToken=$NPM_TOKEN\n@amfa-team:registry=https://npm.pkg.github.com" > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: yarn install
+      - run: echo -e "SENTRY_DNS=$SENTRY_DNS" >> packages/example/.env
+        env:
+          SENTRY_DNS: ${{ secrets.SENTRY_EXAMPLE_DNS }}
+      - run: echo -e "WS_API=$WS_API" >> packages/example/.env
+        env:
+          WS_API: ${{ secrets.PRODUCTION_WEBSOCKET }}
+      - run: echo -e "HTTP_API=$HTTP_API" >> packages/example/.env
+        env:
+          HTTP_API: ${{ secrets.PRODUCTION_CLUSTER_API }}
+      - run: echo -e "SENTRY_ENVIRONMENT=$ENVIRONMENT_NAME" >> packages/example/.env
+        env:
+          SENTRY_ENVIRONMENT: production
+      - run: echo -e "SPACE_SERVICE_API_ENDPOINT=$SPACE_SERVICE_API_ENDPOINT" >> packages/example/.env
+        env:
+          SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_PRODUCTION }}
+      - run: echo -e "USER_API_ENDPOINT=$USER_API_ENDPOINT" >> packages/example/.env
+        env:
+          USER_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_PRODUCTION }}
+      - name: build
+        run: yarn build
+        env:
+          SENTRY_ENVIRONMENT: production
+      - name: publish sdk
+        run: yarn npm:release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
+      - name: deploy
+        working-directory: ./packages/example
+        run: yarn aws:profile:set --stage production && yarn deploy:production
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
+          SLACK_CHANNEL: deploys
+          SLACK_TITLE: broadcast-service/example deployed
+      - name: serverless deploy
+        working-directory: ./packages/api
+        run: yarn aws:profile:set --stage production && yarn deploy:production
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SENTRY_DNS: ${{ secrets.SENTRY_API_DNS }}
+          SECRET: ${{ secrets.PRODUCTION_CLUSTER_SECRET }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          MONGO_DB_URL: ${{ secrets.MONGO_DB_PRODUCTION }}
+          USER_SERVICE_API_SECRET: ${{ secrets.USER_SERVICE_API_SECRET_PRODUCTION }}
+          USER_SERVICE_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_PRODUCTION }}
+          SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_PRODUCTION }}
+      - name: Create SSH directory
+        run: mkdir -p ~/.ssh
+      - name: Create SSH Private Key
+        run: echo "$SSH_KEY" > ~/.ssh/picnic && chmod 600 ~/.ssh/picnic
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+      - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/picnic
+        name: register ssh agent
+      - run: yarn build
+        working-directory: ./packages/server
+      - run: yarn deploy
+        working-directory: ./packages/server
+        env:
+          CLUSTER_API: ${{ secrets.PRODUCTION_CLUSTER_API }}
+          CLUSTER_SECRET: ${{ secrets.PRODUCTION_CLUSTER_SECRET }}
+          PUBLIC_IP: ${{ env.SERVER_PUBLIC_IP }}
+          SENTRY_ENVIRONMENT: production
+          NODE_ENV: production
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
+          SLACK_CHANNEL: deploys
+          SLACK_TITLE: Mediasoup Server deployed
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
+          SLACK_CHANNEL: deploys
+          SLACK_TITLE: Mediasoup Server FAILED
+          SLACK_COLOR: "#2eb886"
+        if: failure()

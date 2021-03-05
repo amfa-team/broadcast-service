@@ -5,8 +5,11 @@ on:
     branches:
       - develop
 
+env:
+  SERVER_PUBLIC_IP: "15.236.168.171"
+
 jobs:
-  install: # Runs install once before everything to create & save cache
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,52 +19,66 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-deploy-staging-
             ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
+      - run: echo -e "//npm.pkg.github.com/:_authToken=$NPM_TOKEN\n@amfa-team:registry=https://npm.pkg.github.com" > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn install
-  deploy-api:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-staging-
-            ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
+      - run: echo -e "SENTRY_DNS=$SENTRY_DNS" >> packages/example/.env
+        env:
+          SENTRY_DNS: ${{ secrets.SENTRY_EXAMPLE_DNS }}
+      - run: echo -e "WS_API=$WS_API" >> packages/example/.env
+        env:
+          WS_API: ${{ secrets.STAGING_WEBSOCKET }}
+      - run: echo -e "HTTP_API=$HTTP_API" >> packages/example/.env
+        env:
+          HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
+      - run: echo -e "SENTRY_ENVIRONMENT=$ENVIRONMENT_NAME" >> packages/example/.env
+        env:
+          SENTRY_ENVIRONMENT: staging
+      - run: echo -e "SPACE_SERVICE_API_ENDPOINT=$SPACE_SERVICE_API_ENDPOINT" >> packages/example/.env
+        env:
+          SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_STAGING }}
+      - run: echo -e "USER_API_ENDPOINT=$USER_API_ENDPOINT" >> packages/example/.env
+        env:
+          USER_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_STAGING }}
+      - name: build
+        run: yarn build
+        env:
+          SENTRY_ENVIRONMENT: staging
+      - name: publish sdk
+        run: yarn npm:release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
+      - name: deploy
+        working-directory: ./packages/example
+        run: yarn aws:profile:set --stage staging && yarn deploy:staging
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
+          SLACK_CHANNEL: deploys
+          SLACK_TITLE: broadcast-service/example deployed
       - name: serverless deploy
         working-directory: ./packages/api
-        run: yarn serverless deploy --stage staging
+        run: yarn aws:profile:set --stage staging && yarn deploy:staging
         env:
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SENTRY_DNS: ${{ secrets.SENTRY_API_DNS }}
           SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
-  deploy-server:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-staging-
-            ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          MONGO_DB_URL: ${{ secrets.MONGO_DB_STAGING }}
+          USER_SERVICE_API_SECRET: ${{ secrets.USER_SERVICE_API_SECRET_STAGING }}
+          USER_SERVICE_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_STAGING }}
+          SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_STAGING }}
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key
@@ -70,19 +87,16 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
       - run: eval "$(ssh-agent -s)" && ssh-add ~/.ssh/picnic
         name: register ssh agent
-      - run: node dumpEnv.js
-        name: generate env file
+      - run: yarn build
+        working-directory: ./packages/server
+      - run: yarn deploy
         working-directory: ./packages/server
         env:
           CLUSTER_API: ${{ secrets.STAGING_CLUSTER_API }}
           CLUSTER_SECRET: ${{ secrets.STAGING_CLUSTER_SECRET }}
-          PUBLIC_IP: "15.236.169.203"
-      - run: "scp -i ~/.ssh/picnic -o 'StrictHostKeyChecking=no' server-env ubuntu@15.236.169.203:~/server-env"
-        name: upload env vars
-        working-directory: ./packages/server
-      - name: pm2 deploy
-        working-directory: ./packages/server
-        run: yarn pm2 deploy staging --force
+          PUBLIC_IP: ${{ env.SERVER_PUBLIC_IP }}
+          SENTRY_ENVIRONMENT: staging
+          NODE_ENV: production
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@master
         env:
@@ -97,67 +111,3 @@ jobs:
           SLACK_TITLE: Mediasoup Server FAILED
           SLACK_COLOR: "#2eb886"
         if: failure()
-  deploy-client-public:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-staging-
-            ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
-      - name: build public website
-        working-directory: ./packages/client
-        run: yarn build:public
-        env:
-          WS_API: ${{ secrets.STAGING_WEBSOCKET }}
-          HTTP_API: ${{ secrets.STAGING_CLUSTER_API }}
-          SENTRY_ENVIRONMENT: "staging"
-      - name: update stack
-        working-directory: ./packages/client
-        run: yarn serverless deploy --stage staging
-        env:
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-      - name: deploy public
-        working-directory: ./packages/client
-        run: yarn serverless client deploy --stage staging --no-confirm
-        env:
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@master
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}
-          SLACK_CHANNEL: deploys
-          SLACK_TITLE: Client test page deployed
-  deploy-client-sdk:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-deploy-staging-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deploy-staging-
-            ${{ runner.os }}-
-      - run: echo '@amfa-team:registry=https://npm.pkg.github.com' > .npmrc
-      - run: yarn install
-      - name: publish sdk
-        working-directory: ./packages/client
-        run: yarn semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SDK }}

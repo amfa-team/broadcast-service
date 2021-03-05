@@ -1,17 +1,17 @@
+import { Integrations, captureException, init } from "@sentry/node";
 import { config } from "dotenv";
 import { startApi } from "./api/api";
-import { startup } from "./sfu/sfuService";
 import { registerServer } from "./cluster/register";
-import * as Sentry from "@sentry/node";
+import { startup } from "./sfu/sfuService";
 
 let timeout: NodeJS.Timeout | null = null;
 
-Sentry.init({
+init({
   dsn:
     "https://2966cca1cb664815bfc242fe7963f630@o443877.ingest.sentry.io/5419724",
   integrations: [
     // enable HTTP calls tracing
-    new Sentry.Integrations.Http({ tracing: true }),
+    new Integrations.Http({ tracing: true }),
   ],
   environment: process.env.SENTRY_ENVIRONMENT ?? "local",
 });
@@ -20,10 +20,20 @@ async function startServer(): Promise<void> {
   config();
   await startup();
   await startApi();
-  registerServer().then(() => {
-    console.log("Registered");
-  });
-  timeout = setInterval(registerServer, 60000);
+  registerServer()
+    .then(() => {
+      console.log("Registered");
+    })
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+  timeout = setInterval(() => {
+    registerServer().catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+  }, 60000);
 
   process.send?.("ready");
 }
@@ -36,15 +46,16 @@ function exit(code: 0 | 1) {
 }
 
 process.on("unhandledRejection", (error) => {
-  Sentry.captureException(error);
+  captureException(error);
   console.error("unhandledRejection", error);
   exit(1);
 });
 
 process.on("uncaughtException", (error) => {
-  Sentry.captureException(error);
+  captureException(error);
   console.error("uncaughtException", error);
   exit(1);
 });
 
-startServer();
+// eslint-disable-next-line no-void
+void startServer();

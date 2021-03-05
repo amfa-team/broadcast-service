@@ -1,19 +1,4 @@
 {
-  "compilerOptions": {
-    "lib": [
-      // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
-      "es2019"
-    ],
-    "allowJs": false,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  }
+  "extends": "./tsconfig.base.json",
+  "include": ["packages/*/src"]
 }

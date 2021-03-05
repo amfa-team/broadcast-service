@@ -1,13 +1,16 @@
-import { postToServer } from "./serverService";
-import type { ConnectionInfo, Routes } from "../../../types";
+import type {
+  Connection,
+  ConnectionInfo,
+  Routes,
+} from "@amfa-team/broadcast-service-types";
+import { patchConnection } from "../db/repositories/connectionRepository";
 import {
-  deleteRecvTransport,
   createRecvTransport,
+  deleteRecvTransport,
 } from "../db/repositories/recvTransportRepository";
 import { getAllSettledValues } from "../io/promises";
-import { patchConnection } from "../db/repositories/connectionRepository";
+import { postToServer } from "./serverService";
 import { closeConsumer } from "./streamConsumerService";
-import { Connection } from "../db/types/connection";
 
 interface InitRecvTransportEvent {
   connectionId: string;
@@ -15,7 +18,7 @@ interface InitRecvTransportEvent {
 }
 
 export async function onInitRecvTransport(
-  event: InitRecvTransportEvent
+  event: InitRecvTransportEvent,
 ): Promise<ConnectionInfo> {
   const { connectionId, data } = event;
 
@@ -28,10 +31,10 @@ export async function onInitRecvTransport(
   // TODO: Handle connection removed in between
   await Promise.all([
     patchConnection({
-      connectionId,
+      _id: connectionId,
       recvTransportId: connectionInfo.transportId,
     }),
-    createRecvTransport({ transportId: connectionInfo.transportId }),
+    createRecvTransport({ _id: connectionInfo.transportId }),
   ]);
 
   return connectionInfo;
@@ -43,7 +46,7 @@ interface ConnectRecvTransportEvent {
 }
 
 export async function onConnectRecvTransport(
-  event: ConnectRecvTransportEvent
+  event: ConnectRecvTransportEvent,
 ): Promise<Routes["/connect/create"]["out"]> {
   return postToServer("/connect/create", event.data);
 }
@@ -53,12 +56,6 @@ interface OnRecvTransportCloseEvent {
   transportId: string;
 }
 
-export async function onRecvTransportClose(
-  event: OnRecvTransportCloseEvent
-): Promise<void> {
-  await closeRecvTransport({ ...event, skipConnectionPatch: false });
-}
-
 interface CloseRecvTransportParams {
   connectionId: string;
   transportId: string | null;
@@ -66,7 +63,7 @@ interface CloseRecvTransportParams {
 }
 
 export async function closeRecvTransport(
-  params: CloseRecvTransportParams
+  params: CloseRecvTransportParams,
 ): Promise<void> {
   if (params.transportId == null) {
     return;
@@ -81,7 +78,7 @@ export async function closeRecvTransport(
       transportId: params.transportId,
       delay: 30000,
     }),
-    deleteRecvTransport({ transportId: params.transportId }),
+    deleteRecvTransport({ _id: params.transportId }),
     // No need to destroy mediasoup consumer as it will be done automatically when closing transport
     closeConsumer({
       transportId: params.transportId,
@@ -91,13 +88,19 @@ export async function closeRecvTransport(
     params.skipConnectionPatch
       ? Promise.resolve(null)
       : patchConnection({
-          connectionId: params.connectionId,
+          _id: params.connectionId,
           recvTransportId: null,
         }),
   ]);
 
   getAllSettledValues<void | null | Connection>(
     results,
-    "closeRecvTransportClose: Unexpected error"
+    "closeRecvTransportClose: Unexpected error",
   );
+}
+
+export async function onRecvTransportClose(
+  event: OnRecvTransportCloseEvent,
+): Promise<void> {
+  await closeRecvTransport({ ...event, skipConnectionPatch: false });
 }

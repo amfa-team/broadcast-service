@@ -1,68 +1,72 @@
-import {
-  CreateConnection,
+import type {
   Connection,
   ConnectionKey,
+  CreateConnection,
   PatchConnection,
-} from "../types/connection";
-import { connectionModel } from "../schema";
-import { PicnicError } from "../../io/exceptions";
+} from "@amfa-team/broadcast-service-types";
+import PicnicError from "../../io/exceptions/PicnicError";
+import { getModels } from "../../services/mongo/client";
 
 export async function createConnection(
-  data: CreateConnection
+  data: CreateConnection,
 ): Promise<Connection> {
-  const connection = new connectionModel(data);
+  const { ConnectionModel } = await getModels();
+  const connection = new ConnectionModel(data);
   await connection.save();
   return connection.toJSON() as Connection;
 }
 
-export async function deleteConnection({
-  connectionId,
-}: ConnectionKey): Promise<void> {
-  await connectionModel.delete({ connectionId });
+export async function deleteConnection({ _id }: ConnectionKey): Promise<void> {
+  const { ConnectionModel } = await getModels();
+  await ConnectionModel.deleteOne({ _id });
 }
 
 export async function getConnection({
-  connectionId,
+  _id,
 }: ConnectionKey): Promise<Connection | null> {
-  const doc = await connectionModel.get({ connectionId });
+  const { ConnectionModel } = await getModels();
+  const doc = await ConnectionModel.findById(_id);
   return (doc?.toJSON() ?? null) as Connection | null;
 }
 
 export async function getConnectionsByToken({
   token,
 }: Pick<Connection, "token">): Promise<Connection[]> {
-  // TODO: Add index to use query instead
-  // TODO: fix typing
-  const results: unknown = await connectionModel
-    .scan({ token: { eq: token } })
-    .exec();
+  const { ConnectionModel } = await getModels();
+  const results = await ConnectionModel.find({
+    token,
+  });
   return results as Connection[];
 }
 
 export async function getAllConnections(): Promise<Connection[]> {
-  const results: unknown = await connectionModel.scan().exec();
+  const { ConnectionModel } = await getModels();
+  const results: unknown = await ConnectionModel.find();
   return results as Connection[];
 }
 
 export async function patchConnection(
-  params: PatchConnection
+  params: PatchConnection,
 ): Promise<Connection> {
-  const { connectionId, ...rest } = params;
+  const { _id, ...rest } = params;
   try {
-    const doc = await connectionModel.update({ connectionId }, rest);
-    return doc.toJSON() as Connection;
+    const { ConnectionModel } = await getModels();
+    await ConnectionModel.updateOne({ _id }, rest);
+    const doc = await ConnectionModel.findById(_id);
+    return (doc?.toJSON() ?? null) as Connection;
   } catch (e) {
     throw new PicnicError("patchConnection: fail", e);
   }
 }
 
 export async function findConnectionByRecvTransportId(
-  recvTransportId: string
+  recvTransportId: string,
 ): Promise<Connection[]> {
   try {
-    const results: unknown = await connectionModel
-      .scan({ recvTransportId: { eq: recvTransportId } })
-      .exec();
+    const { ConnectionModel } = await getModels();
+    const results: unknown = await ConnectionModel.find({
+      recvTransportId,
+    });
     return results as Connection[];
   } catch (e) {
     throw new PicnicError("findConnectionByRecvTransportId: failed", e);

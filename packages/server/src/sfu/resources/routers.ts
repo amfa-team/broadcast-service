@@ -1,4 +1,4 @@
-import { types } from "mediasoup";
+import type { types } from "mediasoup";
 
 // https://mediasoup.org/documentation/v3/mediasoup/api/#RouterOptions
 const MEDIA_CODECS: types.RtpCodecCapability[] = [
@@ -57,7 +57,7 @@ const routers: Map<string, types.Router> = new Map();
 const routersMeta: WeakMap<types.Router, RouterMeta> = new WeakMap();
 
 export async function createRouter(
-  worker: types.Worker
+  worker: types.Worker,
 ): Promise<types.Router> {
   const router = await worker.createRouter({
     mediaCodecs: MEDIA_CODECS,
@@ -100,8 +100,8 @@ export function getRouterMeta(router: types.Router): RouterMeta {
 }
 
 export function getWorkerRouter(worker: types.Worker): types.Router {
-  const routers = getRouters();
-  for (const router of routers) {
+  const allRouters = getRouters();
+  for (const router of allRouters) {
     if (getRouterMeta(router).workerPid === worker.pid) {
       return router;
     }

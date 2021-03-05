@@ -1,16 +1,20 @@
-import type { Routes, StreamInfo, ProducerState } from "../../../types";
+import type {
+  ProducerState,
+  Routes,
+  StreamInfo,
+} from "@amfa-team/broadcast-service-types";
+import { JsonDecoder } from "ts.data.json";
 import { getConnection } from "../db/repositories/connectionRepository";
-import { postToServer } from "./serverService";
 import {
   createStream,
-  getStream,
   deleteStream,
   deleteStreamByTransportId,
+  getStream,
   patchStream,
 } from "../db/repositories/streamRepository";
 import { broadcastToConnections } from "../io/io";
-import { JsonDecoder } from "ts.data.json";
 import { getAllSettledValues } from "../io/promises";
+import { postToServer } from "./serverService";
 import { closeConsumerOf } from "./streamConsumerService";
 
 type CreateStreamEvent = {
@@ -25,22 +29,22 @@ export const decodeSendParams: JsonDecoder.Decoder<
     transportId: JsonDecoder.string,
     kind: JsonDecoder.oneOf(
       [JsonDecoder.isExactly("audio"), JsonDecoder.isExactly("video")],
-      "kind"
+      "kind",
     ),
     rtpParameters: JsonDecoder.succeed,
   },
-  "SendParams"
+  "SendParams",
 );
 
 export async function onCreateStream(
-  event: CreateStreamEvent
+  event: CreateStreamEvent,
 ): Promise<string> {
   const { connectionId, data } = event;
 
-  const connection = await getConnection({ connectionId });
+  const connection = await getConnection({ _id: connectionId });
   if (connection === null || connection.sendTransportId === null) {
     throw new Error(
-      "onCreateStream: connection or sendTransportId does not exists"
+      "onCreateStream: connection or sendTransportId does not exists",
     );
   }
 
@@ -53,7 +57,7 @@ export async function onCreateStream(
   // TODO: if exists?
   const stream = {
     transportId: connection.sendTransportId,
-    producerId: producerId,
+    producerId,
     kind: data.kind,
     score: 0,
     paused: false,
@@ -74,13 +78,13 @@ export async function onCreateStream(
           type: "stream:add",
           data: { ...stream, score, paused },
         },
-      })
+      }),
     ),
   ]);
 
   getAllSettledValues<StreamInfo | void>(
     results,
-    "onCreateStream: Unexpected error"
+    "onCreateStream: Unexpected error",
   );
 
   return producerId;
@@ -107,14 +111,14 @@ export const decodeOnChangeStreamStateData: JsonDecoder.Decoder<OnChangeStreamSt
         JsonDecoder.isExactly("pause"),
         JsonDecoder.isExactly("play"),
       ],
-      "state"
+      "state",
     ),
   },
-  "ChangeStreamStateEventData"
+  "ChangeStreamStateEventData",
 );
 
 export async function onChangeStreamState(
-  event: OnChangeStreamStateEvent
+  event: OnChangeStreamStateEvent,
 ): Promise<null> {
   const {
     data: { state, transportId, producerId },
@@ -134,7 +138,7 @@ export async function onChangeStreamState(
   }
   if (state === "close") {
     const results = await Promise.allSettled([
-      postToServer("/send/destroy", { transportId, producerId }),
+      postToServer("/send/destroy", { transportId, producerId, delay: 120000 }),
       deleteStream(transportId, producerId),
       broadcastToConnections(
         JSON.stringify({
@@ -143,7 +147,7 @@ export async function onChangeStreamState(
             type: "stream:remove",
             data: transportId,
           },
-        })
+        }),
       ),
     ]);
 
@@ -171,7 +175,7 @@ export async function closeStream(params: CloseStreamParams): Promise<void> {
           type: "stream:remove",
           data: params.transportId,
         },
-      })
+      }),
     ),
   ]);
 
@@ -185,7 +189,7 @@ interface ProducerStateChangeEvent {
 }
 
 export async function onProducerStateChange(
-  event: ProducerStateChangeEvent
+  event: ProducerStateChangeEvent,
 ): Promise<boolean> {
   const {
     transportId,
@@ -212,13 +216,13 @@ export async function onProducerStateChange(
             paused,
           },
         },
-      })
+      }),
     ),
   ]);
 
   getAllSettledValues<void | StreamInfo>(
     results,
-    "onProducerStateChange: Unexpected error"
+    "onProducerStateChange: Unexpected error",
   );
 
   return true;

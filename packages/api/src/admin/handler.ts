@@ -1,62 +1,47 @@
+// eslint-disable-next-line import/no-unassigned-import
 import "source-map-support/register";
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from "aws-lambda";
 import { JsonDecoder } from "ts.data.json";
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import {
-  createParticipant,
-  getAllParticipants,
-} from "../db/repositories/participantRepository";
+import { createServerDecoder } from "../../../types/src/db/server";
+import { getAllConnections } from "../db/repositories/connectionRepository";
+import { getAllRecvTransport } from "../db/repositories/recvTransportRepository";
+import { getAllSendTransport } from "../db/repositories/sendTransportRepository";
 import {
   createServer,
   getAllServers,
   getServer,
 } from "../db/repositories/serverRepository";
-import { createParticipantDecoder } from "../db/types/participant";
-import { createServerDecoder } from "../db/types/server";
-import {
-  handleSuccessResponse,
-  handleHttpErrorResponse,
-  parseHttpAdminRequest,
-  broadcastToConnections,
-} from "../io/io";
-import { getAllConnections } from "../db/repositories/connectionRepository";
-import { getAllSendTransport } from "../db/repositories/sendTransportRepository";
-import { getAllRecvTransport } from "../db/repositories/recvTransportRepository";
-import { getAllStreams } from "../db/repositories/streamRepository";
 import { getAllStreamConsumers } from "../db/repositories/streamConsumerRepository";
+import { getAllStreams } from "../db/repositories/streamRepository";
+import {
+  broadcastToConnections,
+  handleHttpErrorResponse,
+  handleSuccessResponse,
+  init,
+  parseHttpAdminRequest,
+} from "../io/io";
 import { requestServer } from "../sfu/serverService";
 
-export async function registerParticipant(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
-  try {
-    const { data } = await parseHttpAdminRequest(
-      event,
-      createParticipantDecoder
-    );
-    const participant = await createParticipant(data);
-
-    return handleSuccessResponse(participant);
-  } catch (e) {
-    return handleHttpErrorResponse(e);
-  }
-}
-
 export async function topology(
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   try {
+    await init(context);
     await parseHttpAdminRequest(event, JsonDecoder.isNull(null));
     const [
-      participants,
       servers,
       connections,
       sendTransports,
       recvTransports,
       streams,
       streamConsumers,
-      topology,
+      serverTopology,
     ] = await Promise.all([
-      getAllParticipants(),
       getAllServers(),
       getAllConnections(),
       getAllSendTransport(),
@@ -68,7 +53,6 @@ export async function topology(
 
     return handleSuccessResponse({
       db: {
-        participants,
         servers,
         connections,
         sendTransports,
@@ -76,7 +60,7 @@ export async function topology(
         streams,
         streamConsumers,
       },
-      server: topology,
+      server: serverTopology,
     });
   } catch (e) {
     return handleHttpErrorResponse(e);
@@ -84,10 +68,12 @@ export async function topology(
 }
 
 export async function registerServer(
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> {
   try {
     // TODO: check resources sync
+    await init(context);
     const { data } = await parseHttpAdminRequest(event, createServerDecoder);
     const [existingServer, server] = await Promise.all([
       getServer(data),
@@ -104,7 +90,7 @@ export async function registerServer(
           payload: {
             fn: "reload",
           },
-        })
+        }),
       );
     }
 

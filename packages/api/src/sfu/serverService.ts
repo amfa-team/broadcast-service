@@ -1,7 +1,7 @@
-import fetch, { RequestInit } from "node-fetch";
+import type { Routes, Server } from "@amfa-team/broadcast-service-types";
+import type { RequestInit } from "node-fetch";
+import fetch from "node-fetch";
 import { getAllServers } from "../db/repositories/serverRepository";
-import { Server } from "../db/types/server";
-import type { Routes } from "../../../types";
 
 async function getDestServer(): Promise<Server> {
   const servers = await getAllServers();
@@ -14,11 +14,11 @@ async function getDestServer(): Promise<Server> {
 
 export async function requestServer<P extends keyof Routes>(
   path: string,
-  options: RequestInit | null = null
+  options: RequestInit | null = null,
 ): Promise<Routes[P]["out"]> {
   const server = await getDestServer();
 
-  const res = await fetch("http://" + server.ip + ":" + server.port + path, {
+  const res = await fetch(`http://${server.ip}:${server.port}${path}`, {
     ...options,
     headers: {
       ...(options?.headers ?? null),
@@ -29,7 +29,7 @@ export async function requestServer<P extends keyof Routes>(
   if (!res.ok) {
     const err = await res
       .json()
-      .then((body) => body.error)
+      .then((body) => body.error as string)
       .catch(() => "Unknown SFU error");
     throw new Error(`requestSFU: fail with ${err}`);
   }
@@ -39,12 +39,12 @@ export async function requestServer<P extends keyof Routes>(
     throw new Error(`requestSFU: fail with ${body.error}`);
   }
 
-  return body.payload;
+  return body.payload as Routes[P]["out"];
 }
 
 export async function postToServer<P extends keyof Routes>(
   path: P,
-  data: Routes[P]["in"]
+  data: Routes[P]["in"],
 ): Promise<Routes[P]["out"]> {
   const options: RequestInit = {
     method: "POST",
