@@ -38,7 +38,7 @@ function BroadcastFeature(): ReactElement {
   );
 
   return (
-    <div style={{ height: "calc(100% - 250px)" }}>
+    <div style={{ height: "calc(100% - 110px)" }}>
       <h3>Broadcast Feature</h3>
       <SpacePage
         slug={spaceId}

@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@amfa-team/broadcast-service";
-import { ModalRoot } from "@amfa-team/theme-service";
+import { ModalRoot, SbsThemeProvider } from "@amfa-team/theme-service";
 import {
   StylesProvider,
   createGenerateClassName,
@@ -37,12 +37,14 @@ ReactDOM.render(
     <ErrorBoundary>
       <Router>
         <RecoilRoot>
-          <StylesProvider generateClassName={generateClassName}>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ModalRoot />
-              <App />
-            </Suspense>
-          </StylesProvider>
+          <SbsThemeProvider>
+            <StylesProvider generateClassName={generateClassName}>
+              <Suspense fallback={<div>Loading...</div>}>
+                <ModalRoot />
+                <App />
+              </Suspense>
+            </StylesProvider>
+          </SbsThemeProvider>
         </RecoilRoot>
       </Router>
     </ErrorBoundary>

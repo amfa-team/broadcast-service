@@ -16,7 +16,7 @@ module.exports = merge(common, {
   },
   devServer: {
     writeToDisk: true,
-    hot: true,
+    hot: false,
     liveReload: false,
     contentBase: commonPaths.outputPath,
     publicPath: commonPaths.outputPath,

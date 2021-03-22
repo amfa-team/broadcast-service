@@ -3,7 +3,9 @@ import type {
   ConsumerState,
   ReceiveParams,
 } from "@amfa-team/broadcast-service-types";
+import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
+import debounce from "lodash.debounce";
 import type { types } from "mediasoup-client";
 import type { PicnicDevice } from "../device/device";
 import type { ServerEvents } from "../events/event";
@@ -89,66 +91,121 @@ export type RecvStreamEvents = {
       kind: "audio" | "video";
     }
   >;
+  ready: PicnicEvent<"ready", null>;
   "stream:pause": PicnicEvent<"stream:pause", { kind: "audio" | "video" }>;
   "stream:resume": PicnicEvent<"stream:resume", { kind: "audio" | "video" }>;
 };
 
-export class RecvStream extends EventTarget<RecvStreamEvents, "strict"> {
-  #ws: PicnicWebSocket;
+export interface IRecvStream extends EventTarget<RecvStreamEvents, "strict"> {
+  getCreatedAt(): number;
 
-  #stream: MediaStream = new MediaStream();
+  getId(): string;
 
-  #transport: PicnicTransport;
+  attachAudioEffect(el: HTMLAudioElement | null): () => void;
 
-  #device: PicnicDevice;
+  attachVideoEffect(el: HTMLVideoElement | null): () => void;
 
-  #audioConsumer: types.Consumer | null = null;
+  isAudioPaused(): boolean;
 
-  #videoConsumer: types.Consumer | null = null;
+  isAudioEnabled(): boolean;
 
-  #audioState: ConsumerState = {
+  isVideoEnabled(): boolean;
+
+  isReady(): boolean;
+
+  isReconnecting(): boolean;
+
+  toggleAudio(): Promise<void>;
+
+  toggleVideo(): Promise<void>;
+}
+
+export class RecvStream
+  extends EventTarget<RecvStreamEvents, "strict">
+  implements IRecvStream {
+  _ws: PicnicWebSocket;
+
+  _audioPaused: boolean = true;
+
+  _videoPaused: boolean = true;
+
+  _videoStream: MediaStream = new MediaStream();
+
+  _audioStream: MediaStream = new MediaStream();
+
+  _transport: PicnicTransport;
+
+  _device: PicnicDevice;
+
+  _audioConsumer: types.Consumer | null = null;
+
+  _videoConsumer: types.Consumer | null = null;
+
+  _audioState: ConsumerState = {
     score: 0,
     producerScore: 0,
     paused: false,
     producerPaused: false,
   };
 
-  #videoState: ConsumerState = {
+  _videoState: ConsumerState = {
     score: 0,
     producerScore: 0,
     paused: false,
     producerPaused: false,
   };
 
-  #sourceTransportId: string;
+  isReconnecting() {
+    if (!this.isAudioPaused()) {
+      if (
+        this._audioState.score === 0 ||
+        this._audioState.producerScore === 0
+      ) {
+        return true;
+      }
+    }
+
+    if (!this.isVideoPaused()) {
+      if (
+        this._videoState.score === 0 ||
+        this._videoState.producerScore === 0
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  _sourceTransportId: string;
 
   // Used to order streams by reception order to prevent flickering
-  #createdAt: number;
+  _createdAt: number;
 
   constructor(options: RecvStreamOptions) {
     super();
 
-    this.#ws = options.ws;
-    this.#transport = options.transport;
-    this.#device = options.device;
-    this.#sourceTransportId = options.sourceTransportId;
-    this.#ws.addEventListener("streamConsumer:state", this.#onQualityChange);
-    this.#createdAt = Date.now();
+    this._ws = options.ws;
+    this._transport = options.transport;
+    this._device = options.device;
+    this._sourceTransportId = options.sourceTransportId;
+    this._ws.addEventListener("streamConsumer:state", this._onQualityChange);
+    this._createdAt = Date.now();
   }
 
   async destroy(): Promise<void> {
     // TODO: notify API?
     // Not needed from stream:delete event because sourceTransport closed ==> consumer closed server-side
-    this.#audioConsumer?.close();
-    this.#videoConsumer?.close();
-    this.#ws.removeEventListener("streamConsumer:state", this.#onQualityChange);
+    this._audioConsumer?.close();
+    this._videoConsumer?.close();
+    this._ws.removeEventListener("streamConsumer:state", this._onQualityChange);
   }
 
   getCreatedAt(): number {
-    return this.#createdAt;
+    return this._createdAt;
   }
 
-  #onQualityChange = (event: ServerEvents["streamConsumer:state"]): void => {
+  _onQualityChange = (event: ServerEvents["streamConsumer:state"]): void => {
     const {
       score,
       consumerId,
@@ -159,97 +216,146 @@ export class RecvStream extends EventTarget<RecvStreamEvents, "strict"> {
 
     const state = { score, producerScore, paused, producerPaused };
 
-    if (this.#audioConsumer?.id === consumerId) {
-      this.#audioState = state;
+    if (this._audioConsumer?.id === consumerId) {
+      this._audioState = state;
       const evt = new PicnicEvent("state", { state, kind: audioKind });
       this.dispatchEvent(evt);
     }
-    if (this.#videoConsumer?.id === consumerId) {
-      this.#videoState = state;
+    if (this._videoConsumer?.id === consumerId) {
+      this._videoState = state;
       const evt = new PicnicEvent("state", { state, kind: videoKind });
       this.dispatchEvent(evt);
     }
   };
 
   getId(): string {
-    return this.#sourceTransportId;
+    return this._sourceTransportId;
   }
 
   async load(producerId: string): Promise<void> {
-    if (this.#videoConsumer?.producerId === producerId) {
+    if (this._videoConsumer?.producerId === producerId) {
       return;
     }
-    if (this.#audioConsumer?.producerId === producerId) {
+    if (this._audioConsumer?.producerId === producerId) {
       return;
     }
 
     const { consumer, state } = await createConsumer(
-      this.#ws,
-      this.#transport,
-      this.#device,
-      this.#sourceTransportId,
+      this._ws,
+      this._transport,
+      this._device,
+      this._sourceTransportId,
       producerId,
     );
 
     if (consumer.kind === "audio") {
       // TODO: If already exists (multiple audio per host)
-      this.#audioConsumer = consumer;
-      this.#audioState = state;
+      this._audioConsumer = consumer;
+      this._audioState = state;
+      this._audioStream.addTrack(consumer.track);
     } else {
       // TODO: If already exists (multiple video per host)
-      this.#videoConsumer = consumer;
-      this.#videoState = state;
+      this._videoConsumer = consumer;
+      this._videoState = state;
+      this._videoStream.addTrack(consumer.track);
     }
 
-    this.#stream.addTrack(consumer.track);
+    if (this.isReady()) {
+      this.dispatchEvent(new PicnicEvent("ready", null));
+      await this.resume();
+    }
   }
 
   isReady(): boolean {
-    return this.#videoConsumer !== null && this.#audioConsumer !== null;
-  }
-
-  async pauseAudio(): Promise<void> {
-    if (this.#audioConsumer !== null) {
-      await pauseConsumer(this.#ws, this.#transport, this.#audioConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: audioKind }));
-    }
-  }
-
-  async resumeAudio(): Promise<void> {
-    if (this.#audioConsumer !== null) {
-      await resumeConsumer(this.#ws, this.#transport, this.#audioConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: audioKind }));
-    }
-  }
-
-  isAudioPaused(): boolean {
-    return this.#audioConsumer?.paused ?? true;
+    return this._videoConsumer !== null && this._audioConsumer !== null;
   }
 
   getAudioState(): ConsumerState {
-    return this.#audioState;
+    return this._audioState;
   }
 
-  async pauseVideo(): Promise<void> {
-    if (this.#videoConsumer !== null) {
-      await pauseConsumer(this.#ws, this.#transport, this.#videoConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: videoKind }));
-    }
+  isAudioEnabled(): boolean {
+    return !this._audioState.producerPaused;
   }
 
-  async resumeVideo(): Promise<void> {
-    if (this.#videoConsumer !== null) {
-      await resumeConsumer(this.#ws, this.#transport, this.#videoConsumer);
-      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: videoKind }));
-    }
+  isAudioPaused(): boolean {
+    return this._audioPaused;
   }
 
-  isVideoPaused(): boolean {
-    return this.#videoConsumer?.paused ?? true;
+  pauseAudio = debounce(
+    async (): Promise<void> => {
+      if (this._audioConsumer !== null) {
+        await pauseConsumer(this._ws, this._transport, this._audioConsumer);
+        this._audioPaused = true;
+        this.dispatchEvent(
+          new PicnicEvent("stream:pause", { kind: audioKind }),
+        );
+      }
+    },
+    300,
+    { leading: true },
+  );
+
+  resumeAudio = debounce(
+    async (): Promise<void> => {
+      if (this._audioConsumer !== null) {
+        await resumeConsumer(this._ws, this._transport, this._audioConsumer);
+        this._audioPaused = false;
+        this.dispatchEvent(
+          new PicnicEvent("stream:resume", { kind: audioKind }),
+        );
+      }
+    },
+    300,
+    { leading: true },
+  );
+
+  async toggleAudio(): Promise<void> {
+    return this.isAudioPaused() ? this.resumeAudio() : this.pauseAudio();
   }
 
   getVideoState(): ConsumerState {
-    return this.#videoState;
+    return this._videoState;
+  }
+
+  isVideoPaused(): boolean {
+    return this._videoPaused;
+  }
+
+  isVideoEnabled(): boolean {
+    return !this._videoState.producerPaused;
+  }
+
+  pauseVideo = debounce(
+    async (): Promise<void> => {
+      if (this._videoConsumer !== null) {
+        await pauseConsumer(this._ws, this._transport, this._videoConsumer);
+        this._videoPaused = true;
+        this.dispatchEvent(
+          new PicnicEvent("stream:pause", { kind: videoKind }),
+        );
+      }
+    },
+    300,
+    { leading: true },
+  );
+
+  resumeVideo = debounce(
+    async (): Promise<void> => {
+      if (this._videoConsumer !== null) {
+        await resumeConsumer(this._ws, this._transport, this._videoConsumer);
+        this._videoPaused = false;
+        this.dispatchEvent(
+          new PicnicEvent("stream:resume", { kind: videoKind }),
+        );
+      }
+    },
+    300,
+    { leading: true },
+  );
+
+  async toggleVideo(): Promise<void> {
+    return this.isVideoPaused() ? this.resumeVideo() : this.pauseVideo();
   }
 
   async resume(): Promise<void> {
@@ -260,8 +366,78 @@ export class RecvStream extends EventTarget<RecvStreamEvents, "strict"> {
     await Promise.all([this.pauseAudio(), this.pauseVideo()]);
   }
 
-  getMediaStream(): MediaStream {
+  getVideoStream(): MediaStream {
     // TODO: if not load?
-    return this.#stream;
+    return this._videoStream;
   }
+
+  getAudioStream(): MediaStream {
+    // TODO: if not load?
+    return this._audioStream;
+  }
+
+  attachAudioEffect = (el: HTMLAudioElement | null) => {
+    if (el === null) {
+      return () => {
+        // no-op
+      };
+    }
+
+    const autoPlay = () => {
+      document.removeEventListener("click", autoPlay);
+
+      el.play().catch((e) => {
+        if (e.name === "NotAllowedError") {
+          document.addEventListener("click", autoPlay, false);
+        } else {
+          captureException(e);
+        }
+      });
+    };
+
+    // eslint-disable-next-line no-param-reassign
+    el.onloadedmetadata = autoPlay;
+    // eslint-disable-next-line no-param-reassign
+    el.srcObject = this._audioStream;
+
+    return () => {
+      document.removeEventListener("click", autoPlay);
+      // eslint-disable-next-line no-param-reassign
+      el.srcObject = null;
+    };
+  };
+
+  attachVideoEffect = (el: HTMLVideoElement | null) => {
+    if (el === null) {
+      return () => {
+        // no-op
+      };
+    }
+
+    const autoPlay = () => {
+      document.removeEventListener("click", autoPlay);
+
+      el.play().catch((e) => {
+        if (e.name === "NotAllowedError") {
+          document.addEventListener("click", autoPlay, false);
+        } else {
+          captureException(e);
+        }
+      });
+    };
+
+    // eslint-disable-next-line no-param-reassign
+    el.onloadedmetadata = autoPlay;
+    // eslint-disable-next-line no-param-reassign
+    el.srcObject = this._videoStream;
+    // eslint-disable-next-line no-param-reassign
+    el.muted = true;
+    autoPlay();
+
+    return () => {
+      document.removeEventListener("click", autoPlay);
+      // eslint-disable-next-line no-param-reassign
+      el.srcObject = null;
+    };
+  };
 }

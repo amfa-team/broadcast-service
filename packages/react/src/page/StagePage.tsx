@@ -2,7 +2,7 @@ import type { Dictionary } from "@amfa-team/broadcast-service-types";
 import { Button, DotLoader } from "@amfa-team/theme-service";
 import { useConnect, useToken } from "@amfa-team/user-service";
 import React from "react";
-import { StageContainer } from "../components/Stage";
+import { Stage } from "../components/Stage";
 import { useSDK } from "../hooks/useSDK";
 import type { Settings } from "../types";
 import styles from "./stagePage.module.css";
@@ -46,7 +46,7 @@ export function StagePage(props: StagePageProps) {
     );
   }
 
-  return <StageContainer sdk={state.sdk} broadcastEnabled={broadcastEnabled} />;
+  return <Stage sdk={state.sdk} canBroadcast={broadcastEnabled} />;
 }
 
 StagePage.defaultProps = {
