@@ -34,10 +34,10 @@
     lodash.isequal "^4.5.0"
     whatwg-fetch "^3.5.0"
 
-"@amfa-team/theme-service@^1.5.0-beta.6":
-  version "1.5.0-beta.8"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.8/1b339684574717d65bb51af11af563dc0c94f05059794afad1c5792deed0a603#6e53b37415d433e8a3ec630b636862ab219f7b03"
-  integrity sha512-r9EAw2mehdYD1NCyB4PBGvg0jtaXUY+VVARecVhGuOM1rLV3cOUFGaaN1o8qdROV9fMd6+aBu91TtuzktMQQ1A==
+"@amfa-team/theme-service@^1.5.0-beta.9":
+  version "1.5.0-beta.9"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.9/8fead71bad6944e6204c593cfa6d2c1743c92a39b6e601e10da94616710bd91f#f0aae3e4c7a49554c3e7def1e94bd7c0e6b17e6a"
+  integrity sha512-JyUa4n66+ucEyWwevyKAIkHbNTBc3ecRnNxGWHt/YIJq6F23HDH8M+zGGO3SGk5WbwTziFu8y/laSfaKYYwZSA==
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@chakra-ui/react" "^1.3.4"
