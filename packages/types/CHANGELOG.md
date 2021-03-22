@@ -1,3 +1,11 @@
+# @amfa-team/broadcast-service-types [1.1.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.0.0...@amfa-team/broadcast-service-types@1.1.0-beta.1) (2021-03-22)
+
+
+### Features
+
+* add basic broadcast layout ([7d4c0f2](https://github.com/amfa-team/broadcast-service/commit/7d4c0f2b556c45dab4e6ce45d14ced4f4dec46f9))
+* upgrade dependencies ([615388c](https://github.com/amfa-team/broadcast-service/commit/615388ce05bbb72ae4fe1b1275e8789feddfb81c))
+
 # @amfa-team/broadcast-service-types 1.0.0 (2021-03-05)
 
 
