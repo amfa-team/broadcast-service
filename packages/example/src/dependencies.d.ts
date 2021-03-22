@@ -4,3 +4,7 @@ declare module "*.module.css" {
 }
 
 declare module "*.css" {}
+
+declare module "react-graph-vis" {
+  export default any;
+}

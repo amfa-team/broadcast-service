@@ -1,5 +1,5 @@
 import type { types } from "mediasoup";
-import { getPublicIP } from "../../cluster/register";
+import { getPublicIP } from "../../cluster/publicIP";
 
 type TransportMeta = {
   routerId: string;

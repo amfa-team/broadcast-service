@@ -10,7 +10,7 @@ type ConsumerMeta = {
 const consumers: Map<string, types.Consumer> = new Map();
 const consumersMeta: WeakMap<types.Consumer, ConsumerMeta> = new Map();
 
-const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
+const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 4000 : 20000;
 
 export function getConsumerState(consumer: types.Consumer): ConsumerState {
   return {
@@ -53,7 +53,9 @@ export async function createConsumer(
       console.error("Consumer.onStateChange: fail", e);
     });
   };
-  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT);
+  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT, {
+    maxWait: DEBOUNCE_WAIT * 5,
+  });
 
   consumer.on("score", onScoreChange);
   consumer.on("producerpause", onStateChange);

@@ -1,12 +1,13 @@
 import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
+import debounce from "lodash.debounce";
 import type { types } from "mediasoup-client";
 import PicnicError from "../../exceptions/PicnicError";
 import { PicnicEvent } from "../events/event";
 import type { PicnicTransport } from "../transport/transport";
 import type { PicnicWebSocket } from "../websocket/websocket";
 
-// https://github.com/microsoft/TypeScript/issues/33232#issuecomment-633343054
+// https://github.com/microsoft/TypeScript/issues/33232_issuecomment-633343054
 declare global {
   interface MediaDevices {
     getDisplayMedia(constraints?: MediaStreamConstraints): Promise<MediaStream>;
@@ -145,191 +146,297 @@ export type SendStreamEvents = {
   "stream:resume": PicnicEvent<"stream:resume", { kind: "audio" | "video" }>;
   "media:change": PicnicEvent<"media:change", null>;
   start: PicnicEvent<"start", null>;
-  stop: PicnicEvent<"stop", null>;
+  destroy: PicnicEvent<"destroy", null>;
 };
 
-export default class SendStream extends EventTarget<
-  SendStreamEvents,
-  "strict"
-> {
-  #transport: PicnicTransport;
+export interface ISendStream extends EventTarget<SendStreamEvents, "strict"> {
+  getId(): string;
+  attachVideoEffect(el: HTMLVideoElement | null): () => void;
+  isAudioPaused(): boolean;
+  isVideoPaused(): boolean;
+  isScreenShareEnabled(): boolean;
+  isReady(): boolean;
+  destroy(): Promise<void>;
+  isReconnecting(): boolean;
+  toggleAudio(): Promise<void>;
+  toggleVideo(): Promise<void>;
+  toggleScreenShare(): Promise<void>;
+}
 
-  #ws: PicnicWebSocket;
+export default class SendStream
+  extends EventTarget<SendStreamEvents, "strict">
+  implements ISendStream {
+  _transport: PicnicTransport;
 
-  #active = false;
+  _ws: PicnicWebSocket;
 
-  #userMedia: MediaStream | null = null;
+  _ready = false;
 
-  #isScreenSharing = false;
+  _userMedia: MediaStream | null = null;
 
-  #videoProducer: types.Producer | null = null;
+  _isScreenSharing = false;
 
-  #audioProducer: types.Producer | null = null;
+  _videoProducer: types.Producer | null = null;
+
+  _audioProducer: types.Producer | null = null;
+
+  _el: HTMLVideoElement | null = null;
 
   constructor(transport: PicnicTransport, ws: PicnicWebSocket) {
     super();
-    this.#transport = transport;
-    this.#ws = ws;
+    this._transport = transport;
+    this._ws = ws;
   }
 
   getId(): string {
-    return this.#transport.getId();
+    return this._transport.getId();
   }
 
-  #destroyAudioProducer = async (): Promise<void> => {
-    if (this.#audioProducer !== null) {
-      await this.#ws
-        .send("/sfu/send/state", {
-          producerId: this.#audioProducer.id,
-          transportId: this.#transport.getId(),
-          state: "close",
-        })
-        .catch(captureException);
-      this.#audioProducer.close();
+  _autoPlayVideo = () => {
+    document.removeEventListener("click", this._autoPlayVideo);
+
+    if (!this.isVideoPaused()) {
+      this._el?.play().catch((e) => {
+        if (e.name === "NotAllowedError") {
+          document.addEventListener("click", this._autoPlayVideo, false);
+        } else {
+          captureException(e);
+        }
+      });
+    } else {
+      this._el?.pause();
     }
   };
 
-  #destroyVideoProducer = async (): Promise<void> => {
-    if (this.#videoProducer !== null) {
-      await this.#ws
+  attachVideoEffect = (el: HTMLVideoElement | null) => {
+    if (el === null) {
+      return () => {
+        // no-op
+      };
+    }
+
+    this._el = el;
+    this._el.srcObject = this._userMedia;
+    this._el.onloadedmetadata = this._autoPlayVideo;
+    this._el.muted = true;
+
+    return () => {
+      // eslint-disable-next-line no-param-reassign
+      el.srcObject = null;
+      this._el = null;
+
+      document.removeEventListener("click", this._autoPlayVideo);
+    };
+  };
+
+  _destroyAudioProducer = async (): Promise<void> => {
+    if (this._audioProducer !== null) {
+      await this._ws
         .send("/sfu/send/state", {
-          producerId: this.#videoProducer.id,
-          transportId: this.#transport.getId(),
+          producerId: this._audioProducer.id,
+          transportId: this._transport.getId(),
           state: "close",
         })
         .catch(captureException);
-      this.#videoProducer.close();
+      this._audioProducer.close();
+    }
+  };
+
+  _destroyVideoProducer = async (): Promise<void> => {
+    if (this._videoProducer !== null) {
+      await this._ws
+        .send("/sfu/send/state", {
+          producerId: this._videoProducer.id,
+          transportId: this._transport.getId(),
+          state: "close",
+        })
+        .catch(captureException);
+      this._videoProducer.close();
     }
   };
 
   async destroy(): Promise<void> {
-    this.#active = false;
+    this._ready = false;
 
     await Promise.all([
-      this.#destroyAudioProducer(),
-      this.#destroyVideoProducer(),
+      this._destroyAudioProducer(),
+      this._destroyVideoProducer(),
     ]);
 
-    if (this.#userMedia) {
-      this.#userMedia.getTracks().forEach((track) => {
+    if (this._userMedia) {
+      this._userMedia.getTracks().forEach((track) => {
         track.stop();
       });
-      this.#userMedia = null;
+      this._userMedia = null;
     }
 
-    this.dispatchEvent(new PicnicEvent("stop", null));
+    this.dispatchEvent(new PicnicEvent("destroy", null));
   }
 
-  isActive(): boolean {
-    return this.#active;
+  isReady(): boolean {
+    return this._ready;
+  }
+
+  isReconnecting(): boolean {
+    // TODO !!
+    return !this._ready;
   }
 
   async load(): Promise<void> {
-    this.#userMedia = await navigator.mediaDevices.getUserMedia(
+    this._userMedia = await navigator.mediaDevices.getUserMedia(
       videoConstraints,
     );
-    [this.#videoProducer, this.#audioProducer] = await Promise.all([
-      createVideoProducer(this.#userMedia, this.#transport),
-      createAudioProducer(this.#userMedia, this.#transport),
+    [this._videoProducer, this._audioProducer] = await Promise.all([
+      createVideoProducer(this._userMedia, this._transport),
+      createAudioProducer(this._userMedia, this._transport),
     ]);
+    this._ready = true;
+    if (this._el !== null) {
+      this._el.srcObject = this._userMedia;
+    }
     this.dispatchEvent(new PicnicEvent("start", null));
-    this.#active = true;
   }
 
-  async screenShare(): Promise<void> {
-    this.#userMedia = await navigator.mediaDevices.getDisplayMedia(
-      screenConstraints,
-    );
-    const videoTracks = this.#userMedia.getVideoTracks();
-    const audioTracks = this.#userMedia.getAudioTracks();
+  screenShare = debounce(
+    async (): Promise<void> => {
+      this._userMedia = await navigator.mediaDevices.getDisplayMedia(
+        screenConstraints,
+      );
+      const videoTracks = this._userMedia.getVideoTracks();
+      const audioTracks = this._userMedia.getAudioTracks();
 
-    if (videoTracks.length > 0) {
-      const videoTrack = videoTracks[0];
-      await this.#videoProducer?.replaceTrack({ track: videoTrack });
-      // await this.#videoProducer?.setMaxSpatialLayer(2);
-      videoTrack.addEventListener("ended", () => {
-        this.disableShare().catch((e) => {
-          console.error(e);
+      if (videoTracks.length > 0) {
+        const videoTrack = videoTracks[0];
+        await this._videoProducer?.replaceTrack({ track: videoTrack });
+        // await this._videoProducer?.setMaxSpatialLayer(2);
+        videoTrack.addEventListener("ended", () => {
+          // TODO: 2 differents video tracks
+          // @ts-ignore
+          this.disableShare().catch((e) => {
+            console.error(e);
+          });
         });
-      });
-    }
-    if (audioTracks.length > 0) {
-      await this.#audioProducer?.replaceTrack({ track: audioTracks[0] });
-    }
+      }
+      if (audioTracks.length > 0) {
+        await this._audioProducer?.replaceTrack({ track: audioTracks[0] });
+      }
 
-    this.#isScreenSharing = true;
-    this.dispatchEvent(new PicnicEvent("media:change", null));
-  }
+      this._isScreenSharing = true;
+      this.dispatchEvent(new PicnicEvent("media:change", null));
+      if (this._el !== null) {
+        this._el.srcObject = this._userMedia;
+      }
+    },
+    500,
+    { leading: true },
+  );
 
-  async disableShare(): Promise<void> {
-    this.#userMedia = await navigator.mediaDevices.getUserMedia(
-      videoConstraints,
-    );
+  disableShare = debounce(
+    async (): Promise<void> => {
+      this._userMedia = await navigator.mediaDevices.getUserMedia(
+        videoConstraints,
+      );
 
-    const videoTrack = this.#userMedia?.getVideoTracks()[0] ?? null;
-    const audioTrack = this.#userMedia?.getAudioTracks()[0] ?? null;
+      const videoTrack = this._userMedia?.getVideoTracks()[0] ?? null;
+      const audioTrack = this._userMedia?.getAudioTracks()[0] ?? null;
 
-    if (videoTrack !== null) {
-      await this.#videoProducer?.replaceTrack({ track: videoTrack });
-      // await this.#videoProducer?.setMaxSpatialLayer(1);
-    }
-    if (audioTrack !== null) {
-      await this.#audioProducer?.replaceTrack({ track: audioTrack });
-    }
+      if (videoTrack !== null) {
+        await this._videoProducer?.replaceTrack({ track: videoTrack });
+        // await this._videoProducer?.setMaxSpatialLayer(1);
+      }
+      if (audioTrack !== null) {
+        await this._audioProducer?.replaceTrack({ track: audioTrack });
+      }
 
-    this.#isScreenSharing = false;
-    this.dispatchEvent(new PicnicEvent("media:change", null));
-  }
+      this._isScreenSharing = false;
+      this.dispatchEvent(new PicnicEvent("media:change", null));
+      if (this._el !== null) {
+        this._el.srcObject = this._userMedia;
+      }
+    },
+    500,
+    { leading: true },
+  );
 
   isScreenShareEnabled(): boolean {
-    return this.#isScreenSharing;
+    return this._isScreenSharing;
   }
 
-  async pauseAudio(): Promise<void> {
-    if (this.#audioProducer !== null) {
-      await pauseProducer(this.#ws, this.#transport, this.#audioProducer);
-    }
-    const evt = new PicnicEvent("stream:pause", { kind: audioKind });
-    this.dispatchEvent(evt);
+  async toggleScreenShare(): Promise<void> {
+    return this.isScreenShareEnabled()
+      ? this.screenShare()
+      : this.disableShare();
   }
 
-  async resumeAudio(): Promise<void> {
-    if (this.#audioProducer !== null) {
-      await resumeProducer(this.#ws, this.#transport, this.#audioProducer);
-    }
-    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: audioKind }));
-  }
+  pauseAudio = debounce(
+    async (): Promise<void> => {
+      if (this._audioProducer !== null) {
+        await pauseProducer(this._ws, this._transport, this._audioProducer);
+      }
+      const evt = new PicnicEvent("stream:pause", { kind: audioKind });
+      this.dispatchEvent(evt);
+    },
+    500,
+    { leading: true },
+  );
+
+  resumeAudio = debounce(
+    async (): Promise<void> => {
+      if (this._audioProducer !== null) {
+        await resumeProducer(this._ws, this._transport, this._audioProducer);
+      }
+      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: audioKind }));
+    },
+    500,
+    { leading: true },
+  );
 
   isAudioPaused(): boolean {
-    return this.#audioProducer?.paused ?? true;
+    return this._audioProducer?.paused ?? true;
   }
 
-  async pauseVideo(): Promise<void> {
-    if (this.#videoProducer !== null) {
-      await pauseProducer(this.#ws, this.#transport, this.#videoProducer);
-    }
-    this.dispatchEvent(new PicnicEvent("stream:pause", { kind: videoKind }));
+  async toggleAudio(): Promise<void> {
+    return this.isAudioPaused() ? this.resumeAudio() : this.pauseAudio();
   }
 
-  async resumeVideo(): Promise<void> {
-    if (this.#videoProducer !== null) {
-      await resumeProducer(this.#ws, this.#transport, this.#videoProducer);
-    }
-    this.dispatchEvent(new PicnicEvent("stream:resume", { kind: videoKind }));
+  pauseVideo = debounce(
+    async (): Promise<void> => {
+      if (this._videoProducer !== null) {
+        await pauseProducer(this._ws, this._transport, this._videoProducer);
+      }
+      this.dispatchEvent(new PicnicEvent("stream:pause", { kind: videoKind }));
+    },
+    500,
+    { leading: true },
+  );
+
+  resumeVideo = debounce(
+    async (): Promise<void> => {
+      if (this._videoProducer !== null) {
+        await resumeProducer(this._ws, this._transport, this._videoProducer);
+      }
+      this.dispatchEvent(new PicnicEvent("stream:resume", { kind: videoKind }));
+    },
+    500,
+    { leading: true },
+  );
+
+  async toggleVideo(): Promise<void> {
+    return this.isVideoPaused() ? this.resumeVideo() : this.pauseVideo();
   }
 
   isVideoPaused(): boolean {
-    return this.#videoProducer?.paused ?? true;
+    return this._videoProducer?.paused ?? true;
   }
 
   getUserMediaStream(): MediaStream {
-    if (this.#userMedia === null) {
+    if (this._userMedia === null) {
       throw new PicnicError(
         "SendStream.getUserMediaStream: is not loaded",
         null,
       );
     }
 
-    return this.#userMedia;
+    return this._userMedia;
   }
 }

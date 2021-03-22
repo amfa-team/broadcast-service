@@ -3,7 +3,10 @@ import type {
   ConnectionInfo,
   Routes,
 } from "@amfa-team/broadcast-service-types";
-import { patchConnection } from "../db/repositories/connectionRepository";
+import {
+  findConnectionBySendTransportId,
+  patchConnection,
+} from "../db/repositories/connectionRepository";
 import {
   createSendTransport,
   deleteSendTransport,
@@ -93,6 +96,19 @@ export async function closeSendTransport(
   );
 }
 
+export async function cleanupSendTransport(transportId: string): Promise<void> {
+  const connection = await findConnectionBySendTransportId(transportId);
+
+  await Promise.all(
+    connection.map(async (c) =>
+      closeSendTransport({
+        connectionId: c._id,
+        transportId,
+        skipConnectionPatch: false,
+      }),
+    ),
+  );
+}
 interface OnSendTransportCloseEvent {
   connectionId: string;
   transportId: string;
