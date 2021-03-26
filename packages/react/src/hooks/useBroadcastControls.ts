@@ -1,5 +1,5 @@
 import { captureException } from "@sentry/react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { IBroadcastSdk } from "../sdk/sdk";
 import type { ISendStream } from "../sdk/stream/SendStream";
 import { useSendStream } from "./useSendStream";
@@ -8,11 +8,11 @@ import { useSendStreamState } from "./useSendStreamState";
 export function useBroadcastControls(sdk: IBroadcastSdk) {
   const sendStream = useSendStream(sdk);
   const sendStreamState = useSendStreamState(sendStream);
+  const [isTogglingVideo, setIsTogglingVideo] = useState(false);
+  const [isTogglingAudio, setIsTogglingAudio] = useState(false);
+  const [isTogglingScreenShare, setIsTogglingScreenShare] = useState(false);
 
-  const onToggleScreenShare = useCallback(() => {
-    return sendStream?.toggleScreenShare();
-  }, [sendStream]);
-  const onToggleBroadcast = useCallback(() => {
+  const onToggleBroadcast = useCallback(async () => {
     const abortController = new AbortController();
     let stream: ISendStream | null = null;
     sdk
@@ -31,11 +31,37 @@ export function useBroadcastControls(sdk: IBroadcastSdk) {
     };
   }, [sdk]);
 
-  const onToggleAudio = useCallback(() => {
-    return sendStream?.toggleAudio();
+  const onToggleAudio = useCallback(async () => {
+    try {
+      setIsTogglingAudio(true);
+      await sendStream?.toggleAudio();
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setIsTogglingAudio(false);
+    }
   }, [sendStream]);
-  const onToggleVideo = useCallback(() => {
-    return sendStream?.toggleVideo();
+
+  const onToggleVideo = useCallback(async () => {
+    try {
+      setIsTogglingVideo(true);
+      await sendStream?.toggleVideo();
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setIsTogglingVideo(false);
+    }
+  }, [sendStream]);
+
+  const onToggleScreenShare = useCallback(async () => {
+    try {
+      setIsTogglingScreenShare(true);
+      await sendStream?.toggleScreenShare();
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setIsTogglingScreenShare(false);
+    }
   }, [sendStream]);
 
   return {
@@ -43,6 +69,9 @@ export function useBroadcastControls(sdk: IBroadcastSdk) {
     isVideoPaused: sendStreamState.isVideoPaused,
     isAudioPaused: sendStreamState.isAudioPaused,
     isScreenSharing: sendStreamState.isScreenSharing,
+    isTogglingVideo,
+    isTogglingAudio,
+    isTogglingScreenShare,
     onToggleVideo,
     onToggleAudio,
     onToggleScreenShare,

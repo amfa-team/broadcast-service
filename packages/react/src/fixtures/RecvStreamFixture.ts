@@ -1,5 +1,7 @@
 import { EventTarget } from "event-target-shim";
+import { PicnicEvent } from "../sdk/events/event";
 import type { IRecvStream, RecvStreamEvents } from "../sdk/stream/RecvStream";
+import { wait } from "./wait";
 
 export interface RecvStreamState {
   isAudioPaused: boolean;
@@ -29,7 +31,7 @@ export class RecvStreamFixture
     super();
     this.state = state;
     this.createdAt = Date.now();
-    this.id = String(this.createdAt);
+    this.id = `${this.createdAt}:${Math.random()}`;
   }
 
   getId() {
@@ -129,13 +131,27 @@ export class RecvStreamFixture
   }
 
   async toggleAudio(): Promise<void> {
+    await wait(400);
     this.state.isAudioPaused = !this.state.isAudioPaused;
     this.autoPlayAudio();
+    this.dispatchEvent(
+      new PicnicEvent(
+        this.state.isAudioPaused ? "stream:pause" : "stream:resume",
+        { kind: "audio" },
+      ),
+    );
   }
 
   async toggleVideo(): Promise<void> {
+    await wait(400);
     this.state.isAudioPaused = !this.state.isAudioPaused;
     this.autoPlayVideo();
+    this.dispatchEvent(
+      new PicnicEvent(
+        this.state.isAudioPaused ? "stream:pause" : "stream:resume",
+        { kind: "video" },
+      ),
+    );
   }
 
   isReady(): boolean {
