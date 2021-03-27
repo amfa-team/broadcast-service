@@ -1,5 +1,5 @@
 import { captureException } from "@sentry/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { IBroadcastSdk } from "../sdk/sdk";
 import type { ISendStream } from "../sdk/stream/SendStream";
 import { useSendStream } from "./useSendStream";
@@ -11,25 +11,46 @@ export function useBroadcastControls(sdk: IBroadcastSdk) {
   const [isTogglingVideo, setIsTogglingVideo] = useState(false);
   const [isTogglingAudio, setIsTogglingAudio] = useState(false);
   const [isTogglingScreenShare, setIsTogglingScreenShare] = useState(false);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [isTogglingBroadcast, setIsTogglingBroadcast] = useState(false);
 
-  const onToggleBroadcast = useCallback(async () => {
+  useEffect(() => {
+    setIsBroadcasting(false);
+    setIsTogglingBroadcast(false);
+  }, [sdk]);
+
+  useEffect(() => {
     const abortController = new AbortController();
     let stream: ISendStream | null = null;
-    sdk
-      .broadcast()
-      .then((s) => {
-        if (abortController.signal.aborted) {
-          s.destroy().catch(captureException);
-        } else {
-          stream = s;
-        }
-      })
-      .catch(captureException);
+
+    if (isBroadcasting) {
+      sdk
+        .broadcast()
+        .then((s) => {
+          if (abortController.signal.aborted) {
+            s.destroy().catch(captureException);
+          } else {
+            stream = s;
+          }
+        })
+        .catch(captureException)
+        .then(() => {
+          setIsTogglingBroadcast(false);
+        })
+        .catch(captureException);
+    } else {
+      setIsTogglingBroadcast(false);
+    }
 
     return (): void => {
       stream?.destroy().catch(captureException);
     };
-  }, [sdk]);
+  }, [isBroadcasting, sdk]);
+
+  const onToggleBroadcast = useCallback(() => {
+    setIsTogglingBroadcast(true);
+    setIsBroadcasting((prev) => !prev);
+  }, []);
 
   const onToggleAudio = useCallback(async () => {
     try {
@@ -65,7 +86,8 @@ export function useBroadcastControls(sdk: IBroadcastSdk) {
   }, [sendStream]);
 
   return {
-    isReady: sendStream !== null && sendStreamState.isReady,
+    isTogglingBroadcast,
+    isBroadcasting: sendStream !== null && sendStreamState.isReady,
     isVideoPaused: sendStreamState.isVideoPaused,
     isAudioPaused: sendStreamState.isAudioPaused,
     isScreenSharing: sendStreamState.isScreenSharing,
