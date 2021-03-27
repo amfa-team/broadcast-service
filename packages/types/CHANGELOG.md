@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service-types [1.1.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.1.0-beta.1...@amfa-team/broadcast-service-types@1.1.0-beta.2) (2021-03-27)
+
+
+### Features
+
+* live participant intermediate states ([23118a3](https://github.com/amfa-team/broadcast-service/commit/23118a3580fa99b8c01bb60863d9b3d77c389be2))
+
 # @amfa-team/broadcast-service-types [1.1.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.0.0...@amfa-team/broadcast-service-types@1.1.0-beta.1) (2021-03-22)
 
 
