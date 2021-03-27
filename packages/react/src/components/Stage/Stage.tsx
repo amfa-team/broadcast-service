@@ -18,7 +18,20 @@ function RawStage(props: StageProps): JSX.Element {
   const { sdk, canBroadcast } = props;
   const recvStreams = useRecvStreams(sdk);
   const sendStream = useSendStream(sdk);
-  const controls = useBroadcastControls(sdk);
+  const {
+    isTogglingBroadcast,
+    isBroadcasting,
+    isVideoPaused,
+    isAudioPaused,
+    isScreenSharing,
+    isTogglingVideo,
+    isTogglingAudio,
+    isTogglingScreenShare,
+    onToggleVideo,
+    onToggleAudio,
+    onToggleScreenShare,
+    onToggleBroadcast,
+  } = useBroadcastControls(sdk);
   const { setFullScreen } = useRecvControls(sdk);
 
   if (canBroadcast) {
@@ -57,7 +70,22 @@ function RawStage(props: StageProps): JSX.Element {
             </GridItem>
           )}
         </Grid>
-        <LiveControls startLabel="Start" stopLabel="Stop" {...controls} />
+        <LiveControls
+          startLabel="Start"
+          stopLabel="Stop"
+          isTogglingBroadcast={isTogglingBroadcast}
+          isBroadcasting={isBroadcasting}
+          isVideoPaused={isVideoPaused}
+          isAudioPaused={isAudioPaused}
+          isScreenSharing={isScreenSharing}
+          isTogglingVideo={isTogglingVideo}
+          isTogglingAudio={isTogglingAudio}
+          isTogglingScreenShare={isTogglingScreenShare}
+          onToggleVideo={onToggleVideo}
+          onToggleAudio={onToggleAudio}
+          onToggleScreenShare={onToggleScreenShare}
+          onToggleBroadcast={onToggleBroadcast}
+        />
       </Grid>
     );
   }

@@ -11,7 +11,7 @@
   "dependencies": {
     "@amfa-team/broadcast-service": "0.0.0",
     "@amfa-team/space-service": "^1.8.0",
-    "@amfa-team/theme-service": "^1.5.0-beta.10",
+    "@amfa-team/theme-service": "^1.5.0-beta.11",
     "@amfa-team/user-service": "^1.9.0",
     "@chakra-ui/react": "^1.4.1",
     "@emotion/react": "^11.1.5",
