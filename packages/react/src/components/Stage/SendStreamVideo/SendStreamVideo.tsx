@@ -12,6 +12,7 @@ export function SendStreamVideo(props: SendStreamVideoProps): JSX.Element {
   const {
     isScreenSharing,
     isVideoPaused,
+    isAudioPaused,
     isReconnecting,
     isReady,
   } = useSendStreamState(sendStream);
@@ -31,18 +32,26 @@ export function SendStreamVideo(props: SendStreamVideoProps): JSX.Element {
 
   return (
     <LiveParticipant
+      isLoading={!isReady}
+      isReconnecting={isReconnecting}
+      isLiveLabel="Live (TODO)"
+      isReconnectingLabel="Reconnecting (TODO)"
       isLocal
       isFrontFacing={!isScreenSharing}
       isVideoEnabled={!isVideoPaused}
-      isFullScreen={false}
-      isAudioEnabled={false}
+      isAudioEnabled={!isAudioPaused}
       attachAudioEffect={attachAudioEffect}
       attachVideoEffect={attachVideoEffect}
-      isLoading={!isReady}
-      isReconnecting={isReconnecting}
       volume={100}
-      onToggleFullScreen={attachAudioEffect}
-      onToggleVolume={attachAudioEffect}
+      isFullScreen={false}
+      isTogglingVolume={false}
+      isTogglingFullScreen={false}
+      onToggleFullScreen={() => {
+        // no-op
+      }}
+      onToggleVolume={() => {
+        // no-op
+      }}
     />
   );
 }
