@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.1.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.2...@amfa-team/broadcast-service@1.1.0-beta.3) (2021-03-27)
+
+
+### Features
+
+* live Host layout ([d6d58bb](https://github.com/amfa-team/broadcast-service/commit/d6d58bb311824a3eb7427a2d1985102356cd2412))
+
 # @amfa-team/broadcast-service [1.1.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.1...@amfa-team/broadcast-service@1.1.0-beta.2) (2021-03-27)
 
 
