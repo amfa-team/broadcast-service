@@ -2,6 +2,7 @@ import { LiveControls } from "@amfa-team/theme-service";
 import { Grid, GridItem } from "@chakra-ui/react";
 import React from "react";
 import { useBroadcastControls } from "../../hooks/useBroadcastControls";
+import { useRecvControls } from "../../hooks/useRecvControls";
 import { useRecvStreams } from "../../hooks/useRecvStreams";
 import { useSendStream } from "../../hooks/useSendStream";
 import type { IBroadcastSdk } from "../../sdk/sdk";
@@ -18,6 +19,7 @@ function RawStage(props: StageProps): JSX.Element {
   const recvStreams = useRecvStreams(sdk);
   const sendStream = useSendStream(sdk);
   const controls = useBroadcastControls(sdk);
+  const { setFullScreen } = useRecvControls(sdk);
 
   if (canBroadcast) {
     return (
@@ -32,13 +34,17 @@ function RawStage(props: StageProps): JSX.Element {
         <Grid
           w="full"
           h="full"
-          templateColumns="repeat(4, minmax(0, 25%))"
-          templateRows="minmax(0, 70%) minmax(0, 25%)"
+          templateColumns="repeat(3, minmax(0, 33.33%))"
+          templateRows="minmax(0, 65%) minmax(0, 35%)"
         >
           {recvStreams.map((recvStream, i) => {
             return (
               <GridItem key={recvStream.getId()} colSpan={i === 0 ? 4 : 1}>
-                <RecvStreamVideo recvStream={recvStream} />
+                <RecvStreamVideo
+                  recvStream={recvStream}
+                  isFullScreen={i === 0}
+                  setFullScreen={setFullScreen}
+                />
               </GridItem>
             );
           })}
@@ -60,15 +66,19 @@ function RawStage(props: StageProps): JSX.Element {
     <Grid
       w="full"
       h="full"
-      templateColumns="repeat(4, minmax(0, 25%))"
-      templateRows="minmax(0, 70%) minmax(0, 25%)"
+      templateColumns="repeat(3, minmax(0, 33.33%))"
+      templateRows="minmax(0, 65%) minmax(0, 35%)"
       maxW="container.lg"
       margin="auto"
     >
       {recvStreams.map((recvStream, i) => {
         return (
           <GridItem key={recvStream.getId()} colSpan={i === 0 ? 4 : 1}>
-            <RecvStreamVideo recvStream={recvStream} />
+            <RecvStreamVideo
+              recvStream={recvStream}
+              isFullScreen={i === 0}
+              setFullScreen={setFullScreen}
+            />
           </GridItem>
         );
       })}
