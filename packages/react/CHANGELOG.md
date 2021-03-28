@@ -1,3 +1,18 @@
+# @amfa-team/broadcast-service [1.1.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.3...@amfa-team/broadcast-service@1.1.0-beta.4) (2021-03-28)
+
+
+### Features
+
+* finalize layout ([94709be](https://github.com/amfa-team/broadcast-service/commit/94709bef85936228ce79480e3401600a0995ebb7))
+
+
+
+
+
+### Dependencies
+
+* **@amfa-team/broadcast-service-types:** upgraded to 1.1.0-beta.3
+
 # @amfa-team/broadcast-service [1.1.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.2...@amfa-team/broadcast-service@1.1.0-beta.3) (2021-03-27)
 
 
