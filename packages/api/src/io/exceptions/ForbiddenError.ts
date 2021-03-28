@@ -1,7 +1,7 @@
 import InvalidRequestError from "./InvalidRequestError";
 
 export default class ForbiddenError extends InvalidRequestError {
-  constructor() {
-    super("Forbidden", 403);
+  constructor(reason: string) {
+    super(`Forbidden: ${reason}`, 403);
   }
 }

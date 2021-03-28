@@ -41,12 +41,12 @@ function RawStage(props: StageProps): JSX.Element {
         templateRows="minmax(0, calc(100% - 80px)) minmax(0, 80px)"
         h="full"
         w="full"
-        maxW="container.lg"
-        margin="auto"
       >
         <Grid
           w="full"
           h="full"
+          maxW="container.lg"
+          margin="auto"
           templateColumns="repeat(3, minmax(0, 33.33%))"
           templateRows="minmax(0, 65%) minmax(0, 35%)"
         >

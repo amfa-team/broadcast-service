@@ -30,20 +30,20 @@ export async function authParticipant(
   const [space] = await Promise.all([
     getSpace(spaceId, token),
     checkBan(requestContext, () => {
-      throw new ForbiddenError();
+      throw new ForbiddenError("banned");
     }),
   ]);
 
   if (!space) {
-    throw new ForbiddenError();
+    throw new ForbiddenError("space does not exists");
   }
 
   if (role === "host") {
     if (!canManageSpace(userData, spaceId)) {
-      throw new ForbiddenError();
+      throw new ForbiddenError("not allowed to host");
     }
   } else if (!space.public && !canAccessSpace(userData, spaceId)) {
-    throw new ForbiddenError();
+    throw new ForbiddenError("not public");
   }
 
   return userData;
