@@ -1,6 +1,7 @@
 import { LiveControls } from "@amfa-team/theme-service";
 import { Grid, GridItem } from "@chakra-ui/react";
 import React from "react";
+import type { ReactElement } from "react";
 import { useBroadcastControls } from "../../hooks/useBroadcastControls";
 import { useRecvControls } from "../../hooks/useRecvControls";
 import { useRecvStreams } from "../../hooks/useRecvStreams";
@@ -12,10 +13,11 @@ import { SendStreamVideo } from "./SendStreamVideo";
 export interface StageProps {
   sdk: IBroadcastSdk;
   canBroadcast: boolean;
+  helpButton?: ReactElement;
 }
 
 function RawStage(props: StageProps): JSX.Element {
-  const { sdk, canBroadcast } = props;
+  const { sdk, canBroadcast, helpButton } = props;
   const recvStreams = useRecvStreams(sdk);
   const sendStream = useSendStream(sdk);
   const {
@@ -85,6 +87,7 @@ function RawStage(props: StageProps): JSX.Element {
           onToggleAudio={onToggleAudio}
           onToggleScreenShare={onToggleScreenShare}
           onToggleBroadcast={onToggleBroadcast}
+          helpButton={helpButton}
         />
       </Grid>
     );

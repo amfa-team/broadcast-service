@@ -53,10 +53,10 @@
     react-datepicker "^3.6.0"
     whatwg-fetch "^3.6.2"
 
-"@amfa-team/theme-service@^1.5.0-beta.13":
-  version "1.5.0-beta.13"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.13/e4913e91f18ad1d85e1a5cbeab8ceee16157a22f417a83dc3892624a56e2872d#68cb222d520118e7cd63959cc73ef071a08c7cb3"
-  integrity sha512-R0Dim2m5St2TsIZqVfW56mDf60otLbe8wKmeLE2umS8Z66lCanE4k1bOmcBtLaqnTeHA/JqxfLOA7zWiGtRB5A==
+"@amfa-team/theme-service@^1.5.0-beta.14":
+  version "1.5.0-beta.14"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.14/76b9946a257a4825a112ed3aa44618d5228c3408fd439e4e0748cff5e147afc0#e7798f9e3bdaddc69fe03aefd926f63dda489cab"
+  integrity sha512-4PBA2MrbRLTgIOgQzhBceSANkRdJVCHd6KOcH6nEY0p4xSqi9+YYkGpHNXs+HZj8/TxRcRCGyjymBPd+jCpnwQ==
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@chakra-ui/react" "^1.4.1"
