@@ -1,5 +1,12 @@
 import { BroadcastControls, LiveControls } from "@amfa-team/theme-service";
-import { Box, Flex, Grid, GridItem, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  useDisclosure,
+  useMediaQuery,
+} from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import type { ReactElement } from "react";
@@ -16,6 +23,88 @@ export interface StageProps {
   canBroadcast: boolean;
   helpButton?: ReactElement;
   featuresViewerButton?: any;
+}
+
+function StreamGrid({ streamLayoutGrid, content }: any) {
+  const [isSmallerThan768] = useMediaQuery(["(max-width: 768px)"]);
+  const nbStreams = content.length;
+
+  if (nbStreams === 0) {
+    return (
+      <GridItem bg="#000000a8" border="1px solid #ffffff70" m="5">
+        <Flex
+          w="full"
+          h="full"
+          alignItems="center"
+          justifyContent="center"
+          color="white"
+        >
+          Nobody is on the live stage yet
+        </Flex>
+      </GridItem>
+    );
+  }
+
+  const [mainContent, ...restContent] = content;
+  const secLine = [...restContent];
+  while (secLine.length < streamLayoutGrid.columns)
+    secLine.push({ key: secLine.length + 1, component: "" });
+
+  if (nbStreams > 3 && isSmallerThan768) {
+    // FIXEME add infinite
+    const subSquare = [secLine.slice(0, 2), secLine.slice(2, 4)];
+    return (
+      <>
+        <GridItem
+          bg="#000000a8"
+          border="1px solid #ffffff70"
+          colSpan={streamLayoutGrid.colSpanFirstLine}
+          key={mainContent.key}
+        >
+          {mainContent.component}
+        </GridItem>
+        {subSquare.map((e, i) => (
+          <GridItem colSpan={streamLayoutGrid.colSpanSecondLine} key={i}>
+            <Grid w="full" h="full" templateRows="repeat(2, minmax(0, 50%))">
+              {e.map((e1: any) => (
+                <GridItem
+                  colSpan={streamLayoutGrid.colSpanSecondLine}
+                  bg="#000000a8"
+                  border="1px solid #ffffff70"
+                  key={e1.key}
+                >
+                  {e1.component}
+                </GridItem>
+              ))}
+            </Grid>
+          </GridItem>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <GridItem
+        bg="#000000a8"
+        border="1px solid #ffffff70"
+        colSpan={streamLayoutGrid.columns}
+        key={mainContent.key}
+      >
+        {mainContent.component}
+      </GridItem>
+      {secLine.map((e) => (
+        <GridItem
+          colSpan={streamLayoutGrid.colSpanSecondLine}
+          bg="#000000a8"
+          border="1px solid #ffffff70"
+          key={e.key}
+        >
+          {e.component}
+        </GridItem>
+      ))}
+    </>
+  );
 }
 
 function RawStage(props: StageProps): JSX.Element {
@@ -96,6 +185,172 @@ function RawStage(props: StageProps): JSX.Element {
     );
   }
 
+  const contentStreams = recvStreams.map((recvStream, i) => {
+    return {
+      key: recvStream.getId(),
+      component: (
+        <RecvStreamVideo
+          recvStream={recvStream}
+          isFullScreen={i === 0}
+          setFullScreen={setFullScreen}
+        />
+      ),
+    };
+  });
+
+  // const contentStreams = [
+  //   {
+  //     component: (
+  //       <Flex
+  //         w="full"
+  //         h="full"
+  //         alignItems="center"
+  //         justifyContent="center"
+  //         color="white"
+  //       >
+  //         screenshare
+  //       </Flex>
+  //     ),
+  //     key: 1,
+  //   },
+  //   {
+  //     component: (
+  //       <Flex
+  //         w="full"
+  //         h="full"
+  //         alignItems="center"
+  //         justifyContent="center"
+  //         color="white"
+  //       >
+  //         camera1
+  //       </Flex>
+  //     ),
+  //     key: 2,
+  //   },
+  //   // {
+  //   //   component: (
+  //   //     <Flex
+  //   //       w="full"
+  //   //       h="full"
+  //   //       alignItems="center"
+  //   //       justifyContent="center"
+  //   //       color="white"
+  //   //     >
+  //   //       cam2
+  //   //     </Flex>
+  //   //   ),
+  //   //   key: 3,
+  //   // },
+  //   // {
+  //   //   component: (
+  //   //     <Flex
+  //   //       w="full"
+  //   //       h="full"
+  //   //       alignItems="center"
+  //   //       justifyContent="center"
+  //   //       color="white"
+  //   //     >
+  //   //       cam4
+  //   //     </Flex>
+  //   //   ),
+  //   //   key: 4,
+  //   // },
+  //   // {
+  //   //   component: (
+  //   //     <Flex
+  //   //       w="full"
+  //   //       h="full"
+  //   //       alignItems="center"
+  //   //       justifyContent="center"
+  //   //       color="white"
+  //   //     >
+  //   //       cam3
+  //   //     </Flex>
+  //   //   ),
+  //   //   key: 5,
+  //   // },
+  // ];
+  let streamLayoutGrid = {
+    templateColumns: {
+      base: "unset",
+      sm: "unset",
+      md: "unset",
+      lg: "unset",
+    },
+    templateRows: {
+      base: "unset",
+      sm: "unset",
+      md: "unset",
+      lg: "unset",
+    },
+    columns: 1,
+    colSpanFirstLine: 0,
+    colSpanSecondLine: 0,
+  };
+
+  switch (contentStreams.length) {
+    case 0:
+      break;
+    case 1:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "unset",
+          sm: "unset",
+          md: "unset",
+          lg: "unset",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 1,
+        colSpanFirstLine: 1,
+        colSpanSecondLine: 1,
+      };
+      break;
+    case 2:
+    case 3:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "repeat(2, minmax(0, 50%))",
+          sm: "unset",
+          md: "unset",
+          lg: "unset",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 2,
+        colSpanFirstLine: 2,
+        colSpanSecondLine: 1,
+      };
+      break;
+    default:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "repeat(2, minmax(0, 50%))",
+          sm: "repeat(2, minmax(0, 50%))",
+          md: "repeat(4, minmax(0, 25%))",
+          lg: "repeat(4, minmax(0, 25%))",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 4,
+        colSpanFirstLine: 2,
+        colSpanSecondLine: 1,
+      };
+      break;
+  }
+
   return (
     <Grid
       column="1"
@@ -107,23 +362,20 @@ function RawStage(props: StageProps): JSX.Element {
         <Grid
           w="full"
           h="full"
-          templateColumns="repeat(4, minmax(0, 33.33%))"
-          templateRows="minmax(0, 65%) minmax(0, 35%)"
+          templateColumns={streamLayoutGrid.templateColumns}
+          templateRows={streamLayoutGrid.templateRows}
           maxW="container.lg"
           margin="auto"
-          // ml={{ base: "8", lg: "6", xl: "20" }}
+          p={{
+            base: contentStreams.length === 0 ? "0" : "1",
+            lg: "0",
+          }}
         >
-          {recvStreams.map((recvStream, i) => {
-            return (
-              <GridItem key={recvStream.getId()} colSpan={i === 0 ? 4 : 1}>
-                <RecvStreamVideo
-                  recvStream={recvStream}
-                  isFullScreen={i === 0}
-                  setFullScreen={setFullScreen}
-                />
-              </GridItem>
-            );
-          })}
+          <StreamGrid
+            streamLayoutGrid={streamLayoutGrid}
+            content={contentStreams}
+          />
+          {/* 
           {sendStream !== null && (
             <GridItem
               key={sendStream.getId()}
@@ -132,31 +384,7 @@ function RawStage(props: StageProps): JSX.Element {
               <SendStreamVideo sendStream={sendStream} />
             </GridItem>
           )}
-          {recvStreams.length < 4 && !sendStream && (
-            <>
-              {recvStreams.length === 0 && (
-                <GridItem
-                  colSpan={4}
-                  bg="#000000a8"
-                  border="1px solid #ffffff70"
-                >
-                  &nbsp;
-                </GridItem>
-              )}
-              {Array((recvStreams.length === 0 ? 4 : 5) - recvStreams.length)
-                .fill(null)
-                .map((e, i) => (
-                  <GridItem
-                    colSpan={1}
-                    bg="#000000a8"
-                    border="1px solid #ffffff70"
-                    key={i}
-                  >
-                    &nbsp;
-                  </GridItem>
-                ))}
-            </>
-          )}
+          )} */}
         </Grid>
         {chatBar.isOpen && (
           <AnimatePresence>
