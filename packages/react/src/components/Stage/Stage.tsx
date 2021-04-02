@@ -127,6 +127,7 @@ function RawStage(props: StageProps): JSX.Element {
   } = useBroadcastControls(sdk);
   const { setFullScreen } = useRecvControls(sdk);
   const chatBar = useDisclosure();
+  const featureBar = useDisclosure();
 
   if (canBroadcast) {
     return (
@@ -185,6 +186,7 @@ function RawStage(props: StageProps): JSX.Element {
     );
   }
 
+  // @ts-ignore
   const contentStreams = recvStreams.map((recvStream, i) => {
     return {
       key: recvStream.getId(),
@@ -198,6 +200,7 @@ function RawStage(props: StageProps): JSX.Element {
     };
   });
 
+  // // @ts-ignore
   // const contentStreams = [
   //   {
   //     component: (
@@ -227,49 +230,50 @@ function RawStage(props: StageProps): JSX.Element {
   //     ),
   //     key: 2,
   //   },
-  //   // {
-  //   //   component: (
-  //   //     <Flex
-  //   //       w="full"
-  //   //       h="full"
-  //   //       alignItems="center"
-  //   //       justifyContent="center"
-  //   //       color="white"
-  //   //     >
-  //   //       cam2
-  //   //     </Flex>
-  //   //   ),
-  //   //   key: 3,
-  //   // },
-  //   // {
-  //   //   component: (
-  //   //     <Flex
-  //   //       w="full"
-  //   //       h="full"
-  //   //       alignItems="center"
-  //   //       justifyContent="center"
-  //   //       color="white"
-  //   //     >
-  //   //       cam4
-  //   //     </Flex>
-  //   //   ),
-  //   //   key: 4,
-  //   // },
-  //   // {
-  //   //   component: (
-  //   //     <Flex
-  //   //       w="full"
-  //   //       h="full"
-  //   //       alignItems="center"
-  //   //       justifyContent="center"
-  //   //       color="white"
-  //   //     >
-  //   //       cam3
-  //   //     </Flex>
-  //   //   ),
-  //   //   key: 5,
-  //   // },
+  // {
+  //   component: (
+  //     <Flex
+  //       w="full"
+  //       h="full"
+  //       alignItems="center"
+  //       justifyContent="center"
+  //       color="white"
+  //     >
+  //       cam2
+  //     </Flex>
+  //   ),
+  //   key: 3,
+  // },
+  // {
+  //   component: (
+  //     <Flex
+  //       w="full"
+  //       h="full"
+  //       alignItems="center"
+  //       justifyContent="center"
+  //       color="white"
+  //     >
+  //       cam4
+  //     </Flex>
+  //   ),
+  //   key: 4,
+  // },
+  // {
+  //   component: (
+  //     <Flex
+  //       w="full"
+  //       h="full"
+  //       alignItems="center"
+  //       justifyContent="center"
+  //       color="white"
+  //     >
+  //       cam3
+  //     </Flex>
+  //   ),
+  //   key: 5,
+  // },
   // ];
+
   let streamLayoutGrid = {
     templateColumns: {
       base: "unset",
@@ -367,12 +371,17 @@ function RawStage(props: StageProps): JSX.Element {
           maxW="container.lg"
           margin="auto"
           p={{
-            base: contentStreams.length === 0 ? "0" : "1",
+            base: contentStreams.length === 0 || chatBar.isOpen ? "0" : "1",
             lg: "0",
+          }}
+          display={{
+            base: chatBar.isOpen ? "none" : "grid",
+            lg: "grid",
           }}
         >
           <StreamGrid
             streamLayoutGrid={streamLayoutGrid}
+            // @ts-ignore
             content={contentStreams}
           />
           {/* 
@@ -391,12 +400,45 @@ function RawStage(props: StageProps): JSX.Element {
             <motion.div
               transition={{ duration: 0.08 }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: 1, zIndex: 1 }}
               exit={{ opacity: 0 }}
             >
-              <Box w="375px" h="full" bg="white">
+              <Flex w={{ base: "100vw", lg: "375px" }} h="full" bg="white">
                 Yo
-              </Box>
+              </Flex>
+            </motion.div>
+          </AnimatePresence>
+        )}
+        {featureBar.isOpen && (
+          <AnimatePresence>
+            <motion.div
+              transition={{ duration: 0.08 }}
+              initial={{
+                opacity: 1,
+                position: "absolute",
+                height: "0",
+                width: "100vw",
+                bottom: "80px",
+              }}
+              animate={{ zIndex: 1, height: "85vh" }}
+              exit={{ opacity: 0 }}
+            >
+              <Flex
+                w="full"
+                h="full"
+                alignItems="flex-end"
+                justifyContent="center"
+              >
+                <Box
+                  bg="gray.900"
+                  h="40%"
+                  w="full"
+                  maxW="container.lg"
+                  color="white"
+                >
+                  yo
+                </Box>
+              </Flex>
             </motion.div>
           </AnimatePresence>
         )}
@@ -411,6 +453,8 @@ function RawStage(props: StageProps): JSX.Element {
         onChatToggle={chatBar.onToggle}
         helpButton={helpButton}
         featuresButton={featuresViewerButton}
+        isFeatureOpen={featureBar.isOpen}
+        onFeatureToggle={featureBar.onToggle}
       />
     </Grid>
   );
