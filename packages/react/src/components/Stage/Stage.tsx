@@ -1,5 +1,6 @@
-import { LiveControls } from "@amfa-team/theme-service";
-import { Grid, GridItem } from "@chakra-ui/react";
+import { BroadcastControls, LiveControls } from "@amfa-team/theme-service";
+import { Box, Flex, Grid, GridItem, useDisclosure } from "@chakra-ui/react";
+import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import type { ReactElement } from "react";
 import { useBroadcastControls } from "../../hooks/useBroadcastControls";
@@ -14,10 +15,11 @@ export interface StageProps {
   sdk: IBroadcastSdk;
   canBroadcast: boolean;
   helpButton?: ReactElement;
+  featuresViewerButton?: any;
 }
 
 function RawStage(props: StageProps): JSX.Element {
-  const { sdk, canBroadcast, helpButton } = props;
+  const { sdk, canBroadcast, helpButton, featuresViewerButton } = props;
   const recvStreams = useRecvStreams(sdk);
   const sendStream = useSendStream(sdk);
   const {
@@ -35,6 +37,7 @@ function RawStage(props: StageProps): JSX.Element {
     onToggleBroadcast,
   } = useBroadcastControls(sdk);
   const { setFullScreen } = useRecvControls(sdk);
+  const chatBar = useDisclosure();
 
   if (canBroadcast) {
     return (
@@ -72,7 +75,7 @@ function RawStage(props: StageProps): JSX.Element {
             </GridItem>
           )}
         </Grid>
-        <LiveControls
+        <BroadcastControls
           startLabel="Start"
           stopLabel="Stop"
           isTogglingBroadcast={isTogglingBroadcast}
@@ -95,32 +98,92 @@ function RawStage(props: StageProps): JSX.Element {
 
   return (
     <Grid
-      w="full"
+      column="1"
+      templateRows="minmax(0, calc(100% - 80px)) minmax(0, 80px)"
       h="full"
-      templateColumns="repeat(3, minmax(0, 33.33%))"
-      templateRows="minmax(0, 65%) minmax(0, 35%)"
-      maxW="container.lg"
-      margin="auto"
+      w="full"
     >
-      {recvStreams.map((recvStream, i) => {
-        return (
-          <GridItem key={recvStream.getId()} colSpan={i === 0 ? 4 : 1}>
-            <RecvStreamVideo
-              recvStream={recvStream}
-              isFullScreen={i === 0}
-              setFullScreen={setFullScreen}
-            />
-          </GridItem>
-        );
-      })}
-      {sendStream !== null && (
-        <GridItem
-          key={sendStream.getId()}
-          colSpan={recvStreams.length === 0 ? 4 : 1}
+      <Flex w="full" h="full" bg="#006654">
+        <Grid
+          w="full"
+          h="full"
+          templateColumns="repeat(4, minmax(0, 33.33%))"
+          templateRows="minmax(0, 65%) minmax(0, 35%)"
+          maxW="container.lg"
+          margin="auto"
+          // ml={{ base: "8", lg: "6", xl: "20" }}
         >
-          <SendStreamVideo sendStream={sendStream} />
-        </GridItem>
-      )}
+          {recvStreams.map((recvStream, i) => {
+            return (
+              <GridItem key={recvStream.getId()} colSpan={i === 0 ? 4 : 1}>
+                <RecvStreamVideo
+                  recvStream={recvStream}
+                  isFullScreen={i === 0}
+                  setFullScreen={setFullScreen}
+                />
+              </GridItem>
+            );
+          })}
+          {sendStream !== null && (
+            <GridItem
+              key={sendStream.getId()}
+              colSpan={recvStreams.length === 0 ? 4 : 1}
+            >
+              <SendStreamVideo sendStream={sendStream} />
+            </GridItem>
+          )}
+          {recvStreams.length < 4 && !sendStream && (
+            <>
+              {recvStreams.length === 0 && (
+                <GridItem
+                  colSpan={4}
+                  bg="#000000a8"
+                  border="1px solid #ffffff70"
+                >
+                  &nbsp;
+                </GridItem>
+              )}
+              {Array((recvStreams.length === 0 ? 4 : 5) - recvStreams.length)
+                .fill(null)
+                .map((e, i) => (
+                  <GridItem
+                    colSpan={1}
+                    bg="#000000a8"
+                    border="1px solid #ffffff70"
+                    key={i}
+                  >
+                    &nbsp;
+                  </GridItem>
+                ))}
+            </>
+          )}
+        </Grid>
+        {chatBar.isOpen && (
+          <AnimatePresence>
+            <motion.div
+              transition={{ duration: 0.08 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Box w="375px" h="full" bg="white">
+                Yo
+              </Box>
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </Flex>
+      <LiveControls
+        chatOpenLabel={"Open Chat"}
+        chatCloseLabel={"Hide Chat"}
+        onHangUp={() => {
+          alert("todo");
+        }}
+        isChatOpen={chatBar.isOpen}
+        onChatToggle={chatBar.onToggle}
+        helpButton={helpButton}
+        featuresButton={featuresViewerButton}
+      />
     </Grid>
   );
 }

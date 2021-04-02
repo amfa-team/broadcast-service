@@ -14,10 +14,17 @@ interface StagePageProps {
   broadcastEnabled: boolean;
   dictionary: Dictionary;
   helpButton?: ReactElement;
+  featuresViewerButton?: any;
 }
 
 function RawStagePage(props: StagePageProps) {
-  const { settings, broadcastEnabled, dictionary, helpButton } = props;
+  const {
+    settings,
+    broadcastEnabled,
+    dictionary,
+    helpButton,
+    featuresViewerButton,
+  } = props;
   const token = useToken();
   const state = useSDK(settings);
 
@@ -42,6 +49,7 @@ function RawStagePage(props: StagePageProps) {
       sdk={state.sdk}
       canBroadcast={broadcastEnabled}
       helpButton={helpButton}
+      featuresViewerButton={featuresViewerButton}
     />
   );
 }
@@ -63,5 +71,6 @@ export function StagePage(props: StagePageProps) {
 
 StagePage.defaultProps = {
   broadcastEnabled: false,
+  featuresViewerButton: null,
   helpButton: null,
 };
