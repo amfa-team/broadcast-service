@@ -3,6 +3,7 @@ import { DotLoader, ErrorShield } from "@amfa-team/theme-service";
 import { useToken } from "@amfa-team/user-service";
 import { Center } from "@chakra-ui/react";
 import React from "react";
+import type { ReactElement } from "react";
 import Cgu from "../components/Cgu/Cgu";
 import { Stage } from "../components/Stage";
 import { useSDK } from "../hooks/useSDK";
@@ -12,10 +13,24 @@ interface StagePageProps {
   settings: Settings;
   broadcastEnabled: boolean;
   dictionary: Dictionary;
+  helpButton?: ReactElement;
+  chatComponent?: ReactElement;
+  featuresViewerButton?: any;
+  featuresComponents?: any;
+  onHangUp: () => void;
 }
 
 function RawStagePage(props: StagePageProps) {
-  const { settings, broadcastEnabled, dictionary } = props;
+  const {
+    settings,
+    broadcastEnabled,
+    dictionary,
+    helpButton,
+    chatComponent,
+    featuresViewerButton,
+    featuresComponents,
+    onHangUp,
+  } = props;
   const token = useToken();
   const state = useSDK(settings);
 
@@ -35,8 +50,24 @@ function RawStagePage(props: StagePageProps) {
     );
   }
 
-  return <Stage sdk={state.sdk} canBroadcast={broadcastEnabled} />;
+  return (
+    <Stage
+      sdk={state.sdk}
+      canBroadcast={broadcastEnabled}
+      helpButton={helpButton}
+      featuresViewerButton={featuresViewerButton}
+      chatComponent={chatComponent}
+      featuresComponents={featuresComponents}
+      onHangUp={onHangUp}
+    />
+  );
 }
+RawStagePage.defaultProps = {
+  helpButton: null,
+  chatComponent: null,
+  featuresViewerButton: [],
+  featuresComponents: [],
+};
 
 export function StagePage(props: StagePageProps) {
   return (
@@ -52,4 +83,8 @@ export function StagePage(props: StagePageProps) {
 
 StagePage.defaultProps = {
   broadcastEnabled: false,
+  featuresViewerButton: [],
+  helpButton: null,
+  chatComponent: null,
+  featuresComponents: [],
 };
