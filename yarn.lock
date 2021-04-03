@@ -10,6 +10,15 @@
     d "1"
     es5-ext "^0.10.47"
 
+"@amfa-team/broadcast-service-types@^1.1.0-beta.3":
+  version "1.1.0-beta.3"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/broadcast-service-types/1.1.0-beta.3/54fe43a5ae666cddce537a6b33ba2541c0f2b2cc668d3634452959bf8ad1fa02#a5413b913de907f01bac093041595993cca216d0"
+  integrity sha512-R1nPDoK/TKCNXzwT1kGlP25XWj7LJpGyHGNCoS/DmLbVZ1XT4Cflf05MOOFhDOaubcveYNYK63Ua1yPkPGTCXQ==
+  dependencies:
+    "@amfa-team/user-service-types" "^1.3.0"
+    mediasoup-client "^3.6.29"
+    ts.data.json "^1.7.0"
+
 "@amfa-team/space-service-node@^1.0.2":
   version "1.0.2"
   resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-node/1.0.2/fd19965d9087bae1965f2b56e17f887ef2543181124755e5433e3dab7def4d5d#bccc5297795425adfe06b2ee33eaffeee2c97871"
@@ -34,25 +43,6 @@
     lodash.isequal "^4.5.0"
     whatwg-fetch "^3.5.0"
 
-"@amfa-team/theme-service@^1.5.0-beta.11":
-  version "1.5.0-beta.11"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.11/d353ae0a397c7830dca228c788dcf8dec746dfd8b5e7c106764cae18b3f7a268#06f11e3411182f52a50cae34c29d26f56e5be4a0"
-  integrity sha512-cmVzgGTMp///6EYeZ3FrtrgPwCZrsrxGWntW4yUgNICEUQB5YK2XMhenUcvE5UVpag6riMaFpFJHZ09zm80Xbw==
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@chakra-ui/react" "^1.3.4"
-    "@chakra-ui/theme-tools" "^1.1.0"
-    "@emotion/react" "^11.1.5"
-    "@emotion/styled" "^11.1.5"
-    "@loadable/component" "^5.14.1"
-    abortcontroller-polyfill "^1.7.1"
-    classnames "^2.2.6"
-    core-js "^3.9.1"
-    formik "^2.2.6"
-    framer-motion "^3.10.2"
-    react-datepicker "^3.6.0"
-    whatwg-fetch "^3.6.2"
-
 "@amfa-team/theme-service@^1.5.0-beta.14":
   version "1.5.0-beta.14"
   resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.14/76b9946a257a4825a112ed3aa44618d5228c3408fd439e4e0748cff5e147afc0#e7798f9e3bdaddc69fe03aefd926f63dda489cab"
@@ -60,6 +50,26 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@chakra-ui/react" "^1.4.1"
+    "@chakra-ui/theme-tools" "^1.1.1"
+    "@emotion/react" "^11.1.5"
+    "@emotion/styled" "^11.1.5"
+    "@loadable/component" "^5.14.1"
+    abortcontroller-polyfill "^1.7.1"
+    classnames "^2.2.6"
+    core-js "^3.9.1"
+    formik "^2.2.6"
+    framer-motion "^3.10.6"
+    react-datepicker "^3.6.0"
+    whatwg-fetch "^3.6.2"
+
+"@amfa-team/theme-service@^1.5.0-beta.16":
+  version "1.5.0-beta.16"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0-beta.16/05cf273acb6a8b5cc02ae9a0ecd1b14a68eff9dea5bdc102b240d43a671c429c#199c3be6f9166ad2544d681c629bba85ef467c58"
+  integrity sha512-SvVq2RGEuVS8JXHO4DAzzgjKM2uSlZfENaWGPllHiLfamPfYNadX4XA07uyIlyMicTn985KbxN65WAuJvepuNw==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@chakra-ui/react" "^1.4.1"
+    "@chakra-ui/react-utils" "^1.1.0"
     "@chakra-ui/theme-tools" "^1.1.1"
     "@emotion/react" "^11.1.5"
     "@emotion/styled" "^11.1.5"
@@ -84,6 +94,24 @@
   version "1.3.0"
   resolved "https://npm.pkg.github.com/download/@amfa-team/user-service-types/1.3.0/a7b471740dfa8ad3816851fbaad88da491ba89059d3e2290f993d996aeb070cc#c591fb0ed4298dfc36d480f5f9981632516e809b"
   integrity sha512-zY+/pt/xODcyEt5HY8Zi+k2hlXGDI+BLAO5TrZuU1geNuCjsTa/DwIqha7qeGk7hkr9yxntbEcYwqYsD4sLvWQ==
+
+"@amfa-team/user-service@^1.10.0-beta.2":
+  version "1.10.0-beta.2"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/user-service/1.10.0-beta.2/d888c52133b7f71dea9387464a37e8b9fc245b9b2663bc5465a458d3ac42694a#e555d44474cabb97995c3ab3187db18c77f8c129"
+  integrity sha512-2WjW5UzTnmkAaiBlXY9H45kcdCi5C+KhpnmhfUs0ikyw4IldkQJ2KDjgi5eKkXrzeHMap2qU7E22zIOEnFJH2g==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@chakra-ui/react" "^1.3.4"
+    "@emotion/react" "^11.1.5"
+    "@emotion/styled" "^11.1.5"
+    abortcontroller-polyfill "^1.7.1"
+    classnames "^2.2.6"
+    core-js "^3.9.1"
+    email-validator "^2.0.4"
+    formik "^2.2.6"
+    framer-motion "^3.10.3"
+    jwt-decode "^3.1.2"
+    whatwg-fetch "^3.6.2"
 
 "@amfa-team/user-service@^1.9.0":
   version "1.9.0"
@@ -2151,6 +2179,13 @@
     "@chakra-ui/utils" "1.4.0"
     "@chakra-ui/visually-hidden" "1.0.6"
 
+"@chakra-ui/react-utils@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@chakra-ui/react-utils/-/react-utils-1.1.0.tgz#9a84bc4248290421ee851ef26e486fe978b5ce4c"
+  integrity sha512-n0wRoz2P+IS29W7d+1LMr1SuWrrU3Z1FbtkGJImnEBuKs7JVPb6MvalmE3zSDaR6WybF3T9ZGKikKlTX1EgdkQ==
+  dependencies:
+    "@chakra-ui/utils" "^1.5.0"
+
 "@chakra-ui/react@^1.3.4":
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/@chakra-ui/react/-/react-1.3.4.tgz#4701feddffc6d632a1b5bb16302c71057759609e"
@@ -2457,7 +2492,7 @@
     "@chakra-ui/form-control" "1.2.3"
     "@chakra-ui/utils" "1.4.0"
 
-"@chakra-ui/theme-tools@1.1.0", "@chakra-ui/theme-tools@^1.1.0":
+"@chakra-ui/theme-tools@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@chakra-ui/theme-tools/-/theme-tools-1.1.0.tgz#3f3599aae6fe1b7e0d28d6e518b25e1247270897"
   integrity sha512-o1rJBJj3vbhq4C02Ld9Ay1xXKrfphQAqDacowKQlRu8G5DL+EvH/v0RGLkdJQd1ORoUsUZrZBvOcXO9dQt9DeQ==
@@ -2572,6 +2607,15 @@
   dependencies:
     "@types/lodash.mergewith" "4.6.6"
     "@types/object-assign" "4.0.30"
+    css-box-model "1.2.1"
+    lodash.mergewith "4.6.2"
+
+"@chakra-ui/utils@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@chakra-ui/utils/-/utils-1.5.0.tgz#8ba5ac1353d85c7fbdfa843c8023d9a2b4a2915d"
+  integrity sha512-rHLGzAo7cwIF9LkfEFEqtmgZN4/e1kuu5fVO4DrLJHcOA7c+wibrNK8QaplBefpq+b5bnmmznE4YHpXqG8yiCQ==
+  dependencies:
+    "@types/lodash.mergewith" "4.6.6"
     css-box-model "1.2.1"
     lodash.mergewith "4.6.2"
 
@@ -11293,20 +11337,7 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
-framer-motion@^3.10.2:
-  version "3.10.4"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-3.10.4.tgz#909274fd4d62fa13aa98ca8b74181ef902a5c1ea"
-  integrity sha512-ef3eZd7Hyzq4VMW0pxQwFTYqov8a8ryW9zwH/iS4nMgXcAV43wFJRkTawGFwpKB7u74E7F7O3vLONydHGRVwIw==
-  dependencies:
-    framesync "5.2.0"
-    hey-listen "^1.0.8"
-    popmotion "9.3.1"
-    style-value-types "4.1.1"
-    tslib "^1.10.0"
-  optionalDependencies:
-    "@emotion/is-prop-valid" "^0.8.2"
-
-framer-motion@^3.10.6:
+framer-motion@^3.10.3, framer-motion@^3.10.6:
   version "3.10.6"
   resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-3.10.6.tgz#67737ef05ed0408860751d81c919770ac831b394"
   integrity sha512-OxOtKgQS4km9a8dm0IMBtNNp4f0DiHfQ/IzxKs818+Kg9V/Ve/pRUJ2dtWBb6+W4lIPNLgRSpbOwOACVj15XcQ==
