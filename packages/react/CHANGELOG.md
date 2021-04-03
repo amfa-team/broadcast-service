@@ -1,3 +1,19 @@
+# @amfa-team/broadcast-service [1.1.0-beta.5](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.4...@amfa-team/broadcast-service@1.1.0-beta.5) (2021-04-03)
+
+
+### Bug Fixes
+
+* add framer-motion ([ee0fece](https://github.com/amfa-team/broadcast-service/commit/ee0fece43b9d523225795dc635548ec9bda40b48))
+
+
+### Features
+
+* add feature bar ([4f471f5](https://github.com/amfa-team/broadcast-service/commit/4f471f5c7d20d1b59b4c07c00a8ba8cc7b5a79e4))
+* cosmetics ([10bc74e](https://github.com/amfa-team/broadcast-service/commit/10bc74eaeb147b96eb7972efe35b5f1793fe7fd8))
+* mofo grid ([3db84b3](https://github.com/amfa-team/broadcast-service/commit/3db84b3cffd8afaf343ac32b9c9c4327cac70aa8))
+* pass down chat and features components ([aff3253](https://github.com/amfa-team/broadcast-service/commit/aff32532bdc43510d035c77995919ef1f91e8d48))
+* upgrade services ([085e687](https://github.com/amfa-team/broadcast-service/commit/085e6870a715a6b92e4bfb8bb09faf0ce7b21c56))
+
 # @amfa-team/broadcast-service [1.1.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.3...@amfa-team/broadcast-service@1.1.0-beta.4) (2021-03-28)
 
 
