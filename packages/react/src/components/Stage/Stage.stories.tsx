@@ -82,7 +82,15 @@ export const Viewer1Broadcast = (): JSX.Element => {
     s.addRecvStream(s1);
     return s;
   }, []);
-  return <Stage sdk={sdk} canBroadcast={false} />;
+  return (
+    <Stage
+      sdk={sdk}
+      canBroadcast={false}
+      onHangUp={() => {
+        alert("todo");
+      }}
+    />
+  );
 };
 
 export const Viewer2Broadcast = (): JSX.Element => {
@@ -92,7 +100,15 @@ export const Viewer2Broadcast = (): JSX.Element => {
     s.addRecvStream(s2);
     return s;
   }, []);
-  return <Stage sdk={sdk} canBroadcast={false} />;
+  return (
+    <Stage
+      sdk={sdk}
+      canBroadcast={false}
+      onHangUp={() => {
+        alert("todo");
+      }}
+    />
+  );
 };
 
 export const Viewer3Broadcast = (): JSX.Element => {
@@ -103,7 +119,15 @@ export const Viewer3Broadcast = (): JSX.Element => {
     s.addRecvStream(s3);
     return s;
   }, []);
-  return <Stage sdk={sdk} canBroadcast={false} />;
+  return (
+    <Stage
+      sdk={sdk}
+      canBroadcast={false}
+      onHangUp={() => {
+        alert("todo");
+      }}
+    />
+  );
 };
 
 export const Viewer4Broadcast = (): JSX.Element => {
@@ -115,7 +139,15 @@ export const Viewer4Broadcast = (): JSX.Element => {
     s.addRecvStream(s4);
     return s;
   }, []);
-  return <Stage sdk={sdk} canBroadcast={false} />;
+  return (
+    <Stage
+      sdk={sdk}
+      canBroadcast={false}
+      onHangUp={() => {
+        alert("todo");
+      }}
+    />
+  );
 };
 
 export const Viewer5Broadcast = (): JSX.Element => {
@@ -128,7 +160,15 @@ export const Viewer5Broadcast = (): JSX.Element => {
     s.addRecvStream(s5);
     return s;
   }, []);
-  return <Stage sdk={sdk} canBroadcast={false} />;
+  return (
+    <Stage
+      sdk={sdk}
+      canBroadcast={false}
+      onHangUp={() => {
+        alert("todo");
+      }}
+    />
+  );
 };
 
 export const Viewer6Broadcast = (): JSX.Element => {
@@ -142,5 +182,13 @@ export const Viewer6Broadcast = (): JSX.Element => {
     s.addRecvStream(s6);
     return s;
   }, []);
-  return <Stage sdk={sdk} canBroadcast={false} />;
+  return (
+    <Stage
+      sdk={sdk}
+      canBroadcast={false}
+      onHangUp={() => {
+        alert("todo");
+      }}
+    />
+  );
 };

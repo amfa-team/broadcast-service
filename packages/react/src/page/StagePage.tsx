@@ -14,7 +14,10 @@ interface StagePageProps {
   broadcastEnabled: boolean;
   dictionary: Dictionary;
   helpButton?: ReactElement;
+  chatComponent?: ReactElement;
   featuresViewerButton?: any;
+  featuresComponents?: any;
+  onHangUp: () => void;
 }
 
 function RawStagePage(props: StagePageProps) {
@@ -23,7 +26,10 @@ function RawStagePage(props: StagePageProps) {
     broadcastEnabled,
     dictionary,
     helpButton,
+    chatComponent,
     featuresViewerButton,
+    featuresComponents,
+    onHangUp,
   } = props;
   const token = useToken();
   const state = useSDK(settings);
@@ -50,11 +56,17 @@ function RawStagePage(props: StagePageProps) {
       canBroadcast={broadcastEnabled}
       helpButton={helpButton}
       featuresViewerButton={featuresViewerButton}
+      chatComponent={chatComponent}
+      featuresComponents={featuresComponents}
+      onHangUp={onHangUp}
     />
   );
 }
 RawStagePage.defaultProps = {
   helpButton: null,
+  chatComponent: null,
+  featuresViewerButton: [],
+  featuresComponents: [],
 };
 
 export function StagePage(props: StagePageProps) {
@@ -71,6 +83,8 @@ export function StagePage(props: StagePageProps) {
 
 StagePage.defaultProps = {
   broadcastEnabled: false,
-  featuresViewerButton: null,
+  featuresViewerButton: [],
   helpButton: null,
+  chatComponent: null,
+  featuresComponents: [],
 };

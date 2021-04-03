@@ -4,11 +4,12 @@ import {
   Flex,
   Grid,
   GridItem,
+  useBreakpointValue,
   useDisclosure,
   useMediaQuery,
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import type { ReactElement } from "react";
 import { useBroadcastControls } from "../../hooks/useBroadcastControls";
 import { useRecvControls } from "../../hooks/useRecvControls";
@@ -22,7 +23,10 @@ export interface StageProps {
   sdk: IBroadcastSdk;
   canBroadcast: boolean;
   helpButton?: ReactElement;
+  chatComponent?: ReactElement;
   featuresViewerButton?: any;
+  featuresComponents?: any;
+  onHangUp: () => void;
 }
 
 function StreamGrid({ streamLayoutGrid, content }: any) {
@@ -108,7 +112,15 @@ function StreamGrid({ streamLayoutGrid, content }: any) {
 }
 
 function RawStage(props: StageProps): JSX.Element {
-  const { sdk, canBroadcast, helpButton, featuresViewerButton } = props;
+  const {
+    sdk,
+    canBroadcast,
+    helpButton,
+    featuresViewerButton,
+    chatComponent,
+    featuresComponents,
+    onHangUp,
+  } = props;
   const recvStreams = useRecvStreams(sdk);
   const sendStream = useSendStream(sdk);
   const {
@@ -128,6 +140,26 @@ function RawStage(props: StageProps): JSX.Element {
   const { setFullScreen } = useRecvControls(sdk);
   const chatBar = useDisclosure();
   const featureBar = useDisclosure();
+  const detectLgBreakpoint = useBreakpointValue({ base: false, lg: true });
+  const [selectedFeature, setSelectedFeature] = useState(-1);
+
+  const onChatToggle = useCallback(() => {
+    if (!detectLgBreakpoint && featureBar.isOpen && !chatBar.isOpen) {
+      featureBar.onClose();
+    }
+    chatBar.onToggle();
+  }, [detectLgBreakpoint, featureBar, chatBar]);
+
+  const onFeatureToggle = useCallback(
+    (i) => {
+      if (!detectLgBreakpoint && chatBar.isOpen && !featureBar.isOpen) {
+        chatBar.onClose();
+      }
+      featureBar.onToggle();
+      setSelectedFeature(i);
+    },
+    [detectLgBreakpoint, featureBar, chatBar],
+  );
 
   if (canBroadcast) {
     return (
@@ -404,7 +436,7 @@ function RawStage(props: StageProps): JSX.Element {
               exit={{ opacity: 0 }}
             >
               <Flex w={{ base: "100vw", lg: "375px" }} h="full" bg="white">
-                Yo
+                {chatComponent}
               </Flex>
             </motion.div>
           </AnimatePresence>
@@ -427,16 +459,33 @@ function RawStage(props: StageProps): JSX.Element {
                 w="full"
                 h="full"
                 alignItems="flex-end"
-                justifyContent="center"
+                justifyContent={{
+                  base: "center",
+                  lg: chatBar.isOpen ? "flex-start" : "center",
+                }}
               >
                 <Box
                   bg="gray.900"
                   h="40%"
-                  w="full"
+                  w={{
+                    base: "full",
+                    lg: chatBar.isOpen ? "calc(100% - 375px)" : "full",
+                  }}
                   maxW="container.lg"
                   color="white"
                 >
-                  yo
+                  {featuresComponents.map((feature: any, i: any) => {
+                    return (
+                      <Box
+                        key={i}
+                        display={selectedFeature === i ? "block" : "none"}
+                        w="full"
+                        h="full"
+                      >
+                        {feature}
+                      </Box>
+                    );
+                  })}
                 </Box>
               </Flex>
             </motion.div>
@@ -446,15 +495,13 @@ function RawStage(props: StageProps): JSX.Element {
       <LiveControls
         chatOpenLabel={"Open Chat"}
         chatCloseLabel={"Hide Chat"}
-        onHangUp={() => {
-          alert("todo");
-        }}
+        onHangUp={onHangUp}
         isChatOpen={chatBar.isOpen}
-        onChatToggle={chatBar.onToggle}
+        onChatToggle={onChatToggle}
         helpButton={helpButton}
         featuresButton={featuresViewerButton}
         isFeatureOpen={featureBar.isOpen}
-        onFeatureToggle={featureBar.onToggle}
+        onFeatureToggle={(i: any) => onFeatureToggle(i)}
       />
     </Grid>
   );
