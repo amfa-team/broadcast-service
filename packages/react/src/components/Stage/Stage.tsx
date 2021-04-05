@@ -456,21 +456,18 @@ function RawStage(props: StageProps): JSX.Element {
               exit={{ opacity: 0 }}
             >
               <Flex
-                w="full"
+                w={{
+                  base: "full",
+                  lg: chatBar.isOpen ? "calc(100% - 375px)" : "full",
+                }}
                 h="full"
                 alignItems="flex-end"
-                justifyContent={{
-                  base: "center",
-                  lg: chatBar.isOpen ? "flex-start" : "center",
-                }}
+                justifyContent="center"
               >
                 <Box
                   bg="gray.900"
-                  h="40%"
-                  w={{
-                    base: "full",
-                    lg: chatBar.isOpen ? "calc(100% - 375px)" : "full",
-                  }}
+                  h="auto"
+                  w="full"
                   maxW="container.lg"
                   color="white"
                 >
