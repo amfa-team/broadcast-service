@@ -1,3 +1,11 @@
+# @amfa-team/broadcast-service [1.1.0-beta.6](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.5...@amfa-team/broadcast-service@1.1.0-beta.6) (2021-04-06)
+
+
+### Features
+
+* stuff ([fab07b0](https://github.com/amfa-team/broadcast-service/commit/fab07b03ff2648d672e76a718a4ea53a21e5731d))
+* up ([734faca](https://github.com/amfa-team/broadcast-service/commit/734facaf78654ede409fcecc0bdc213299fd8839))
+
 # @amfa-team/broadcast-service [1.1.0-beta.5](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.4...@amfa-team/broadcast-service@1.1.0-beta.5) (2021-04-03)
 
 
