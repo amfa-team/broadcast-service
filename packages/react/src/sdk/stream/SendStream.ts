@@ -364,8 +364,8 @@ export default class SendStream
 
   async toggleScreenShare(): Promise<void> {
     return this.isScreenShareEnabled()
-      ? this.screenShare()
-      : this.disableShare();
+      ? this.disableShare()
+      : this.screenShare();
   }
 
   pauseAudio = debounce(
