@@ -1,4 +1,5 @@
 import { StagePage } from "@amfa-team/broadcast-service";
+import { defaultDictionary } from "@amfa-team/broadcast-service-types";
 import { SpacePage } from "@amfa-team/space-service";
 import { DotLoader } from "@amfa-team/theme-service";
 import {
@@ -25,10 +26,9 @@ function ViewFeature(): ReactElement {
       return (
         <StagePage
           settings={{ endpoint: ws, spaceId }}
-          dictionary={{
-            join: "Join",
-            cgu:
-              "By joining you accept the terms and policy of SideBySide.live",
+          dictionary={defaultDictionary.en}
+          onHangUp={() => {
+            alert("todo");
           }}
         />
       );
@@ -45,7 +45,7 @@ function ViewFeature(): ReactElement {
         logoutDictionary={defaultLogoutDictionary.fr}
         registerDictionary={defaultRegisterDictionary.fr}
         dictionary={defaultRestrictedPageDictionary.fr}
-        LoadingComponent={DotLoader}
+        LoadingComponent={() => <DotLoader />}
       >
         {render}
       </SpacePage>

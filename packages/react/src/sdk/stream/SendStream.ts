@@ -290,10 +290,10 @@ export default class SendStream
       createVideoProducer(this._userMedia, this._transport),
       createAudioProducer(this._userMedia, this._transport),
     ]);
-    this._ready = true;
     if (this._el !== null) {
       this._el.srcObject = this._userMedia;
     }
+    this._ready = true;
     this.dispatchEvent(new PicnicEvent("start", null));
   }
 

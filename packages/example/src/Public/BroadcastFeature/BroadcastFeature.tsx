@@ -27,6 +27,9 @@ function BroadcastFeature(): ReactElement {
         <StagePage
           settings={{ endpoint: ws, spaceId }}
           dictionary={defaultDictionary.fr}
+          onHangUp={() => {
+            alert("todo");
+          }}
           broadcastEnabled
         />
       );

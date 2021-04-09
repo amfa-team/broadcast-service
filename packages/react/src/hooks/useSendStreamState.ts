@@ -10,7 +10,7 @@ export function useSendStreamState(sendStream: ISendStream | null) {
 
   useEffect(() => {
     const listener = () => {
-      setIsScreenSharing(sendStream?.isReady() ?? false);
+      setIsScreenSharing(sendStream?.isScreenShareEnabled() ?? false);
       setIsAudioPaused(sendStream?.isAudioPaused() ?? false);
       setIsVideoPaused(sendStream?.isVideoPaused() ?? false);
       setIsReconnecting(sendStream?.isReconnecting() ?? false);

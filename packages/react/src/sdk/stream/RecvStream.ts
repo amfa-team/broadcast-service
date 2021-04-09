@@ -156,7 +156,7 @@ export class RecvStream
   };
 
   isReconnecting() {
-    if (!this.isAudioPaused()) {
+    if (!this.isAudioPaused() && this.isAudioEnabled()) {
       if (
         this._audioState.score === 0 ||
         this._audioState.producerScore === 0
@@ -165,7 +165,7 @@ export class RecvStream
       }
     }
 
-    if (!this.isVideoPaused()) {
+    if (!this.isVideoPaused() && this.isVideoEnabled()) {
       if (
         this._videoState.score === 0 ||
         this._videoState.producerScore === 0
