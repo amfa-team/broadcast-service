@@ -1,3 +1,11 @@
+# @amfa-team/broadcast-service [1.1.0-beta.8](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.7...@amfa-team/broadcast-service@1.1.0-beta.8) (2021-04-09)
+
+
+### Bug Fixes
+
+* camera flip ([a22f8cd](https://github.com/amfa-team/broadcast-service/commit/a22f8cd0b34868ea6f0e091ec052bdef21d6ca21))
+* reconnecting state when audio/video disabled by host ([f6380d2](https://github.com/amfa-team/broadcast-service/commit/f6380d2662f68abc0e836a1a69923fa27291dc89))
+
 # @amfa-team/broadcast-service [1.1.0-beta.7](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.6...@amfa-team/broadcast-service@1.1.0-beta.7) (2021-04-09)
 
 
