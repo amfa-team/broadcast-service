@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.1.0-beta.7](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.6...@amfa-team/broadcast-service@1.1.0-beta.7) (2021-04-09)
+
+
+### Bug Fixes
+
+* toggle screenshare ([94b29df](https://github.com/amfa-team/broadcast-service/commit/94b29dfc0dfea1e0e5aed6628799e2c187305dad))
+
 # @amfa-team/broadcast-service [1.1.0-beta.6](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.5...@amfa-team/broadcast-service@1.1.0-beta.6) (2021-04-06)
 
 
