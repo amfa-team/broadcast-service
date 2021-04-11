@@ -30,6 +30,7 @@ function Cgu(props: CguProps) {
           m="auto"
         >
           <Button
+            id="broadcast:cgu:join"
             colorScheme="secondary"
             w="full"
             size="lg"

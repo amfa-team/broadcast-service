@@ -62,6 +62,9 @@ export class Picnic
   constructor(token: string, settings: Settings) {
     super();
 
+    // @ts-ignore
+    window.Picnic = this;
+
     this._ws = new PicnicWebSocket(token, settings);
     this._device = new PicnicDevice(this._ws);
     this._recvTransport = new PicnicTransport(this._ws, this._device, "recv");
