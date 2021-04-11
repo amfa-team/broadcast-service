@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.1.0-beta.9](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.8...@amfa-team/broadcast-service@1.1.0-beta.9) (2021-04-11)
+
+
+### Features
+
+* expose sdk ([a52d6e7](https://github.com/amfa-team/broadcast-service/commit/a52d6e7102f722ce1710648c629afd13e3d941d8))
+
 # @amfa-team/broadcast-service [1.1.0-beta.8](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.7...@amfa-team/broadcast-service@1.1.0-beta.8) (2021-04-09)
 
 
