@@ -1,9 +1,33 @@
-# @amfa-team/broadcast-service [1.1.0-beta.10](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.9...@amfa-team/broadcast-service@1.1.0-beta.10) (2021-04-14)
+# @amfa-team/broadcast-service [1.1.0](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0...@amfa-team/broadcast-service@1.1.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* add framer-motion ([ee0fece](https://github.com/amfa-team/broadcast-service/commit/ee0fece43b9d523225795dc635548ec9bda40b48))
+* build ([6c96069](https://github.com/amfa-team/broadcast-service/commit/6c96069b5af8f6a14f31a5f04db68ce72df5374f))
+* camera flip ([a22f8cd](https://github.com/amfa-team/broadcast-service/commit/a22f8cd0b34868ea6f0e091ec052bdef21d6ca21))
+* reconnecting state when audio/video disabled by host ([f6380d2](https://github.com/amfa-team/broadcast-service/commit/f6380d2662f68abc0e836a1a69923fa27291dc89))
+* toggle screenshare ([94b29df](https://github.com/amfa-team/broadcast-service/commit/94b29dfc0dfea1e0e5aed6628799e2c187305dad))
 
 
 ### Features
 
+* add basic broadcast layout ([7d4c0f2](https://github.com/amfa-team/broadcast-service/commit/7d4c0f2b556c45dab4e6ce45d14ced4f4dec46f9))
+* add feature bar ([4f471f5](https://github.com/amfa-team/broadcast-service/commit/4f471f5c7d20d1b59b4c07c00a8ba8cc7b5a79e4))
+* cosmetics ([10bc74e](https://github.com/amfa-team/broadcast-service/commit/10bc74eaeb147b96eb7972efe35b5f1793fe7fd8))
+* expose sdk ([a52d6e7](https://github.com/amfa-team/broadcast-service/commit/a52d6e7102f722ce1710648c629afd13e3d941d8))
+* finalize layout ([94709be](https://github.com/amfa-team/broadcast-service/commit/94709bef85936228ce79480e3401600a0995ebb7))
+* live Host layout ([d6d58bb](https://github.com/amfa-team/broadcast-service/commit/d6d58bb311824a3eb7427a2d1985102356cd2412))
+* live participant intermediate states ([23118a3](https://github.com/amfa-team/broadcast-service/commit/23118a3580fa99b8c01bb60863d9b3d77c389be2))
+* mofo grid ([3db84b3](https://github.com/amfa-team/broadcast-service/commit/3db84b3cffd8afaf343ac32b9c9c4327cac70aa8))
+* pass down chat and features components ([aff3253](https://github.com/amfa-team/broadcast-service/commit/aff32532bdc43510d035c77995919ef1f91e8d48))
+* stuff ([fab07b0](https://github.com/amfa-team/broadcast-service/commit/fab07b03ff2648d672e76a718a4ea53a21e5731d))
+* up ([734faca](https://github.com/amfa-team/broadcast-service/commit/734facaf78654ede409fcecc0bdc213299fd8839))
+* upgrade dependencies ([615388c](https://github.com/amfa-team/broadcast-service/commit/615388ce05bbb72ae4fe1b1275e8789feddfb81c))
 * upgrade deps ([45bd8a8](https://github.com/amfa-team/broadcast-service/commit/45bd8a8a6734a81ab84fa047dfb216e6715b60d0))
+* upgrade services ([085e687](https://github.com/amfa-team/broadcast-service/commit/085e6870a715a6b92e4bfb8bb09faf0ce7b21c56))
+* upgrade theme-service ([50b9339](https://github.com/amfa-team/broadcast-service/commit/50b9339bb5400e523a1e5e04c412ae9619952c50))
+
 
 
 
@@ -11,7 +35,7 @@
 
 ### Dependencies
 
-* **@amfa-team/broadcast-service-types:** upgraded to 1.1.0-beta.4
+* **@amfa-team/broadcast-service-types:** upgraded to 1.1.0
 
 # @amfa-team/broadcast-service [1.1.0-beta.9](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.8...@amfa-team/broadcast-service@1.1.0-beta.9) (2021-04-11)
 
