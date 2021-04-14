@@ -115,7 +115,7 @@ export async function parseWsParticipantRequest<T>(
   decoder: JsonDecoder.Decoder<T>,
 ): Promise<WsParticipantRequest<T>> {
   const result = parseWsRequest(event, decoder);
-  const participant = await authParticipant(result, role, event.requestContext);
+  const participant = await authParticipant(result, role);
 
   return {
     ...result,
