@@ -51,9 +51,9 @@ async function getClient(url: string): Promise<Mongoose> {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       connectTimeoutMS: 5_000, // How long to wait for a connection to be established before timing out
-      poolSize: Number(process.env.POOL_SIZE ?? 10), // Maintain up to 10 socket connections
-      maxPoolSize: Number(process.env.MAX_POOL_SIZE ?? 20),
-      minPoolSize: Number(process.env.MIN_POOL_SIZE ?? 2),
+      poolSize: Number(process.env.POOL_SIZE ?? 5), // Maintain up to 5 socket connections
+      maxPoolSize: Number(process.env.MAX_POOL_SIZE ?? 5),
+      minPoolSize: Number(process.env.MIN_POOL_SIZE ?? 0),
       maxIdleTimeMS: 600_000,
       serverSelectionTimeoutMS: 5_000, // How long to block for server selection before throwing an error
       heartbeatFrequencyMS: 2_000, // The frequency with which topology updates are scheduled

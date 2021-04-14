@@ -14,7 +14,6 @@
   "devDependencies": {
     "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^12.0.1",
-    "multi-semantic-release": "^2.8.0",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "eslint": "^7.23.0",
@@ -29,6 +28,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.4",
+    "multi-semantic-release": "^2.8.0",
     "prettier": "^2.2.1",
     "stylelint": "^13.12.0",
     "stylelint-config-css-modules": "^2.2.0",
