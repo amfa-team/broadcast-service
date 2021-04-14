@@ -10,7 +10,7 @@ type ProducerMeta = {
 const producers: Map<string, types.Producer> = new Map();
 const producersMeta: WeakMap<types.Producer, ProducerMeta> = new WeakMap();
 
-const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 1000 : 20000;
+const DEBOUNCE_WAIT = process.env.NODE_ENV === "production" ? 4000 : 20000;
 
 export function getProducerScore(producer: types.Producer): number {
   const { score } = producer;
@@ -46,7 +46,9 @@ export async function createProducer(
       console.error("Producer.onStateChange: fail", e);
     });
   };
-  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT);
+  const onScoreChange = debounce(onStateChange, DEBOUNCE_WAIT, {
+    maxWait: DEBOUNCE_WAIT * 5,
+  });
 
   // Set Producer events.
   producer.on("score", onScoreChange);

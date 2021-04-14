@@ -1,3 +1,92 @@
+# @amfa-team/broadcast-service [1.1.0-beta.9](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.8...@amfa-team/broadcast-service@1.1.0-beta.9) (2021-04-11)
+
+
+### Features
+
+* expose sdk ([a52d6e7](https://github.com/amfa-team/broadcast-service/commit/a52d6e7102f722ce1710648c629afd13e3d941d8))
+
+# @amfa-team/broadcast-service [1.1.0-beta.8](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.7...@amfa-team/broadcast-service@1.1.0-beta.8) (2021-04-09)
+
+
+### Bug Fixes
+
+* camera flip ([a22f8cd](https://github.com/amfa-team/broadcast-service/commit/a22f8cd0b34868ea6f0e091ec052bdef21d6ca21))
+* reconnecting state when audio/video disabled by host ([f6380d2](https://github.com/amfa-team/broadcast-service/commit/f6380d2662f68abc0e836a1a69923fa27291dc89))
+
+# @amfa-team/broadcast-service [1.1.0-beta.7](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.6...@amfa-team/broadcast-service@1.1.0-beta.7) (2021-04-09)
+
+
+### Bug Fixes
+
+* toggle screenshare ([94b29df](https://github.com/amfa-team/broadcast-service/commit/94b29dfc0dfea1e0e5aed6628799e2c187305dad))
+
+# @amfa-team/broadcast-service [1.1.0-beta.6](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.5...@amfa-team/broadcast-service@1.1.0-beta.6) (2021-04-06)
+
+
+### Features
+
+* stuff ([fab07b0](https://github.com/amfa-team/broadcast-service/commit/fab07b03ff2648d672e76a718a4ea53a21e5731d))
+* up ([734faca](https://github.com/amfa-team/broadcast-service/commit/734facaf78654ede409fcecc0bdc213299fd8839))
+
+# @amfa-team/broadcast-service [1.1.0-beta.5](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.4...@amfa-team/broadcast-service@1.1.0-beta.5) (2021-04-03)
+
+
+### Bug Fixes
+
+* add framer-motion ([ee0fece](https://github.com/amfa-team/broadcast-service/commit/ee0fece43b9d523225795dc635548ec9bda40b48))
+
+
+### Features
+
+* add feature bar ([4f471f5](https://github.com/amfa-team/broadcast-service/commit/4f471f5c7d20d1b59b4c07c00a8ba8cc7b5a79e4))
+* cosmetics ([10bc74e](https://github.com/amfa-team/broadcast-service/commit/10bc74eaeb147b96eb7972efe35b5f1793fe7fd8))
+* mofo grid ([3db84b3](https://github.com/amfa-team/broadcast-service/commit/3db84b3cffd8afaf343ac32b9c9c4327cac70aa8))
+* pass down chat and features components ([aff3253](https://github.com/amfa-team/broadcast-service/commit/aff32532bdc43510d035c77995919ef1f91e8d48))
+* upgrade services ([085e687](https://github.com/amfa-team/broadcast-service/commit/085e6870a715a6b92e4bfb8bb09faf0ce7b21c56))
+
+# @amfa-team/broadcast-service [1.1.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.3...@amfa-team/broadcast-service@1.1.0-beta.4) (2021-03-28)
+
+
+### Features
+
+* finalize layout ([94709be](https://github.com/amfa-team/broadcast-service/commit/94709bef85936228ce79480e3401600a0995ebb7))
+
+
+
+
+
+### Dependencies
+
+* **@amfa-team/broadcast-service-types:** upgraded to 1.1.0-beta.3
+
+# @amfa-team/broadcast-service [1.1.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.2...@amfa-team/broadcast-service@1.1.0-beta.3) (2021-03-27)
+
+
+### Features
+
+* live Host layout ([d6d58bb](https://github.com/amfa-team/broadcast-service/commit/d6d58bb311824a3eb7427a2d1985102356cd2412))
+
+# @amfa-team/broadcast-service [1.1.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0-beta.1...@amfa-team/broadcast-service@1.1.0-beta.2) (2021-03-27)
+
+
+### Bug Fixes
+
+* build ([6c96069](https://github.com/amfa-team/broadcast-service/commit/6c96069b5af8f6a14f31a5f04db68ce72df5374f))
+
+
+### Features
+
+* live participant intermediate states ([23118a3](https://github.com/amfa-team/broadcast-service/commit/23118a3580fa99b8c01bb60863d9b3d77c389be2))
+
+# @amfa-team/broadcast-service [1.1.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0...@amfa-team/broadcast-service@1.1.0-beta.1) (2021-03-22)
+
+
+### Features
+
+* add basic broadcast layout ([7d4c0f2](https://github.com/amfa-team/broadcast-service/commit/7d4c0f2b556c45dab4e6ce45d14ced4f4dec46f9))
+* upgrade dependencies ([615388c](https://github.com/amfa-team/broadcast-service/commit/615388ce05bbb72ae4fe1b1275e8789feddfb81c))
+* upgrade theme-service ([50b9339](https://github.com/amfa-team/broadcast-service/commit/50b9339bb5400e523a1e5e04c412ae9619952c50))
+
 # @amfa-team/broadcast-service 1.0.0 (2021-03-05)
 
 

@@ -1,12 +1,86 @@
-import React from "react";
-import { Video } from "../Video";
-import { RecvStreamOverlay } from "./RecvStreamOverlay";
-import type { UseRecvStreamVideo } from "./useRecvStreamVideo";
+import { LiveParticipant } from "@amfa-team/theme-service";
+import { captureException } from "@sentry/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useRecvStreamState } from "../../../hooks/useRecvStreamEvents";
+import type { IRecvStream } from "../../../sdk/stream/RecvStream";
 
-export function RecvStreamVideo(props: UseRecvStreamVideo): JSX.Element {
+export interface RecvStreamVideoProps {
+  recvStream: IRecvStream;
+  isFullScreen: boolean;
+  setFullScreen: (recvStream: IRecvStream) => Promise<void>;
+}
+
+export function RecvStreamVideo(props: RecvStreamVideoProps): JSX.Element {
+  const { recvStream, isFullScreen, setFullScreen } = props;
+  const {
+    volume,
+    isAudioEnabled,
+    isReady,
+    isVideoEnabled,
+    isReconnecting,
+  } = useRecvStreamState(recvStream);
+  const [isTogglingVolume, setIsTogglingVolume] = useState(false);
+  const [isTogglingFullScreen, setIsTogglingFullScreen] = useState(false);
+
+  const onToggleFullScreen = useCallback(async () => {
+    try {
+      setIsTogglingFullScreen(true);
+      await setFullScreen(recvStream);
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setIsTogglingFullScreen(false);
+    }
+  }, [recvStream, setFullScreen]);
+
+  useEffect(() => {
+    setIsTogglingVolume(false);
+    setIsTogglingFullScreen(false);
+  }, [recvStream]);
+
+  const attachAudioEffect = useCallback(
+    (el: HTMLAudioElement | null) => {
+      return recvStream.attachAudioEffect(el);
+    },
+    [recvStream],
+  );
+
+  const attachVideoEffect = useCallback(
+    (el: HTMLVideoElement | null) => {
+      return recvStream.attachVideoEffect(el);
+    },
+    [recvStream],
+  );
+
+  const onToggleVolume = useCallback(async () => {
+    try {
+      setIsTogglingVolume(true);
+      await recvStream.toggleAudio();
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setIsTogglingVolume(false);
+    }
+  }, [recvStream]);
+
   return (
-    <Video {...props.video}>
-      <RecvStreamOverlay {...props.overlay} />
-    </Video>
+    <LiveParticipant
+      isLoading={!isReady}
+      isReconnecting={isReconnecting}
+      isLiveLabel="Live (TODO)"
+      isReconnectingLabel="Reconnecting (TODO)"
+      isLocal={false}
+      isFrontFacing={false}
+      isVideoEnabled={isVideoEnabled}
+      isAudioEnabled={isAudioEnabled}
+      attachAudioEffect={attachAudioEffect}
+      attachVideoEffect={attachVideoEffect}
+      volume={volume}
+      isFullScreen={isFullScreen}
+      isTogglingVolume={isTogglingVolume}
+      isTogglingFullScreen={isTogglingFullScreen}
+      onToggleFullScreen={onToggleFullScreen}
+      onToggleVolume={onToggleVolume}
+    />
   );
 }

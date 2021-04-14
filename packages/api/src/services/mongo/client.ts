@@ -48,13 +48,12 @@ async function getClient(url: string): Promise<Mongoose> {
     const instance = new mongoose.Mongoose();
     cachedClient = instance.connect(url, {
       appname: `broadcast-service-${getEnvName()}`,
-      autoReconnect: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,
       connectTimeoutMS: 5_000, // How long to wait for a connection to be established before timing out
-      poolSize: Number(process.env.POOL_SIZE ?? 10), // Maintain up to 10 socket connections
-      maxPoolSize: Number(process.env.MAX_POOL_SIZE ?? 20),
-      minPoolSize: Number(process.env.MIN_POOL_SIZE ?? 2),
+      poolSize: Number(process.env.POOL_SIZE ?? 5), // Maintain up to 5 socket connections
+      maxPoolSize: Number(process.env.MAX_POOL_SIZE ?? 5),
+      minPoolSize: Number(process.env.MIN_POOL_SIZE ?? 0),
       maxIdleTimeMS: 600_000,
       serverSelectionTimeoutMS: 5_000, // How long to block for server selection before throwing an error
       heartbeatFrequencyMS: 2_000, // The frequency with which topology updates are scheduled
@@ -65,7 +64,6 @@ async function getClient(url: string): Promise<Mongoose> {
       useFindAndModify: false,
       useCreateIndex: true,
       bufferCommands: true,
-      bufferMaxEntries: 20, // Sets a cap on how many operations the driver will buffer up before giving up on getting a working connection, default is -1 which is unlimited
       readPreference: "primaryPreferred",
     });
 

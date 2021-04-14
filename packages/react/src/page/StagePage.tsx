@@ -1,54 +1,90 @@
 import type { Dictionary } from "@amfa-team/broadcast-service-types";
-import { Button, DotLoader } from "@amfa-team/theme-service";
-import { useConnect, useToken } from "@amfa-team/user-service";
+import { DotLoader, ErrorShield } from "@amfa-team/theme-service";
+import { useToken } from "@amfa-team/user-service";
+import { Center } from "@chakra-ui/react";
 import React from "react";
-import { StageContainer } from "../components/Stage";
+import type { ReactElement } from "react";
+import Cgu from "../components/Cgu/Cgu";
+import { Stage } from "../components/Stage";
 import { useSDK } from "../hooks/useSDK";
 import type { Settings } from "../types";
-import styles from "./stagePage.module.css";
 
 interface StagePageProps {
   settings: Settings;
   broadcastEnabled: boolean;
   dictionary: Dictionary;
+  helpButton?: ReactElement;
+  chatComponent?: ReactElement;
+  featuresViewerButton?: any;
+  featuresComponents?: any;
+  onHangUp: () => void;
 }
 
-export function StagePage(props: StagePageProps) {
-  const { settings, broadcastEnabled, dictionary } = props;
+function RawStagePage(props: StagePageProps) {
+  const {
+    settings,
+    broadcastEnabled,
+    dictionary,
+    helpButton,
+    chatComponent,
+    featuresViewerButton,
+    featuresComponents,
+    onHangUp,
+  } = props;
   const token = useToken();
   const state = useSDK(settings);
-  const { isConnecting, isReady, connect } = useConnect();
-
-  if (!isReady || isConnecting) {
-    return (
-      <div className={styles.container}>
-        <DotLoader />
-      </div>
-    );
-  }
 
   if (!token) {
     return (
-      <div className={styles.container}>
-        <div className={styles.cgu}>{dictionary.cgu}</div>
-        <div className={styles.joinContainer}>
-          <Button onClick={connect}>{dictionary.join}</Button>
-        </div>
-      </div>
+      <Center h="full" w="full">
+        <Cgu dictionary={dictionary} />
+      </Center>
     );
   }
 
   if (!state.loaded) {
     return (
-      <div className={styles.container}>
+      <Center h="full" w="full">
         <DotLoader />
-      </div>
+      </Center>
     );
   }
 
-  return <StageContainer sdk={state.sdk} broadcastEnabled={broadcastEnabled} />;
+  return (
+    <Stage
+      sdk={state.sdk}
+      canBroadcast={broadcastEnabled}
+      helpButton={helpButton}
+      featuresViewerButton={featuresViewerButton}
+      chatComponent={chatComponent}
+      featuresComponents={featuresComponents}
+      onHangUp={onHangUp}
+    />
+  );
+}
+RawStagePage.defaultProps = {
+  helpButton: null,
+  chatComponent: null,
+  featuresViewerButton: [],
+  featuresComponents: [],
+};
+
+export function StagePage(props: StagePageProps) {
+  return (
+    <ErrorShield
+      errorTitle={props.dictionary.error.unknown.title}
+      errorText={props.dictionary.error.unknown.text}
+      errorRetry={props.dictionary.error.unknown.retryBtn}
+    >
+      <RawStagePage {...props} />
+    </ErrorShield>
+  );
 }
 
 StagePage.defaultProps = {
   broadcastEnabled: false,
+  featuresViewerButton: [],
+  helpButton: null,
+  chatComponent: null,
+  featuresComponents: [],
 };

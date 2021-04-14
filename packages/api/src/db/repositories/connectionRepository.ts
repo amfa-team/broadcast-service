@@ -72,3 +72,17 @@ export async function findConnectionByRecvTransportId(
     throw new PicnicError("findConnectionByRecvTransportId: failed", e);
   }
 }
+
+export async function findConnectionBySendTransportId(
+  sendTransportId: string,
+): Promise<Connection[]> {
+  try {
+    const { ConnectionModel } = await getModels();
+    const results: unknown = await ConnectionModel.find({
+      sendTransportId,
+    });
+    return results as Connection[];
+  } catch (e) {
+    throw new PicnicError("findConnectionBySendTransportId: failed", e);
+  }
+}

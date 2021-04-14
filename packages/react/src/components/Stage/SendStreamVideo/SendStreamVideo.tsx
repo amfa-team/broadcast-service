@@ -1,12 +1,44 @@
-import React from "react";
-import { Video } from "../Video";
-import { SendStreamOverlay } from "./SendStreamOverlay";
-import type { UseSendStreamVideo } from "./useSendStreamVideo";
+import { LiveHost } from "@amfa-team/theme-service";
+import React, { useCallback } from "react";
+import { useSendStreamState } from "../../../hooks/useSendStreamState";
+import type { ISendStream } from "../../../sdk/stream/SendStream";
 
-export function SendStreamVideo(props: UseSendStreamVideo): JSX.Element {
+export interface SendStreamVideoProps {
+  sendStream: ISendStream;
+}
+
+export function SendStreamVideo(props: SendStreamVideoProps): JSX.Element {
+  const { sendStream } = props;
+  const {
+    isScreenSharing,
+    isVideoPaused,
+    isReconnecting,
+    isReady,
+  } = useSendStreamState(sendStream);
+
+  const attachVideoEffect = useCallback(
+    (el: HTMLVideoElement | null) => {
+      return sendStream.attachVideoEffect(el);
+    },
+    [sendStream],
+  );
+
+  const attachAudioEffect = useCallback(() => {
+    return () => {
+      // no-op
+    };
+  }, []);
+
   return (
-    <Video {...props.video}>
-      <SendStreamOverlay {...props.overlay} />
-    </Video>
+    <LiveHost
+      isLoading={!isReady}
+      isReconnecting={isReconnecting}
+      isLiveLabel="Live (TODO)"
+      isReconnectingLabel="Reconnecting (TODO)"
+      isFrontFacing={!isScreenSharing}
+      isVideoEnabled={!isVideoPaused}
+      attachAudioEffect={attachAudioEffect}
+      attachVideoEffect={attachVideoEffect}
+    />
   );
 }

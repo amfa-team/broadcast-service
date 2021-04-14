@@ -5,7 +5,9 @@ import type { SDKState, Settings } from "../types";
 import { PicnicDevice } from "./device/device";
 import type { ServerEvents } from "./events/event";
 import { PicnicEvent } from "./events/event";
+import type { IRecvStream } from "./stream/RecvStream";
 import { RecvStream } from "./stream/RecvStream";
+import type { ISendStream } from "./stream/SendStream";
 import SendStream from "./stream/SendStream";
 import { PicnicTransport } from "./transport/transport";
 import { PicnicWebSocket } from "./websocket/websocket";
@@ -19,159 +21,199 @@ export const initialState: SDKState = {
 
 export type SdkEvents = {
   "state:change": PicnicEvent<"state:change", SDKState>;
-  "stream:update": PicnicEvent<"stream:update", Map<string, RecvStream>>;
+  "stream:update": PicnicEvent<"stream:update", IRecvStream[]>;
+  "broadcast:init": PicnicEvent<"broadcast:init", null>;
   "broadcast:start": PicnicEvent<"broadcast:start", null>;
   "broadcast:stop": PicnicEvent<"broadcast:stop", null>;
   destroy: PicnicEvent<"destroy", null>;
 };
 
-export class Picnic extends EventTarget<SdkEvents, "strict"> {
-  #state: SDKState = initialState;
+export interface IBroadcastSdk extends EventTarget<SdkEvents, "strict"> {
+  getRecvStreams(): IRecvStream[];
 
-  #recvStreams: Map<string, RecvStream> = new Map();
+  getBroadcastStream(): ISendStream | null;
 
-  #device: PicnicDevice;
+  setMainRecvStream(id: string | null): void;
 
-  #ws: PicnicWebSocket;
+  broadcast(): Promise<ISendStream>;
 
-  #sendTransport: PicnicTransport | null = null;
+  destroy(): Promise<void>;
+}
 
-  #recvTransport: PicnicTransport;
+export class Picnic
+  extends EventTarget<SdkEvents, "strict">
+  implements IBroadcastSdk {
+  _state: SDKState = initialState;
 
-  #broadcastStream: SendStream | null = null;
+  _recvStreams: Map<string, RecvStream> = new Map();
+
+  _device: PicnicDevice;
+
+  _ws: PicnicWebSocket;
+
+  _sendTransport: PicnicTransport | null = null;
+
+  _recvTransport: PicnicTransport;
+
+  _broadcastStream: SendStream | null = null;
+
+  _mainRecvStream: string | null = null;
 
   constructor(token: string, settings: Settings) {
     super();
 
-    this.#ws = new PicnicWebSocket(token, settings);
-    this.#device = new PicnicDevice(this.#ws);
-    this.#recvTransport = new PicnicTransport(this.#ws, this.#device, "recv");
+    // @ts-ignore
+    window.Picnic = this;
 
-    this.#ws.addEventListener("state:change", this.#onStateChange);
-    this.#device.addEventListener("state:change", this.#onStateChange);
-    this.#recvTransport.addEventListener("state:change", this.#onStateChange);
+    this._ws = new PicnicWebSocket(token, settings);
+    this._device = new PicnicDevice(this._ws);
+    this._recvTransport = new PicnicTransport(this._ws, this._device, "recv");
+
+    this._ws.addEventListener("state:change", this._onStateChange);
+    this._device.addEventListener("state:change", this._onStateChange);
+    this._recvTransport.addEventListener("state:change", this._onStateChange);
   }
 
   getState(): SDKState {
-    return this.#state;
+    return this._state;
   }
 
-  #onStateChange = (): void => {
-    this.#state = {
-      websocket: this.#ws.getState(),
-      device: this.#device.getState(),
-      recvTransport: this.#recvTransport.getState(),
-      sendTransport: this.#sendTransport?.getState() ?? "initial",
+  _onStateChange = (): void => {
+    this._state = {
+      websocket: this._ws.getState(),
+      device: this._device.getState(),
+      recvTransport: this._recvTransport.getState(),
+      sendTransport: this._sendTransport?.getState() ?? "initial",
     };
 
     const event = new PicnicEvent<"state:change", SDKState>(
       "state:change",
-      this.#state,
+      this._state,
     );
     this.dispatchEvent(event);
   };
 
   async destroy(): Promise<void> {
-    this.#ws.removeEventListener("state:change", this.#onStateChange);
-    this.#device.removeEventListener("state:change", this.#onStateChange);
-    this.#recvTransport.removeEventListener(
+    this._ws.removeEventListener("state:change", this._onStateChange);
+    this._device.removeEventListener("state:change", this._onStateChange);
+    this._recvTransport.removeEventListener(
       "state:change",
-      this.#onStateChange,
+      this._onStateChange,
     );
-    this.#sendTransport?.removeEventListener(
+    this._sendTransport?.removeEventListener(
       "state:change",
-      this.#onStateChange,
+      this._onStateChange,
     );
-    this.#broadcastStream?.removeEventListener("start", this.#onBroadcastStart);
-    this.#broadcastStream?.removeEventListener("stop", this.#onBroadcastStop);
+    this._broadcastStream?.removeEventListener("start", this._onBroadcastStart);
+    this._broadcastStream?.removeEventListener(
+      "destroy",
+      this._onBroadcastDestroy,
+    );
 
-    await this.#device.destroy();
+    await this._device.destroy();
     await Promise.all(
-      Array.from(this.#recvStreams.values()).map(async (s) =>
-        this.#removeStream(s.getId()),
+      Array.from(this._recvStreams.values()).map(async (s) =>
+        this._removeStream(s.getId()),
       ),
     );
-    await this.#recvTransport.destroy();
-    await this.#sendTransport?.destroy();
-    await this.#ws.destroy();
+    await this._recvTransport.destroy();
+    await this._sendTransport?.destroy();
+    await this._ws.destroy();
 
     this.dispatchEvent(new PicnicEvent("destroy", null));
   }
 
   getBroadcastStream(): SendStream | null {
-    return this.#broadcastStream;
+    return this._broadcastStream;
   }
 
   getStreams(): Map<string, RecvStream> {
-    return this.#recvStreams;
+    return this._recvStreams;
   }
 
-  #updateStreams = async (): Promise<void> => {
+  setMainRecvStream(id: string | null): void {
+    this._mainRecvStream = id;
+    const evt = new PicnicEvent("stream:update", this.getRecvStreams());
+    this.dispatchEvent(evt);
+  }
+
+  getRecvStreams(): RecvStream[] {
+    return Array.from(this.getStreams().values()).sort((a, b) => {
+      if (a.getId() === this._mainRecvStream) {
+        return -1;
+      }
+
+      if (b.getId() === this._mainRecvStream) {
+        return 1;
+      }
+
+      return a.getCreatedAt() - b.getCreatedAt();
+    });
+  }
+
+  _updateStreams = async (): Promise<void> => {
     const removedEvents: Array<ServerEvents["stream:remove"]["data"]> = [];
     const watchRemoved = ({ data }: ServerEvents["stream:remove"]) => {
       removedEvents.push(data);
     };
-    this.#ws.addEventListener("stream:remove", watchRemoved);
+    this._ws.addEventListener("stream:remove", watchRemoved);
 
-    const infos = await this.#ws.send<StreamInfo[]>("/sfu/send/list", null);
-    await Promise.all(infos.map(this.#addStream));
-    this.#ws.removeEventListener("stream:remove", watchRemoved);
+    const infos = await this._ws.send<StreamInfo[]>("/sfu/send/list", null);
+    await Promise.all(infos.map(this._addStream));
+    this._ws.removeEventListener("stream:remove", watchRemoved);
 
     // replay received remove events
-    await Promise.all(removedEvents.map(this.#removeStream));
+    await Promise.all(removedEvents.map(this._removeStream));
   };
 
   async load(): Promise<void> {
-    await this.#ws.load();
-    await this.#device.loadDevice();
-    await this.#recvTransport.load();
+    await this._ws.load();
+    await this._device.loadDevice();
+    await this._recvTransport.load();
 
-    this.#ws.addEventListener(
+    this._ws.addEventListener(
       "stream:add",
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async ({ data }: ServerEvents["stream:add"]) => {
-        await this.#addStream(data);
+        await this._addStream(data);
       },
     );
-    this.#ws.addEventListener(
+    this._ws.addEventListener(
       "stream:remove",
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async ({ data }: ServerEvents["stream:remove"]) => {
-        await this.#removeStream(data);
+        await this._removeStream(data);
       },
     );
 
-    await this.#updateStreams();
+    await this._updateStreams();
   }
 
-  #addStream = async (info: StreamInfo): Promise<void> => {
+  _addStream = async (info: StreamInfo): Promise<void> => {
     try {
       const { transportId, producerId } = info;
 
-      if (
-        this.#sendTransport?.getState() === "connected" &&
-        this.#sendTransport.getId() === transportId
-      ) {
+      if (this._sendTransport?.getId() === transportId) {
         // ignore self stream
         return;
       }
 
       const recvStream =
-        this.#recvStreams.get(transportId) ??
+        this._recvStreams.get(transportId) ??
         new RecvStream({
-          transport: this.#recvTransport,
-          device: this.#device,
-          ws: this.#ws,
+          transport: this._recvTransport,
+          device: this._device,
+          ws: this._ws,
           sourceTransportId: transportId,
         });
 
-      this.#recvStreams.set(transportId, recvStream);
+      this._recvStreams.set(transportId, recvStream);
 
       await recvStream.load(producerId);
 
       // Might not be ready if only one of audio/video track is loaded
       if (recvStream.isReady()) {
-        const evt = new PicnicEvent("stream:update", this.#recvStreams);
+        const evt = new PicnicEvent("stream:update", this.getRecvStreams());
         this.dispatchEvent(evt);
       }
     } catch (error) {
@@ -181,42 +223,53 @@ export class Picnic extends EventTarget<SdkEvents, "strict"> {
     }
   };
 
-  #removeStream = async (sourceTransportId: string): Promise<void> => {
-    const recvStream = this.#recvStreams.get(sourceTransportId);
+  _removeStream = async (sourceTransportId: string): Promise<void> => {
+    const recvStream = this._recvStreams.get(sourceTransportId);
     if (!recvStream) {
       return;
     }
 
     await recvStream.destroy();
-    this.#recvStreams.delete(sourceTransportId);
-    const evt = new PicnicEvent("stream:update", this.#recvStreams);
+    this._recvStreams.delete(sourceTransportId);
+    const evt = new PicnicEvent("stream:update", this.getRecvStreams());
     this.dispatchEvent(evt);
   };
 
-  #onBroadcastStart = (): void => {
+  _onBroadcastStart = (): void => {
     const event = new PicnicEvent("broadcast:start", null);
     this.dispatchEvent(event);
   };
 
-  #onBroadcastStop = (): void => {
+  _onBroadcastDestroy = (): void => {
+    this._broadcastStream = null;
     const event = new PicnicEvent("broadcast:stop", null);
     this.dispatchEvent(event);
   };
 
   async broadcast(): Promise<SendStream> {
-    if (this.#sendTransport === null) {
-      this.#sendTransport = new PicnicTransport(this.#ws, this.#device, "send");
-      this.#sendTransport.addEventListener("state:change", this.#onStateChange);
-      await this.#sendTransport.load();
+    if (this._sendTransport === null) {
+      this._sendTransport = new PicnicTransport(this._ws, this._device, "send");
+      this._sendTransport.addEventListener("state:change", this._onStateChange);
+      await this._sendTransport.load();
     }
-    const broadcastStream = new SendStream(this.#sendTransport, this.#ws);
 
-    broadcastStream.addEventListener("start", this.#onBroadcastStart);
-    broadcastStream.addEventListener("stop", this.#onBroadcastStop);
+    if (this._broadcastStream === null) {
+      const broadcastStream = new SendStream(this._sendTransport, this._ws);
 
-    await broadcastStream.load();
-    this.#broadcastStream = broadcastStream;
+      broadcastStream.addEventListener("start", this._onBroadcastStart);
+      broadcastStream.addEventListener("destroy", this._onBroadcastDestroy);
 
-    return broadcastStream;
+      this._broadcastStream = broadcastStream;
+      this.dispatchEvent(new PicnicEvent("broadcast:init", null));
+      try {
+        await broadcastStream.load();
+        return broadcastStream;
+      } catch (e) {
+        this._onBroadcastDestroy();
+        throw e;
+      }
+    }
+
+    return this._broadcastStream;
   }
 }

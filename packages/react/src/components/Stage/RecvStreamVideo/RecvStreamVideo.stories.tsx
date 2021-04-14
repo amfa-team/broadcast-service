@@ -1,8 +1,12 @@
 import { action } from "@storybook/addon-actions";
 import type { Story } from "@storybook/react";
-import React, { createRef } from "react";
-import video from "../Video/test/video.mp4";
-import type { UseRecvStreamVideo } from ".";
+import React, { useMemo } from "react";
+import audio from "../../../fixtures/assets/outfoxing.mp3";
+import video from "../../../fixtures/assets/video.mp4";
+import type { RecvStreamState } from "../../../fixtures/RecvStreamFixture";
+import { RecvStreamFixture } from "../../../fixtures/RecvStreamFixture";
+import { wait } from "../../../fixtures/wait";
+import type { RecvStreamVideoProps } from "./RecvStreamVideo";
 import { RecvStreamVideo } from ".";
 
 export default {
@@ -10,94 +14,113 @@ export default {
   component: RecvStreamVideo,
 };
 
-const Template: Story<UseRecvStreamVideo> = (
-  props: UseRecvStreamVideo,
-): JSX.Element => <RecvStreamVideo {...props} />;
+interface TemplateProps extends Omit<RecvStreamVideoProps, "recStream"> {
+  state: RecvStreamState;
+}
+
+const Template: Story<TemplateProps> = (props: TemplateProps): JSX.Element => {
+  const { state, ...rest } = props;
+  const recvStream = useMemo(() => {
+    return new RecvStreamFixture({ ...state });
+  }, [state]);
+  return (
+    <RecvStreamVideo
+      {...rest}
+      recvStream={recvStream}
+      setFullScreen={async (r) => {
+        action("setFullScreen")(r);
+        await wait(400);
+      }}
+    />
+  );
+};
 
 export const Loading = Template.bind({});
 Loading.args = {
-  video: {
-    refVideo: createRef(),
-    isLoading: true,
-    isPlaying: false,
-    muted: false,
-    flip: false,
+  state: {
+    isVideoEnabled: false,
+    isAudioEnabled: false,
+    isAudioPaused: true,
+    isVideoPaused: true,
+    isReady: false,
+    isReconnecting: false,
+    audio,
+    video,
   },
-  overlay: {
-    controls: {
-      audioPaused: false,
-      videoPaused: false,
-      toggleAudio: action("toggleAudio"),
-      toggleVideo: action("toggleVideo"),
-      maximize: action("maximize"),
-    },
-    status: {
-      recvQuality: null,
-      producerAudioPaused: true,
-    },
-  },
-};
-
-const autoPlay = (ref: null | HTMLVideoElement) => {
-  if (ref) {
-    // eslint-disable-next-line no-param-reassign
-    ref.onloadedmetadata = () => {
-      ref.play();
-    };
-    // eslint-disable-next-line no-param-reassign
-    ref.src = video;
-  }
+  isFullScreen: false,
 };
 
 export const Default = Template.bind({});
 Default.args = {
-  video: {
-    refVideo: autoPlay,
-    isLoading: false,
-    isPlaying: true,
-    muted: false,
-    flip: false,
+  state: {
+    isVideoEnabled: true,
+    isAudioEnabled: true,
+    isAudioPaused: false,
+    isVideoPaused: false,
+    isReady: true,
+    isReconnecting: false,
+    audio,
+    video,
   },
-  overlay: {
-    controls: {
-      audioPaused: false,
-      videoPaused: false,
-      toggleAudio: action("toggleAudio"),
-      toggleVideo: action("toggleVideo"),
-      maximize: action("maximize"),
-    },
-    status: {
-      recvQuality: 3,
-      producerAudioPaused: true,
-    },
-  },
+  isFullScreen: true,
 };
 
-export const ManualPlay = Template.bind({});
-ManualPlay.args = {
-  video: {
-    refVideo: (ref: null | HTMLVideoElement) => {
-      if (ref) {
-        // eslint-disable-next-line no-param-reassign
-        ref.src = video;
-      }
-    },
-    isLoading: false,
-    isPlaying: false,
-    muted: false,
-    flip: true,
+export const MicOff = Template.bind({});
+MicOff.args = {
+  state: {
+    isVideoEnabled: true,
+    isAudioEnabled: false,
+    isAudioPaused: false,
+    isVideoPaused: false,
+    isReady: true,
+    isReconnecting: false,
+    audio,
+    video,
   },
-  overlay: {
-    controls: {
-      audioPaused: true,
-      videoPaused: false,
-      toggleAudio: action("toggleAudio"),
-      toggleVideo: action("toggleVideo"),
-      maximize: null,
-    },
-    status: {
-      recvQuality: 1,
-      producerAudioPaused: true,
-    },
+  isFullScreen: true,
+};
+
+export const SoundOff = Template.bind({});
+SoundOff.args = {
+  state: {
+    isVideoEnabled: true,
+    isAudioEnabled: true,
+    isAudioPaused: true,
+    isVideoPaused: false,
+    isReady: true,
+    isReconnecting: false,
+    audio,
+    video,
   },
+  isFullScreen: true,
+};
+
+export const NotFullScreen = Template.bind({});
+NotFullScreen.args = {
+  state: {
+    isVideoEnabled: true,
+    isAudioEnabled: false,
+    isAudioPaused: false,
+    isVideoPaused: false,
+    isReady: true,
+    isReconnecting: false,
+    audio,
+    video,
+  },
+  isFullScreen: false,
+};
+
+export const IsReconnecting = Template.bind({});
+IsReconnecting.args = {
+  state: {
+    isVideoEnabled: true,
+    isAudioEnabled: false,
+    isAudioPaused: false,
+    isVideoPaused: false,
+    isReady: true,
+    isReconnecting: true,
+    audio,
+    video,
+  },
+  isFullScreen: false,
 };

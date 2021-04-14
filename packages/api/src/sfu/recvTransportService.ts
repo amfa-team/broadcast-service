@@ -3,7 +3,10 @@ import type {
   ConnectionInfo,
   Routes,
 } from "@amfa-team/broadcast-service-types";
-import { patchConnection } from "../db/repositories/connectionRepository";
+import {
+  findConnectionByRecvTransportId,
+  patchConnection,
+} from "../db/repositories/connectionRepository";
 import {
   createRecvTransport,
   deleteRecvTransport,
@@ -96,6 +99,20 @@ export async function closeRecvTransport(
   getAllSettledValues<void | null | Connection>(
     results,
     "closeRecvTransportClose: Unexpected error",
+  );
+}
+
+export async function cleanupRecvTransport(transportId: string): Promise<void> {
+  const connection = await findConnectionByRecvTransportId(transportId);
+
+  await Promise.all(
+    connection.map(async (c) =>
+      closeRecvTransport({
+        connectionId: c._id,
+        transportId,
+        skipConnectionPatch: false,
+      }),
+    ),
   );
 }
 

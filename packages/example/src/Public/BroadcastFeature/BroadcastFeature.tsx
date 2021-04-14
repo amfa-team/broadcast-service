@@ -1,4 +1,5 @@
 import { StagePage } from "@amfa-team/broadcast-service";
+import { defaultDictionary } from "@amfa-team/broadcast-service-types";
 import { SpacePage } from "@amfa-team/space-service";
 import { DotLoader } from "@amfa-team/theme-service";
 import {
@@ -25,10 +26,9 @@ function BroadcastFeature(): ReactElement {
       return (
         <StagePage
           settings={{ endpoint: ws, spaceId }}
-          dictionary={{
-            join: "Join",
-            cgu:
-              "By joining you accept the terms and policy of SideBySide.live",
+          dictionary={defaultDictionary.fr}
+          onHangUp={() => {
+            alert("todo");
           }}
           broadcastEnabled
         />
@@ -38,7 +38,7 @@ function BroadcastFeature(): ReactElement {
   );
 
   return (
-    <div style={{ height: "calc(100% - 250px)" }}>
+    <div style={{ height: "calc(100% - 110px)" }}>
       <h3>Broadcast Feature</h3>
       <SpacePage
         slug={spaceId}

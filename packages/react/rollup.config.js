@@ -1,8 +1,5 @@
-import alias from "@rollup/plugin-alias";
 import babel from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
-import postCssValues from "postcss-modules-values";
-import postcss from "rollup-plugin-postcss";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import { terser } from "rollup-plugin-terser";
 import pkg from "./package.json";
@@ -21,11 +18,6 @@ export default [
       },
     ],
     plugins: [
-      alias({
-        entries: {
-          "react-resize-detector": "react-resize-detector/build/withPolyfill",
-        },
-      }),
       resolve({
         extensions,
         browser: true,
@@ -34,12 +26,6 @@ export default [
         resolveOnly: [/^@amfa-team\/broadcast-service.*$/],
       }),
       sourcemaps(),
-      postcss({
-        extract: true,
-        minimize: !process.env.ROLLUP_WATCH,
-        sourceMap: true,
-        plugins: [postCssValues],
-      }),
       babel({
         babelHelpers: "runtime",
         extensions,
@@ -58,11 +44,6 @@ export default [
       },
     ],
     plugins: [
-      alias({
-        entries: {
-          "react-resize-detector": "react-resize-detector/build/withPolyfill",
-        },
-      }),
       resolve({
         extensions,
         browser: true,
@@ -71,12 +52,6 @@ export default [
         resolveOnly: [/^@amfa-team\/broadcast-service.*$/],
       }),
       sourcemaps(),
-      postcss({
-        extract: true,
-        minimize: !process.env.ROLLUP_WATCH,
-        sourceMap: true,
-        plugins: [postCssValues],
-      }),
       babel({
         babelHelpers: "runtime",
         extensions,

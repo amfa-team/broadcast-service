@@ -1,5 +1,4 @@
-import { ErrorBoundary } from "@amfa-team/broadcast-service";
-import { ModalRoot } from "@amfa-team/theme-service";
+import { ModalRoot, SbsThemeProvider } from "@amfa-team/theme-service";
 import {
   StylesProvider,
   createGenerateClassName,
@@ -14,7 +13,6 @@ import App from "./App";
 import "normalize.css/normalize.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "@amfa-team/theme-service/dist/index.css";
-// import "@amfa-team/space-service/dist/index.css";
 import "@amfa-team/user-service/dist/index.css";
 import "./global.css";
 
@@ -34,18 +32,18 @@ if (process.env.SENTRY_ENVIRONMENT !== "dev") {
 
 ReactDOM.render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <Router>
-        <RecoilRoot>
+    <Router>
+      <RecoilRoot>
+        <SbsThemeProvider>
           <StylesProvider generateClassName={generateClassName}>
             <Suspense fallback={<div>Loading...</div>}>
               <ModalRoot />
               <App />
             </Suspense>
           </StylesProvider>
-        </RecoilRoot>
-      </Router>
-    </ErrorBoundary>
+        </SbsThemeProvider>
+      </RecoilRoot>
+    </Router>
   </React.StrictMode>,
   document.getElementById("root"),
 );

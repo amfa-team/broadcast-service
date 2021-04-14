@@ -13,8 +13,7 @@
         }
       }
     },
-    "targets": ["Chrome >= 70", "Edge >= 18", "Firefox >= 64", "Safari >= 12"],
-    "polyfills": ["navigator.mediaDevices"]
+    "targets": ["Chrome >= 70", "Edge >= 18", "Firefox >= 64", "Safari >= 12"]
   },
   "rules": {
     "no-console": "off"

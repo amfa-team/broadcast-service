@@ -1,3 +1,25 @@
+# @amfa-team/broadcast-service-types [1.1.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.1.0-beta.2...@amfa-team/broadcast-service-types@1.1.0-beta.3) (2021-03-28)
+
+
+### Features
+
+* finalize layout ([94709be](https://github.com/amfa-team/broadcast-service/commit/94709bef85936228ce79480e3401600a0995ebb7))
+
+# @amfa-team/broadcast-service-types [1.1.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.1.0-beta.1...@amfa-team/broadcast-service-types@1.1.0-beta.2) (2021-03-27)
+
+
+### Features
+
+* live participant intermediate states ([23118a3](https://github.com/amfa-team/broadcast-service/commit/23118a3580fa99b8c01bb60863d9b3d77c389be2))
+
+# @amfa-team/broadcast-service-types [1.1.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.0.0...@amfa-team/broadcast-service-types@1.1.0-beta.1) (2021-03-22)
+
+
+### Features
+
+* add basic broadcast layout ([7d4c0f2](https://github.com/amfa-team/broadcast-service/commit/7d4c0f2b556c45dab4e6ce45d14ced4f4dec46f9))
+* upgrade dependencies ([615388c](https://github.com/amfa-team/broadcast-service/commit/615388ce05bbb72ae4fe1b1275e8789feddfb81c))
+
 # @amfa-team/broadcast-service-types 1.0.0 (2021-03-05)
 
 
