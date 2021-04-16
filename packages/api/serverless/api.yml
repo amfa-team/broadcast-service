@@ -1,70 +1,60 @@
-sfu_routerCapabilities:
-  handler: src/sfu/handler.routerCapabilities
+handler:
+  handler: src/handler.handler
+  reservedConcurrency: "${env:CONCURRENCY, 100}"
   events:
     - websocket:
         route: /sfu/router-capabilities
         routeResponseSelectionExpression: $default
-sfu_initConnect:
-  handler: src/sfu/handler.initConnect
-  events:
     - websocket:
         route: /sfu/connect/init
         routeResponseSelectionExpression: $default
-sfu_refreshConnection:
-  handler: src/sfu/handler.refreshConnection
-  events:
     - websocket:
         route: /sfu/refresh
         routeResponseSelectionExpression: $default
-sfu_createConnect:
-  handler: src/sfu/handler.createConnect
-  events:
     - websocket:
         route: /sfu/connect/create
         routeResponseSelectionExpression: $default
-sfu_createSend:
-  handler: src/sfu/handler.createSend
-  events:
     - websocket:
         route: /sfu/send/create
         routeResponseSelectionExpression: $default
-sfu_stateSend:
-  handler: src/sfu/handler.handleOnChangeStreamState
-  events:
     - websocket:
         route: /sfu/send/state
         routeResponseSelectionExpression: $default
-sfu_getStreams:
-  handler: src/sfu/handler.getStreams
-  events:
     - websocket:
         route: /sfu/send/list
         routeResponseSelectionExpression: $default
-sfu_createReceive:
-  handler: src/sfu/handler.createReceive
-  events:
     - websocket:
         route: /sfu/receive/create
         routeResponseSelectionExpression: $default
-sfu_stateReceive:
-  handler: src/sfu/handler.handleOnChangeConsumerStreamState
-  events:
     - websocket:
         route: /sfu/receive/state
         routeResponseSelectionExpression: $default
-sfu_getStateReceive:
-  handler: src/sfu/handler.handleGetConsumerStreamState
-  events:
     - websocket:
         route: /sfu/receive/state/get
         routeResponseSelectionExpression: $default
-disconnect:
-  handler: src/sfu/handler.disconnect
-  events:
     - websocket: $disconnect
-ping:
-  handler: src/sfu/handler.ping
-  events:
     - websocket:
         route: /sfu/ping
         routeResponseSelectionExpression: $default
+    - http:
+        path: /admin/topology
+        method: get
+        cors:
+          origin: "*" # <-- Specify allowed origin
+          headers: # <-- Specify allowed headers
+            - Content-Type
+            - X-Amz-Date
+            - Authorization
+            - X-Api-Key
+            - X-Amz-Security-Token
+            - X-Amz-User-Agent
+          allowCredentials: false
+    - http:
+        path: /admin/server
+        method: post
+    - http:
+        path: /event/producer/state/change
+        method: post
+    - http:
+        path: /event/consumer/state/change
+        method: post
