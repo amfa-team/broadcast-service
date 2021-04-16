@@ -67,7 +67,7 @@ export const handler = AWSLambda.wrapHandler(async function handler(
   switch (event.resource) {
     case "/admin/topology":
       return topology(event, context);
-    case "/admin/register":
+    case "/admin/server":
       return registerServer(event, context);
     case "/event/producer/state/change":
       return producerStateChange(event);
