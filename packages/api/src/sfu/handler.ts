@@ -1,5 +1,3 @@
-// eslint-disable-next-line import/no-unassigned-import
-import "source-map-support/register";
 import type {
   ReceiveParams,
   SendParams,

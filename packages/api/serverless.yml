@@ -39,6 +39,7 @@ provider:
     shouldStartNameWithService: true
   tracing:
     apiGateway: true
+    lambda: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -49,9 +50,7 @@ package:
   individually: false
 
 functions:
-  - ${file(./serverless/adminRoutes.yml)}
-  - ${file(./serverless/eventRoutes.yml)}
-  - ${file(./serverless/websocket.yml)}
+  - ${file(./serverless/api.yml)}
 
 custom:
   sbs:

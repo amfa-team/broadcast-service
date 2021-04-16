@@ -14,7 +14,8 @@ if (!slsw.lib.webpack.isLocal) {
       release: process.env.GITHUB_SHA,
       org: "side-by-side-sas",
       project: "broadcast-service-api",
-      include: "./src",
+      include: `${__dirname}/.webpack/service`,
+      urlPrefix: "/var/task",
     }),
   );
 }
@@ -22,8 +23,10 @@ if (!slsw.lib.webpack.isLocal) {
 module.exports = {
   entry: slsw.lib.entries,
   mode: slsw.lib.webpack.isLocal ? "development" : "production",
+  devtool: slsw.lib.webpack.isLocal ? false : "source-map",
   optimization: {
     concatenateModules: false,
+    minimize: false,
   },
   target: "node",
   module: {

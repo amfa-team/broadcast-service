@@ -127,6 +127,9 @@ export async function handleHttpErrorResponse(
   e: unknown,
   msgId: string | null = null,
 ): Promise<APIGatewayProxyResult> {
+  console.error(e);
+  captureException(e);
+
   if (e instanceof InvalidRequestError) {
     return {
       statusCode: e.code,
@@ -138,8 +141,6 @@ export async function handleHttpErrorResponse(
     };
   }
 
-  console.error(e);
-  captureException(e);
   await flush(2000).catch(() => {
     console.error("io.handleHttpErrorResponse: fail to flush errors");
   });
