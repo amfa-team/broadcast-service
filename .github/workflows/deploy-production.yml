@@ -93,6 +93,10 @@ jobs:
           USER_SERVICE_API_SECRET: ${{ secrets.USER_SERVICE_API_SECRET_PRODUCTION }}
           USER_SERVICE_API_ENDPOINT: ${{ secrets.USER_SERVICE_API_ENDPOINT_PRODUCTION }}
           SPACE_SERVICE_API_ENDPOINT: ${{ secrets.SPACE_SERVICE_API_ENDPOINT_PRODUCTION }}
+          CONCURRENCY: ${{ secrets.CONCURRENCY_PRODUCTION }}
+          POOL_SIZE: ${{ secrets.POOL_SIZE_PRODUCTION }}
+          MAX_POOL_SIZE: ${{ secrets.MAX_POOL_SIZE_PRODUCTION }}
+          MIN_POOL_SIZE: ${{ secrets.MIN_POOL_SIZE_PRODUCTION }}
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
       - name: Create SSH Private Key
