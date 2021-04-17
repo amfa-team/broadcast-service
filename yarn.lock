@@ -10,11 +10,12 @@
     d "1"
     es5-ext "^0.10.47"
 
-"@amfa-team/space-service-node@^1.1.0":
-  version "1.1.0"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-node/1.1.0/c9e880b4c36b207cb73e4b2be32bcaa4b138bcb54418f421e3efb827a270afdc#a6ed7423783310aec240f68b9def33ea61691c44"
-  integrity sha512-vskl+zQcn8iAWZOHqJq/nhgz+9+osM74xhmg/0wWGHDsChKA6iebyC/Apjl8Tudk088KocLiV6Sou9uU5gDfDw==
+"@amfa-team/space-service-node@^1.2.0-beta.1":
+  version "1.2.0-beta.1"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-node/1.2.0-beta.1/0cd8b56d5af90573e25c4525e3be6724959d1bc684fba22c8667419bbf5b275f#be28aefbd8b6a32c9b9b9c443e68fa4c0eee8457"
+  integrity sha512-LVlVYwxM2JuhKEoGWeVX+BEhd2+HzL6crJEHSJ//sRjt6/qlEdwDHBYyJCKBWGAb1WmlkNpZn/0SGKPLYFXHCw==
   dependencies:
+    fetch-retry "^4.1.1"
     node-fetch "^2.6.1"
 
 "@amfa-team/space-service-types@^1.4.0":
@@ -9797,6 +9798,11 @@ fecha@^4.2.0:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.1.tgz#0a83ad8f86ef62a091e22bb5a039cd03d23eecce"
   integrity sha512-MMMQ0ludy/nBs1/o0zVOiKTpG7qMbonKUzjJgQFEuvq6INZ1OraKPRAWkBq5vlKLOUMpmNYG1JoN3oDPUQ9m3Q==
+
+fetch-retry@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/fetch-retry/-/fetch-retry-4.1.1.tgz#fafe0bb22b54f4d0a9c788dff6dd7f8673ca63f3"
+  integrity sha512-e6eB7zN6UBSwGVwrbWVH+gdLnkW9WwHhmq2YDK1Sh30pzx1onRVGBvogTlUeWxwTa+L86NYdo4hFkh7O8ZjSnA==
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
