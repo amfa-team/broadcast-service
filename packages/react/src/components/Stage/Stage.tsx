@@ -449,6 +449,9 @@ function RawStage(props: StageProps): JSX.Element {
           errorTitle={dictionary.error.unknown.title}
           errorText={dictionary.error.unknown.text}
           errorRetry={dictionary.error.unknown.retryBtn}
+          notSupportedErrorTitle={dictionary.error.notSupported.title}
+          notSupportedErrorText={dictionary.error.notSupported.text}
+          notSupportedErrorRetry={dictionary.error.notSupported.retryBtn}
         >
           <LiveStage
             settings={settings}

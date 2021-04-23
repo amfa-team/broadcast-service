@@ -7,6 +7,11 @@ export type Dictionary = {
       text: string;
       retryBtn: string;
     };
+    notSupported: {
+      title: string;
+      text: string;
+      retryBtn: string;
+    };
   };
 };
 
@@ -20,6 +25,11 @@ export const defaultDictionary: Record<"fr" | "en", Dictionary> = {
         text: "If the problem persist, please contact the support",
         retryBtn: "Retry",
       },
+      notSupported: {
+        title: "Oops: an error occurred",
+        text: "If the problem persist, please contact the support",
+        retryBtn: "Retry",
+      },
     },
   },
   fr: {
@@ -27,6 +37,11 @@ export const defaultDictionary: Record<"fr" | "en", Dictionary> = {
     cgu: "En cliquant sur rejoindre j'accepte les cgu",
     error: {
       unknown: {
+        title: "Oups: une erreur est survenue",
+        text: "Si le probleme persiste, veuillez contacter le support",
+        retryBtn: "Réessayer",
+      },
+      notSupported: {
         title: "Oups: une erreur est survenue",
         text: "Si le probleme persiste, veuillez contacter le support",
         retryBtn: "Réessayer",
