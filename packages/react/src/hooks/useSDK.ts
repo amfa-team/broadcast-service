@@ -23,11 +23,15 @@ export function useSDK(settings: Settings): SDKState {
   useEffect(() => {
     if (token) {
       const sdk = new Picnic(token, { endpoint, spaceId });
-      sdk
-        .load()
-        .then(() => setSDKState({ loaded: true, sdk }))
-        // TODO: handle error
-        .catch(setError);
+      if (!sdk.deviceSupported()) {
+        setError(new Error("PLOP"));
+      } else {
+        sdk
+          .load()
+          .then(() => setSDKState({ loaded: true, sdk }))
+          // TODO: handle error
+          .catch(setError);
+      }
 
       return (): void => {
         sdk.destroy().catch(console.error);

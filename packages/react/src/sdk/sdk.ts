@@ -1,6 +1,7 @@
 import type { StreamInfo } from "@amfa-team/broadcast-service-types";
 import { captureException } from "@sentry/react";
 import { EventTarget } from "event-target-shim";
+import { detectDevice } from "mediasoup-client";
 import type { SDKState, Settings } from "../types";
 import { PicnicDevice } from "./device/device";
 import type { ServerEvents } from "./events/event";
@@ -58,6 +59,8 @@ export class Picnic
   _broadcastStream: SendStream | null = null;
 
   _mainRecvStream: string | null = null;
+
+  _detectedDevice: string | null = detectDevice() ?? null;
 
   constructor(token: string, settings: Settings) {
     super();
@@ -165,6 +168,10 @@ export class Picnic
     // replay received remove events
     await Promise.all(removedEvents.map(this._removeStream));
   };
+
+  deviceSupported(): boolean {
+    return !!this._detectedDevice;
+  }
 
   async load(): Promise<void> {
     await this._ws.load();
