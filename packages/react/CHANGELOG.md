@@ -1,3 +1,21 @@
+# @amfa-team/broadcast-service [1.2.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.1...@amfa-team/broadcast-service@1.2.0-beta.2) (2021-04-23)
+
+
+### Features
+
+* error shield ([a43c843](https://github.com/amfa-team/broadcast-service/commit/a43c8431a8778d27b8d8992ddad9ec90ab32ab20))
+* stuff ([91cf650](https://github.com/amfa-team/broadcast-service/commit/91cf650ac7b94e8ffce49068d4722e32a0f2ac1c))
+* stuff ([670fa11](https://github.com/amfa-team/broadcast-service/commit/670fa1141aa735e8c5f26c7d59851cf144e8e7ee))
+* stuff ([4d86eb0](https://github.com/amfa-team/broadcast-service/commit/4d86eb0675458c924a66d8b108dcdee02bc2b06f))
+
+
+
+
+
+### Dependencies
+
+* **@amfa-team/broadcast-service-types:** upgraded to 1.2.0-beta.1
+
 # @amfa-team/broadcast-service [1.2.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0...@amfa-team/broadcast-service@1.2.0-beta.1) (2021-04-23)
 
 
