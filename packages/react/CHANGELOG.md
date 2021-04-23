@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.2.0-beta.5](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.4...@amfa-team/broadcast-service@1.2.0-beta.5) (2021-04-23)
+
+
+### Bug Fixes
+
+* useSDK ([70b2b63](https://github.com/amfa-team/broadcast-service/commit/70b2b6373489c46621f4eaedcde28eb8fb7bae2c))
+
 # @amfa-team/broadcast-service [1.2.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.3...@amfa-team/broadcast-service@1.2.0-beta.4) (2021-04-23)
 
 
