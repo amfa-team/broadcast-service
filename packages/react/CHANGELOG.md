@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.2.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.3...@amfa-team/broadcast-service@1.2.0-beta.4) (2021-04-23)
+
+
+### Bug Fixes
+
+* zindex ([5247439](https://github.com/amfa-team/broadcast-service/commit/52474397a84c1d81a915dea0585d4c8ed1c9e670))
+
 # @amfa-team/broadcast-service [1.2.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.2...@amfa-team/broadcast-service@1.2.0-beta.3) (2021-04-23)
 
 
