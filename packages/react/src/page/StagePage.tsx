@@ -1,5 +1,5 @@
 import type { Dictionary } from "@amfa-team/broadcast-service-types";
-import { DotLoader, ErrorShield } from "@amfa-team/theme-service";
+import { DotLoader } from "@amfa-team/theme-service";
 import { useToken } from "@amfa-team/user-service";
 import { Center } from "@chakra-ui/react";
 import React from "react";
@@ -62,6 +62,7 @@ function RawStagePage(props: StagePageProps) {
       featuresComponents={featuresComponents}
       onHangUp={onHangUp}
       liveDictionary={liveDictionary}
+      dictionary={dictionary}
     />
   );
 }
@@ -74,15 +75,16 @@ RawStagePage.defaultProps = {
 };
 
 export function StagePage(props: StagePageProps) {
-  return (
-    <ErrorShield
-      errorTitle={props.dictionary.error.unknown.title}
-      errorText={props.dictionary.error.unknown.text}
-      errorRetry={props.dictionary.error.unknown.retryBtn}
-    >
-      <RawStagePage {...props} />
-    </ErrorShield>
-  );
+  // return (
+  //   <ErrorShield
+  //     errorTitle={props.dictionary.error.unknown.title}
+  //     errorText={props.dictionary.error.unknown.text}
+  //     errorRetry={props.dictionary.error.unknown.retryBtn}
+  //   >
+  //     <RawStagePage {...props} />
+  //   </ErrorShield>
+  // );
+  return <RawStagePage {...props} />;
 }
 
 StagePage.defaultProps = {

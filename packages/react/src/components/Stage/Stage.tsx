@@ -1,4 +1,8 @@
-import { BroadcastControls, LiveControls } from "@amfa-team/theme-service";
+import {
+  BroadcastControls,
+  ErrorShield,
+  LiveControls,
+} from "@amfa-team/theme-service";
 import {
   Box,
   Flex,
@@ -27,6 +31,7 @@ export interface StageProps {
   featuresViewerButton?: any;
   featuresComponents?: any;
   onHangUp: () => void;
+  dictionary?: any; // Flemme
   liveDictionary?: any; // Flemme
 }
 
@@ -124,6 +129,7 @@ function RawStage(props: StageProps): JSX.Element {
     chatComponent,
     featuresComponents,
     onHangUp,
+    dictionary,
     liveDictionary,
   } = props;
   const recvStreams = useRecvStreams(sdk);
@@ -435,12 +441,19 @@ function RawStage(props: StageProps): JSX.Element {
             lg: "grid",
           }}
         >
-          <StreamGrid
-            streamLayoutGrid={streamLayoutGrid}
-            // @ts-ignore
-            content={contentStreams}
-            liveDictionary={liveDictionary}
-          />
+          <ErrorShield
+            errorTitle={dictionary.error.unknown.title}
+            errorText={dictionary.error.unknown.text}
+            errorRetry={dictionary.error.unknown.retryBtn}
+          >
+            <StreamGrid
+              streamLayoutGrid={streamLayoutGrid}
+              // @ts-ignore
+              content={contentStreams}
+              liveDictionary={liveDictionary}
+            />
+          </ErrorShield>
+
           {/* 
           {sendStream !== null && (
             <GridItem
