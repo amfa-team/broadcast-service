@@ -485,7 +485,7 @@ function RawStage(props: StageProps): JSX.Element {
                 bottom: "80px",
                 pointerEvents: "none",
               }}
-              animate={{ zIndex: 1, height: "85vh" }}
+              animate={{ zIndex: 10, height: "85vh" }}
               exit={{ opacity: 0 }}
             >
               <Flex
