@@ -23,7 +23,7 @@ export function useSDK(settings: Settings): SDKState {
   useEffect(() => {
     if (token) {
       const sdk = new Picnic(token, { endpoint, spaceId });
-      if (sdk.deviceSupported()) {
+      if (!sdk.deviceSupported()) {
         setError(new Error("DEVICE_NOT_SUPPORTED"));
       } else {
         sdk
