@@ -27,9 +27,10 @@ export interface StageProps {
   featuresViewerButton?: any;
   featuresComponents?: any;
   onHangUp: () => void;
+  liveDictionary?: any; // Flemme
 }
 
-function StreamGrid({ streamLayoutGrid, content }: any) {
+function StreamGrid({ streamLayoutGrid, content, liveDictionary }: any) {
   const [isSmallerThan768] = useMediaQuery(["(max-width: 768px)"]);
   const nbStreams = content.length;
 
@@ -43,7 +44,7 @@ function StreamGrid({ streamLayoutGrid, content }: any) {
           justifyContent="center"
           color="white"
         >
-          Nobody is on the live stage yet
+          {liveDictionary?.noBroadcastYet ?? ""}
         </Flex>
       </GridItem>
     );
@@ -63,6 +64,7 @@ function StreamGrid({ streamLayoutGrid, content }: any) {
           bg="#000000a8"
           border="1px solid #ffffff70"
           colSpan={streamLayoutGrid.colSpanFirstLine}
+          overflow="hidden"
           key={mainContent.key}
         >
           {mainContent.component}
@@ -75,6 +77,7 @@ function StreamGrid({ streamLayoutGrid, content }: any) {
                   colSpan={streamLayoutGrid.colSpanSecondLine}
                   bg="#000000a8"
                   border="1px solid #ffffff70"
+                  overflow="hidden"
                   key={e1.key}
                 >
                   {e1.component}
@@ -93,6 +96,7 @@ function StreamGrid({ streamLayoutGrid, content }: any) {
         bg="#000000a8"
         border="1px solid #ffffff70"
         colSpan={streamLayoutGrid.columns}
+        overflow="hidden"
         key={mainContent.key}
       >
         {mainContent.component}
@@ -120,6 +124,7 @@ function RawStage(props: StageProps): JSX.Element {
     chatComponent,
     featuresComponents,
     onHangUp,
+    liveDictionary,
   } = props;
   const recvStreams = useRecvStreams(sdk);
   const sendStream = useSendStream(sdk);
@@ -256,54 +261,55 @@ function RawStage(props: StageProps): JSX.Element {
   //         alignItems="center"
   //         justifyContent="center"
   //         color="white"
+  //         bg="tomato"
   //       >
   //         camera1
   //       </Flex>
   //     ),
   //     key: 2,
   //   },
-  // {
-  //   component: (
-  //     <Flex
-  //       w="full"
-  //       h="full"
-  //       alignItems="center"
-  //       justifyContent="center"
-  //       color="white"
-  //     >
-  //       cam2
-  //     </Flex>
-  //   ),
-  //   key: 3,
-  // },
-  // {
-  //   component: (
-  //     <Flex
-  //       w="full"
-  //       h="full"
-  //       alignItems="center"
-  //       justifyContent="center"
-  //       color="white"
-  //     >
-  //       cam4
-  //     </Flex>
-  //   ),
-  //   key: 4,
-  // },
-  // {
-  //   component: (
-  //     <Flex
-  //       w="full"
-  //       h="full"
-  //       alignItems="center"
-  //       justifyContent="center"
-  //       color="white"
-  //     >
-  //       cam3
-  //     </Flex>
-  //   ),
-  //   key: 5,
-  // },
+  //   // {
+  //   //   component: (
+  //   //     <Flex
+  //   //       w="full"
+  //   //       h="full"
+  //   //       alignItems="center"
+  //   //       justifyContent="center"
+  //   //       color="white"
+  //   //     >
+  //   //       cam2
+  //   //     </Flex>
+  //   //   ),
+  //   //   key: 3,
+  //   // },
+  //   // {
+  //   //   component: (
+  //   //     <Flex
+  //   //       w="full"
+  //   //       h="full"
+  //   //       alignItems="center"
+  //   //       justifyContent="center"
+  //   //       color="white"
+  //   //     >
+  //   //       cam4
+  //   //     </Flex>
+  //   //   ),
+  //   //   key: 4,
+  //   // },
+  //   // {
+  //   //   component: (
+  //   //     <Flex
+  //   //       w="full"
+  //   //       h="full"
+  //   //       alignItems="center"
+  //   //       justifyContent="center"
+  //   //       color="white"
+  //   //     >
+  //   //       cam3
+  //   //     </Flex>
+  //   //   ),
+  //   //   key: 5,
+  //   // },
   // ];
 
   let streamLayoutGrid = {
@@ -336,10 +342,10 @@ function RawStage(props: StageProps): JSX.Element {
           lg: "unset",
         },
         templateRows: {
-          base: "minmax(0, 50%) minmax(0, 50%)",
-          sm: "minmax(0, 50%) minmax(0, 50%)",
-          md: "minmax(0, 70%) minmax(0, 30%)",
-          lg: "minmax(0, 65%) minmax(0, 35%)",
+          base: "minmax(0, 60%) minmax(0, 0%)",
+          sm: "minmax(0, 60%) minmax(0, 0%)",
+          md: "minmax(0, 75%) minmax(0, 0%)",
+          lg: "minmax(0, 75%) minmax(0, 0%)",
         },
         columns: 1,
         colSpanFirstLine: 1,
@@ -347,13 +353,31 @@ function RawStage(props: StageProps): JSX.Element {
       };
       break;
     case 2:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "100%",
+          sm: "100%",
+          md: "repeat(2, minmax(0, 50%))",
+          lg: "repeat(2, minmax(0, 50%))",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 2,
+        colSpanFirstLine: 2,
+        colSpanSecondLine: 1,
+      };
+      break;
     case 3:
       streamLayoutGrid = {
         templateColumns: {
           base: "repeat(2, minmax(0, 50%))",
-          sm: "unset",
-          md: "unset",
-          lg: "unset",
+          sm: "repeat(2, minmax(0, 50%))",
+          md: "repeat(2, minmax(0, 50%))",
+          lg: "repeat(2, minmax(0, 50%))",
         },
         templateRows: {
           base: "minmax(0, 50%) minmax(0, 50%)",
@@ -415,6 +439,7 @@ function RawStage(props: StageProps): JSX.Element {
             streamLayoutGrid={streamLayoutGrid}
             // @ts-ignore
             content={contentStreams}
+            liveDictionary={liveDictionary}
           />
           {/* 
           {sendStream !== null && (
@@ -451,6 +476,7 @@ function RawStage(props: StageProps): JSX.Element {
                 height: "0",
                 width: "100vw",
                 bottom: "80px",
+                pointerEvents: "none",
               }}
               animate={{ zIndex: 1, height: "85vh" }}
               exit={{ opacity: 0 }}
@@ -470,6 +496,7 @@ function RawStage(props: StageProps): JSX.Element {
                   w="full"
                   maxW="container.lg"
                   color="white"
+                  pointerEvents="all"
                 >
                   {featuresComponents.map((feature: any, i: any) => {
                     return (
@@ -490,8 +517,9 @@ function RawStage(props: StageProps): JSX.Element {
         )}
       </Flex>
       <LiveControls
-        chatOpenLabel={"Open Chat"}
-        chatCloseLabel={"Hide Chat"}
+        chatOpenLabel={liveDictionary.chatOpenLabel}
+        chatCloseLabel={liveDictionary.chatCloseLabel}
+        hangUpLabel={liveDictionary.hangUpLabel}
         onHangUp={onHangUp}
         isChatOpen={chatBar.isOpen}
         onChatToggle={onChatToggle}
