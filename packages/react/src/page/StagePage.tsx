@@ -17,6 +17,7 @@ interface StagePageProps {
   chatComponent?: ReactElement;
   featuresViewerButton?: any;
   featuresComponents?: any;
+  liveDictionary?: any; // Flemme
   onHangUp: () => void;
 }
 
@@ -29,6 +30,7 @@ function RawStagePage(props: StagePageProps) {
     chatComponent,
     featuresViewerButton,
     featuresComponents,
+    liveDictionary,
     onHangUp,
   } = props;
   const token = useToken();
@@ -59,6 +61,7 @@ function RawStagePage(props: StagePageProps) {
       chatComponent={chatComponent}
       featuresComponents={featuresComponents}
       onHangUp={onHangUp}
+      liveDictionary={liveDictionary}
     />
   );
 }
@@ -67,6 +70,7 @@ RawStagePage.defaultProps = {
   chatComponent: null,
   featuresViewerButton: [],
   featuresComponents: [],
+  liveDictionary: null,
 };
 
 export function StagePage(props: StagePageProps) {
@@ -87,4 +91,5 @@ StagePage.defaultProps = {
   helpButton: null,
   chatComponent: null,
   featuresComponents: [],
+  liveDictionary: null,
 };
