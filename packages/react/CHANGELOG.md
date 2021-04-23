@@ -1,3 +1,11 @@
+# @amfa-team/broadcast-service [1.2.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0...@amfa-team/broadcast-service@1.2.0-beta.1) (2021-04-23)
+
+
+### Features
+
+* stuff ([b9dd75b](https://github.com/amfa-team/broadcast-service/commit/b9dd75b86c8b5d7e804ccce1d01de9f2fb330e2e))
+* update theme service ([23bc976](https://github.com/amfa-team/broadcast-service/commit/23bc97603e1d9d6083aabe4813915bc9a1db05d3))
+
 # @amfa-team/broadcast-service [1.1.0](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0...@amfa-team/broadcast-service@1.1.0) (2021-04-14)
 
 
