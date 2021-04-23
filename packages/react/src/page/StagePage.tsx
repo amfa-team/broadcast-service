@@ -1,12 +1,11 @@
 import type { Dictionary } from "@amfa-team/broadcast-service-types";
-import { DotLoader, ErrorShield } from "@amfa-team/theme-service";
+import { ErrorShield } from "@amfa-team/theme-service";
 import { useToken } from "@amfa-team/user-service";
 import { Center } from "@chakra-ui/react";
 import React from "react";
 import type { ReactElement } from "react";
 import Cgu from "../components/Cgu/Cgu";
 import { Stage } from "../components/Stage";
-import { useSDK } from "../hooks/useSDK";
 import type { Settings } from "../types";
 
 interface StagePageProps {
@@ -34,7 +33,6 @@ function RawStagePage(props: StagePageProps) {
     onHangUp,
   } = props;
   const token = useToken();
-  const state = useSDK(settings);
 
   if (!token) {
     return (
@@ -44,17 +42,9 @@ function RawStagePage(props: StagePageProps) {
     );
   }
 
-  if (!state.loaded) {
-    return (
-      <Center h="full" w="full">
-        <DotLoader />
-      </Center>
-    );
-  }
-
   return (
     <Stage
-      sdk={state.sdk}
+      settings={settings}
       canBroadcast={broadcastEnabled}
       helpButton={helpButton}
       featuresViewerButton={featuresViewerButton}
@@ -62,6 +52,7 @@ function RawStagePage(props: StagePageProps) {
       featuresComponents={featuresComponents}
       onHangUp={onHangUp}
       liveDictionary={liveDictionary}
+      dictionary={dictionary}
     />
   );
 }

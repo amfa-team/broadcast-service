@@ -67,8 +67,8 @@ export function RecvStreamVideo(props: RecvStreamVideoProps): JSX.Element {
     <LiveParticipant
       isLoading={!isReady}
       isReconnecting={isReconnecting}
-      isLiveLabel="Live (TODO)"
-      isReconnectingLabel="Reconnecting (TODO)"
+      isLiveLabel="En Direct"
+      isReconnectingLabel="Reconnexion"
       isLocal={false}
       isFrontFacing={false}
       isVideoEnabled={isVideoEnabled}
