@@ -35,6 +35,8 @@ export async function createProducer(
   const producer = await transport.produce({
     kind,
     rtpParameters,
+    // Bad connections should not break producer
+    keyFrameRequestDelay: 4_000,
   });
 
   const onStateChange = () => {
