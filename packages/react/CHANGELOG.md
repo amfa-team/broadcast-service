@@ -1,3 +1,50 @@
+# @amfa-team/broadcast-service [1.2.0-beta.5](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.4...@amfa-team/broadcast-service@1.2.0-beta.5) (2021-04-23)
+
+
+### Bug Fixes
+
+* useSDK ([70b2b63](https://github.com/amfa-team/broadcast-service/commit/70b2b6373489c46621f4eaedcde28eb8fb7bae2c))
+
+# @amfa-team/broadcast-service [1.2.0-beta.4](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.3...@amfa-team/broadcast-service@1.2.0-beta.4) (2021-04-23)
+
+
+### Bug Fixes
+
+* zindex ([5247439](https://github.com/amfa-team/broadcast-service/commit/52474397a84c1d81a915dea0585d4c8ed1c9e670))
+
+# @amfa-team/broadcast-service [1.2.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.2...@amfa-team/broadcast-service@1.2.0-beta.3) (2021-04-23)
+
+
+### Bug Fixes
+
+* oups ([50324b6](https://github.com/amfa-team/broadcast-service/commit/50324b67cd08211e97e2c894fe0d135610ade061))
+
+# @amfa-team/broadcast-service [1.2.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0-beta.1...@amfa-team/broadcast-service@1.2.0-beta.2) (2021-04-23)
+
+
+### Features
+
+* error shield ([a43c843](https://github.com/amfa-team/broadcast-service/commit/a43c8431a8778d27b8d8992ddad9ec90ab32ab20))
+* stuff ([91cf650](https://github.com/amfa-team/broadcast-service/commit/91cf650ac7b94e8ffce49068d4722e32a0f2ac1c))
+* stuff ([670fa11](https://github.com/amfa-team/broadcast-service/commit/670fa1141aa735e8c5f26c7d59851cf144e8e7ee))
+* stuff ([4d86eb0](https://github.com/amfa-team/broadcast-service/commit/4d86eb0675458c924a66d8b108dcdee02bc2b06f))
+
+
+
+
+
+### Dependencies
+
+* **@amfa-team/broadcast-service-types:** upgraded to 1.2.0-beta.1
+
+# @amfa-team/broadcast-service [1.2.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0...@amfa-team/broadcast-service@1.2.0-beta.1) (2021-04-23)
+
+
+### Features
+
+* stuff ([b9dd75b](https://github.com/amfa-team/broadcast-service/commit/b9dd75b86c8b5d7e804ccce1d01de9f2fb330e2e))
+* update theme service ([23bc976](https://github.com/amfa-team/broadcast-service/commit/23bc97603e1d9d6083aabe4813915bc9a1db05d3))
+
 # @amfa-team/broadcast-service [1.1.0](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.0.0...@amfa-team/broadcast-service@1.1.0) (2021-04-14)
 
 

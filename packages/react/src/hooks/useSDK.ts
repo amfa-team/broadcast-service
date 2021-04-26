@@ -22,14 +22,30 @@ export function useSDK(settings: Settings): SDKState {
 
   useEffect(() => {
     if (token) {
+      const abortController = new AbortController();
       const sdk = new Picnic(token, { endpoint, spaceId });
-      sdk
-        .load()
-        .then(() => setSDKState({ loaded: true, sdk }))
-        // TODO: handle error
-        .catch(setError);
+      if (!sdk.deviceSupported()) {
+        if (!abortController.signal.aborted) {
+          setError(new Error("DEVICE_NOT_SUPPORTED"));
+        }
+      } else {
+        sdk
+          .load()
+          .then(() => {
+            if (!abortController.signal.aborted) {
+              setSDKState({ loaded: true, sdk });
+            }
+          })
+          // TODO: handle error
+          .catch((e) => {
+            if (!abortController.signal.aborted) {
+              setError(e);
+            }
+          });
+      }
 
       return (): void => {
+        abortController.abort();
         sdk.destroy().catch(console.error);
       };
     }

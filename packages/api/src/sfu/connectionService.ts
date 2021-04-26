@@ -43,18 +43,18 @@ async function closeConnection(params: CloseConnectionParams): Promise<void> {
   getAllSettledValues(results, "onDisconnect: Unexpected error");
 }
 
-async function removeOldConnections(event: ConnectEvent): Promise<void> {
-  const { connectionId, token } = event;
-  const connections = await getConnectionsByToken({ token });
+// async function removeOldConnections(event: ConnectEvent): Promise<void> {
+//   const { connectionId, token } = event;
+//   const connections = await getConnectionsByToken({ token });
 
-  const results = await Promise.allSettled(
-    connections
-      .filter((c) => c._id !== connectionId)
-      .map(async (c) => closeConnection({ connection: c })),
-  );
+//   const results = await Promise.allSettled(
+//     connections
+//       .filter((c) => c._id !== connectionId)
+//       .map(async (c) => closeConnection({ connection: c })),
+//   );
 
-  getAllSettledValues(results, "removeOldConnections: Unexpected error");
-}
+//   getAllSettledValues(results, "removeOldConnections: Unexpected error");
+// }
 
 export async function onConnect(
   event: ConnectEvent,
@@ -62,7 +62,7 @@ export async function onConnect(
   const [routerCapabilities] = await Promise.all([
     requestServer<"/router-capabilities">("/router-capabilities", null),
     createConnection({ _id: event.connectionId, token: event.token }),
-    removeOldConnections(event),
+    // removeOldConnections(event),
   ]);
 
   return routerCapabilities;

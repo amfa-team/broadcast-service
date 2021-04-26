@@ -1,12 +1,11 @@
 import type { Dictionary } from "@amfa-team/broadcast-service-types";
-import { DotLoader, ErrorShield } from "@amfa-team/theme-service";
+import { ErrorShield } from "@amfa-team/theme-service";
 import { useToken } from "@amfa-team/user-service";
 import { Center } from "@chakra-ui/react";
 import React from "react";
 import type { ReactElement } from "react";
 import Cgu from "../components/Cgu/Cgu";
 import { Stage } from "../components/Stage";
-import { useSDK } from "../hooks/useSDK";
 import type { Settings } from "../types";
 
 interface StagePageProps {
@@ -17,6 +16,7 @@ interface StagePageProps {
   chatComponent?: ReactElement;
   featuresViewerButton?: any;
   featuresComponents?: any;
+  liveDictionary?: any; // Flemme
   onHangUp: () => void;
 }
 
@@ -29,10 +29,10 @@ function RawStagePage(props: StagePageProps) {
     chatComponent,
     featuresViewerButton,
     featuresComponents,
+    liveDictionary,
     onHangUp,
   } = props;
   const token = useToken();
-  const state = useSDK(settings);
 
   if (!token) {
     return (
@@ -42,23 +42,17 @@ function RawStagePage(props: StagePageProps) {
     );
   }
 
-  if (!state.loaded) {
-    return (
-      <Center h="full" w="full">
-        <DotLoader />
-      </Center>
-    );
-  }
-
   return (
     <Stage
-      sdk={state.sdk}
+      settings={settings}
       canBroadcast={broadcastEnabled}
       helpButton={helpButton}
       featuresViewerButton={featuresViewerButton}
       chatComponent={chatComponent}
       featuresComponents={featuresComponents}
       onHangUp={onHangUp}
+      liveDictionary={liveDictionary}
+      dictionary={dictionary}
     />
   );
 }
@@ -67,6 +61,7 @@ RawStagePage.defaultProps = {
   chatComponent: null,
   featuresViewerButton: [],
   featuresComponents: [],
+  liveDictionary: null,
 };
 
 export function StagePage(props: StagePageProps) {
@@ -87,4 +82,5 @@ StagePage.defaultProps = {
   helpButton: null,
   chatComponent: null,
   featuresComponents: [],
+  liveDictionary: null,
 };

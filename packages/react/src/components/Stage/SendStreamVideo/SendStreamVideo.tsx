@@ -33,8 +33,8 @@ export function SendStreamVideo(props: SendStreamVideoProps): JSX.Element {
     <LiveHost
       isLoading={!isReady}
       isReconnecting={isReconnecting}
-      isLiveLabel="Live (TODO)"
-      isReconnectingLabel="Reconnecting (TODO)"
+      isLiveLabel="En Direct"
+      isReconnectingLabel="Reconnexion"
       isFrontFacing={!isScreenSharing}
       isVideoEnabled={!isVideoPaused}
       attachAudioEffect={attachAudioEffect}
