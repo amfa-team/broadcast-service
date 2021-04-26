@@ -10,23 +10,23 @@
     d "1"
     es5-ext "^0.10.47"
 
-"@amfa-team/space-service-node@^1.2.0-beta.1":
-  version "1.2.0-beta.1"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-node/1.2.0-beta.1/0cd8b56d5af90573e25c4525e3be6724959d1bc684fba22c8667419bbf5b275f#be28aefbd8b6a32c9b9b9c443e68fa4c0eee8457"
-  integrity sha512-LVlVYwxM2JuhKEoGWeVX+BEhd2+HzL6crJEHSJ//sRjt6/qlEdwDHBYyJCKBWGAb1WmlkNpZn/0SGKPLYFXHCw==
+"@amfa-team/space-service-node@^1.2.0":
+  version "1.2.0"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-node/1.2.0/c1a610208f931bf218c029f91b9f5dbd994e82b74ac8cc1a8153793022b03dee#a931fd2b0bcab3effa7a9ffc63f87b200d9dd4d8"
+  integrity sha512-YOL1jwxd8oWVCplLRO9rAHWNEIOp7RaRFT62r6alN4fZMug9PCSgrKOHCEAa5iWTBPgnUtWRLQMiLKwgQdVTvg==
   dependencies:
     fetch-retry "^4.1.1"
     node-fetch "^2.6.1"
 
-"@amfa-team/space-service-types@^1.4.0":
-  version "1.4.0"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-types/1.4.0/37fb3de6f90e1eb0e27e27ec35a184768caf547b549d54f62b2f81b868e63797#df0f0cc266f4439ac8c4e9211277bdbc286bc283"
-  integrity sha512-3VPxbcjBZdlm7WAY8LcpI0PpSbg9YnJmwguJSMrlAmHCddrzVwhHs5qxs9JgbR4L248Ft584q3z51V03b4x4Mw==
+"@amfa-team/space-service-types@^1.5.0":
+  version "1.5.0"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service-types/1.5.0/baa6884a182b59910e994b24f0d5a3508f9c0110d32e62cd3622cb9672e975a4#f88505196ebb41ec1021f7661a27892971a85885"
+  integrity sha512-csVQH8agOF5j7qnD6DKZNN6X43nez3IneZdZB9M8YqMWF7mccSOvF8cRSW+xAflcc1WZrPR9UZykeHikE/bWAQ==
 
-"@amfa-team/space-service@^1.9.0":
-  version "1.9.0"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service/1.9.0/33efc1d4d8896024c531e205b4bb15902dc334d7e0e04cac1ac3aae0103f0588#5fae793a863b3eb767e66b3bb587a2fc90cc45f7"
-  integrity sha512-oGaSUUkebzjlb+jrdseFQ9sfsdTMLLCu5cleXgaVe3KgJJ56rryh3yxpMh6LRIC+0UIPAT9g6j+cYAf4up/9Hw==
+"@amfa-team/space-service@^1.10.0":
+  version "1.10.0"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/space-service/1.10.0/4a2f77045e664389bfecebe814bd653265d4f2800b13fe7f3ac84a2842804673#957526764a30e57cdc77f68dc0caf00fa12e705d"
+  integrity sha512-SJU9Xwq4lcni5yj7sO2mTcl+CKPwuL2XdIE4UdtjEOAcTfbBkRS1wpbEiTfKQ42Fw6qYoX+BbJ5dmTy1CbZxYA==
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@chakra-ui/react" "^1.5.1"
@@ -41,28 +41,10 @@
     uuid "^8.3.2"
     whatwg-fetch "^3.6.2"
 
-"@amfa-team/theme-service@^1.5.0":
-  version "1.5.0"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.5.0/e5235b61f610d7e3dec272d5ee04e089f0f1b65f1f5fa7d6624fee6ac38aed59#d9ae89f590bfebb901274ad800eb04f55df7bd25"
-  integrity sha512-B5dFlfHuxIgSuZHGW2oKDNf3ns+Sq2wAXXuG9WlTP9BOZQ6vfO1spE8cReZWDSzWIiMOHbPcnlVy0BIcw0iSfA==
-  dependencies:
-    "@chakra-ui/react" "^1.5.0"
-    "@chakra-ui/react-utils" "^1.1.1"
-    "@chakra-ui/theme-tools" "^1.1.3"
-    "@emotion/react" "^11.1.5"
-    "@emotion/styled" "^11.3.0"
-    "@loadable/component" "^5.14.1"
-    abortcontroller-polyfill "^1.7.1"
-    classnames "^2.3.1"
-    core-js "^3.10.1"
-    framer-motion "^3.10.6"
-    react-datepicker "^3.7.0"
-    whatwg-fetch "^3.6.2"
-
-"@amfa-team/theme-service@^1.6.0-beta.3":
-  version "1.6.0-beta.3"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.6.0-beta.3/496d4328db209f8f633c71461f0e02b89f70e7d97d2be11cdddef6734b5ad99f#7ec774d75a61dc123cb8b7cbcaee5c97844216b6"
-  integrity sha512-UVdQMkJCmagPBiG93NEYG5vFQmvnIki0fAkTrq2jB23l4VfKefqjaRTf7YTT5XBqPNb9Y+EdsrpHdcG/y2/rQg==
+"@amfa-team/theme-service@^1.6.0":
+  version "1.6.0"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/theme-service/1.6.0/a317264dbe06603d840e2c6449b35a31bf6916eb729ba6e71194f6f508d747fd#0eca508cb1707eece3b2f2e9bf5adcfe993a25be"
+  integrity sha512-Bmys6OD083ZbGC9Jj5LBsWGrFpUi7heVYKjVFsxceD3y2f6/0k3YHjwK0gPj41zCOUBmY16lnZvz0Wd5LOgUKg==
   dependencies:
     "@chakra-ui/react" "^1.5.0"
     "@chakra-ui/react-utils" "^1.1.1"
@@ -90,10 +72,10 @@
   resolved "https://npm.pkg.github.com/download/@amfa-team/user-service-types/1.4.0/f060855d05bd6c78236012aded2597c9465dda0b0ad842cc4cc86091a756de2d#180d59af0ae6ee42e066a36a5c9973f2f1699dcc"
   integrity sha512-CM6KcaJ4XE1qA54S+1EKrndXXLuvSVuJeLCSi6TWKr2riQ+044EHb7yQp1+C77rB8/V4Dq/NNXQmiD5BvgTYxg==
 
-"@amfa-team/user-service@^1.10.0":
-  version "1.10.0"
-  resolved "https://npm.pkg.github.com/download/@amfa-team/user-service/1.10.0/1c3ef003c50787246f4256f5113e51415b4d7dcc8cad2a3e9dbaf2d30e0bef5e#718015c2564ce400a51f5df31c366895f6b8c19f"
-  integrity sha512-gRqwua+njG26ShAc5VcdMU6mWUSOqivMXKq+2ny1gvf8gQux5Rp2PN87Wg4U1svUxyhX3o0d1tHJqfGXaoDKzg==
+"@amfa-team/user-service@^1.11.0":
+  version "1.11.0"
+  resolved "https://npm.pkg.github.com/download/@amfa-team/user-service/1.11.0/84d2288811e9a7e32dab43f00e0bcb1c37ff24111e2b95ace7b4ca04d9ef5ed1#d8493d9dbfeb7df747223be0b432be4656ac0b70"
+  integrity sha512-pPRVrjyIkMGz+gojQBNrIiKCsh6R/KHfsXtMCxDEWbSHpIff7jOdkGl3wGxo6Y3T23+RPQY6X+FQPT3uq9yvBg==
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@chakra-ui/react" "^1.5.1"
