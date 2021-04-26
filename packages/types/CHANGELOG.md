@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service-types [1.2.0](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.1.0...@amfa-team/broadcast-service-types@1.2.0) (2021-04-26)
+
+
+### Features
+
+* stuff ([91cf650](https://github.com/amfa-team/broadcast-service/commit/91cf650ac7b94e8ffce49068d4722e32a0f2ac1c))
+
 # @amfa-team/broadcast-service-types [1.2.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service-types@1.1.0...@amfa-team/broadcast-service-types@1.2.0-beta.1) (2021-04-23)
 
 
