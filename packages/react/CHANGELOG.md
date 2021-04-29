@@ -1,3 +1,15 @@
+# @amfa-team/broadcast-service [1.3.0-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.2.0...@amfa-team/broadcast-service@1.3.0-beta.1) (2021-04-29)
+
+
+### Bug Fixes
+
+* keys ([e97a7e0](https://github.com/amfa-team/broadcast-service/commit/e97a7e0ba89aa62c3742e1d5b29b9499e89bdfd0))
+
+
+### Features
+
+* add demo condition slug ([7d0fce0](https://github.com/amfa-team/broadcast-service/commit/7d0fce01135b97d6e880368ef86298d80dc45645))
+
 # @amfa-team/broadcast-service [1.2.0](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.1.0...@amfa-team/broadcast-service@1.2.0) (2021-04-26)
 
 
