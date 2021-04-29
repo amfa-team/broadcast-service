@@ -385,6 +385,222 @@ function LiveStage(props: LiveStageProps): JSX.Element {
   return <LiveStageRaw {...restProps} sdk={state.sdk} />;
 }
 
+export interface LiveStageRawDemoProps {
+  settings: Settings;
+  liveDictionary?: any; // Flemme
+  chatBar?: any; // Flemme
+}
+function LiveStageRawDemo(props: LiveStageRawDemoProps): JSX.Element {
+  const { liveDictionary, chatBar } = props;
+
+  const contentStreams = [
+    {
+      component: (
+        <Flex
+          w="full"
+          h="full"
+          alignItems="center"
+          justifyContent="center"
+          color="white"
+        >
+          screenshare
+        </Flex>
+      ),
+      key: 1,
+    },
+    {
+      component: (
+        <Flex
+          w="full"
+          h="full"
+          alignItems="center"
+          justifyContent="center"
+          color="white"
+          bg="tomato"
+        >
+          camera1
+        </Flex>
+      ),
+      key: 99,
+    },
+    // {
+    //   component: (
+    //     <Flex
+    //       w="full"
+    //       h="full"
+    //       alignItems="center"
+    //       justifyContent="center"
+    //       color="white"
+    //     >
+    //       cam2
+    //     </Flex>
+    //   ),
+    //   key: 3,
+    // },
+    // {
+    //   component: (
+    //     <Flex
+    //       w="full"
+    //       h="full"
+    //       alignItems="center"
+    //       justifyContent="center"
+    //       color="white"
+    //     >
+    //       cam4
+    //     </Flex>
+    //   ),
+    //   key: 4,
+    // },
+    // {
+    //   component: (
+    //     <Flex
+    //       w="full"
+    //       h="full"
+    //       alignItems="center"
+    //       justifyContent="center"
+    //       color="white"
+    //     >
+    //       cam3
+    //     </Flex>
+    //   ),
+    //   key: 5,
+    // },
+  ];
+
+  let streamLayoutGrid = {
+    templateColumns: {
+      base: "unset",
+      sm: "unset",
+      md: "unset",
+      lg: "unset",
+    },
+    templateRows: {
+      base: "unset",
+      sm: "unset",
+      md: "unset",
+      lg: "unset",
+    },
+    columns: 1,
+    colSpanFirstLine: 0,
+    colSpanSecondLine: 0,
+  };
+
+  switch (contentStreams.length) {
+    case 0:
+      break;
+    case 1:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "unset",
+          sm: "unset",
+          md: "unset",
+          lg: "unset",
+        },
+        templateRows: {
+          base: "minmax(0, 60%) minmax(0, 0%)",
+          sm: "minmax(0, 60%) minmax(0, 0%)",
+          md: "minmax(0, 75%) minmax(0, 0%)",
+          lg: "minmax(0, 75%) minmax(0, 0%)",
+        },
+        columns: 1,
+        colSpanFirstLine: 1,
+        colSpanSecondLine: 1,
+      };
+      break;
+    case 2:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "100%",
+          sm: "100%",
+          md: "repeat(2, minmax(0, 50%))",
+          lg: "repeat(2, minmax(0, 50%))",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 2,
+        colSpanFirstLine: 2,
+        colSpanSecondLine: 1,
+      };
+      break;
+    case 3:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "repeat(2, minmax(0, 50%))",
+          sm: "repeat(2, minmax(0, 50%))",
+          md: "repeat(2, minmax(0, 50%))",
+          lg: "repeat(2, minmax(0, 50%))",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 2,
+        colSpanFirstLine: 2,
+        colSpanSecondLine: 1,
+      };
+      break;
+    default:
+      streamLayoutGrid = {
+        templateColumns: {
+          base: "repeat(2, minmax(0, 50%))",
+          sm: "repeat(2, minmax(0, 50%))",
+          md: "repeat(4, minmax(0, 25%))",
+          lg: "repeat(4, minmax(0, 25%))",
+        },
+        templateRows: {
+          base: "minmax(0, 50%) minmax(0, 50%)",
+          sm: "minmax(0, 50%) minmax(0, 50%)",
+          md: "minmax(0, 70%) minmax(0, 30%)",
+          lg: "minmax(0, 65%) minmax(0, 35%)",
+        },
+        columns: 4,
+        colSpanFirstLine: 2,
+        colSpanSecondLine: 1,
+      };
+      break;
+  }
+
+  return (
+    <Grid
+      w="full"
+      h="full"
+      templateColumns={streamLayoutGrid.templateColumns}
+      templateRows={streamLayoutGrid.templateRows}
+      maxW="container.lg"
+      margin="auto"
+      p={{
+        base: contentStreams.length === 0 || chatBar.isOpen ? "0" : "1",
+        lg: "0",
+      }}
+      display={{
+        base: chatBar.isOpen ? "none" : "grid",
+        lg: "grid",
+      }}
+    >
+      <StreamGrid
+        streamLayoutGrid={streamLayoutGrid}
+        // @ts-ignore
+        content={contentStreams}
+        liveDictionary={liveDictionary}
+      />
+    </Grid>
+  );
+}
+export interface LiveStageDemoProps {
+  settings: Settings;
+  liveDictionary?: any; // Flemme
+  chatBar?: any; // Flemme
+}
+function LiveStageDemo(props: LiveStageDemoProps): JSX.Element {
+  return <LiveStageRawDemo {...props} />;
+}
+
 export interface StageProps {
   settings: Settings;
   canBroadcast: boolean;
@@ -453,11 +669,19 @@ function RawStage(props: StageProps): JSX.Element {
           notSupportedErrorText={dictionary.error.notSupported.text}
           notSupportedErrorRetry={dictionary.error.notSupported.retryBtn}
         >
-          <LiveStage
-            settings={settings}
-            liveDictionary={liveDictionary}
-            chatBar={chatBar}
-          />
+          {settings.spaceId !== "demo" ? (
+            <LiveStage
+              settings={settings}
+              liveDictionary={liveDictionary}
+              chatBar={chatBar}
+            />
+          ) : (
+            <LiveStageDemo
+              settings={settings}
+              liveDictionary={liveDictionary}
+              chatBar={chatBar}
+            />
+          )}
         </ErrorShield>
         {chatBar.isOpen && (
           <AnimatePresence>
@@ -542,78 +766,3 @@ function RawStage(props: StageProps): JSX.Element {
 const Stage = React.memo<StageProps>(RawStage);
 
 export { Stage };
-
-// // @ts-ignore
-// const contentStreams = [
-//   {
-//     component: (
-//       <Flex
-//         w="full"
-//         h="full"
-//         alignItems="center"
-//         justifyContent="center"
-//         color="white"
-//       >
-//         screenshare
-//       </Flex>
-//     ),
-//     key: 1,
-//   },
-//   {
-//     component: (
-//       <Flex
-//         w="full"
-//         h="full"
-//         alignItems="center"
-//         justifyContent="center"
-//         color="white"
-//         bg="tomato"
-//       >
-//         camera1
-//       </Flex>
-//     ),
-//     key: 2,
-//   },
-//   // {
-//   //   component: (
-//   //     <Flex
-//   //       w="full"
-//   //       h="full"
-//   //       alignItems="center"
-//   //       justifyContent="center"
-//   //       color="white"
-//   //     >
-//   //       cam2
-//   //     </Flex>
-//   //   ),
-//   //   key: 3,
-//   // },
-//   // {
-//   //   component: (
-//   //     <Flex
-//   //       w="full"
-//   //       h="full"
-//   //       alignItems="center"
-//   //       justifyContent="center"
-//   //       color="white"
-//   //     >
-//   //       cam4
-//   //     </Flex>
-//   //   ),
-//   //   key: 4,
-//   // },
-//   // {
-//   //   component: (
-//   //     <Flex
-//   //       w="full"
-//   //       h="full"
-//   //       alignItems="center"
-//   //       justifyContent="center"
-//   //       color="white"
-//   //     >
-//   //       cam3
-//   //     </Flex>
-//   //   ),
-//   //   key: 5,
-//   // },
-// ];
