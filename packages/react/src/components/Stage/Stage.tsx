@@ -421,7 +421,7 @@ function LiveStageRawDemo(props: LiveStageRawDemoProps): JSX.Element {
           camera1
         </Flex>
       ),
-      key: 2,
+      key: 99,
     },
     // {
     //   component: (
