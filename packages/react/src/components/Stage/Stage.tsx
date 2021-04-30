@@ -234,6 +234,7 @@ function LiveStageRaw(props: LiveStageRawProps): JSX.Element {
           recvStream={recvStream}
           isFullScreen={i === 0}
           setFullScreen={setFullScreen}
+          liveDictionary={liveDictionary}
         />
       ),
     };
