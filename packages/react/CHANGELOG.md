@@ -1,3 +1,10 @@
+# @amfa-team/broadcast-service [1.3.0-beta.3](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.3.0-beta.2...@amfa-team/broadcast-service@1.3.0-beta.3) (2021-04-30)
+
+
+### Bug Fixes
+
+* oups ([ca72415](https://github.com/amfa-team/broadcast-service/commit/ca7241539b1490a3a8268285a7ffb5a7d3848fea))
+
 # @amfa-team/broadcast-service [1.3.0-beta.2](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.3.0-beta.1...@amfa-team/broadcast-service@1.3.0-beta.2) (2021-04-30)
 
 
