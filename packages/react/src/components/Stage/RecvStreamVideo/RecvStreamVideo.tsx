@@ -70,13 +70,13 @@ export function RecvStreamVideo(props: RecvStreamVideoProps): JSX.Element {
       isReconnecting={isReconnecting}
       isLiveLabel={
         liveDictionary
-          ? `${liveDictionary?.live.toUpperCase()}${liveDictionary.live?.substr(
+          ? `${liveDictionary?.live[0].toUpperCase()}${liveDictionary.live?.substr(
               1,
             )}`
           : "En direct"
       }
       isReconnectingLabel={
-        liveDictionary ? liveDictionary?.live : "Reconnexion"
+        liveDictionary ? liveDictionary?.isReconnectingLabel : "Reconnexion"
       }
       isLocal={false}
       isFrontFacing={false}
