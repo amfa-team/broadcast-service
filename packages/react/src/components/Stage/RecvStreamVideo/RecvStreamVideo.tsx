@@ -7,11 +7,12 @@ import type { IRecvStream } from "../../../sdk/stream/RecvStream";
 export interface RecvStreamVideoProps {
   recvStream: IRecvStream;
   isFullScreen: boolean;
+  liveDictionary?: any; // Flemme
   setFullScreen: (recvStream: IRecvStream) => Promise<void>;
 }
 
 export function RecvStreamVideo(props: RecvStreamVideoProps): JSX.Element {
-  const { recvStream, isFullScreen, setFullScreen } = props;
+  const { recvStream, isFullScreen, setFullScreen, liveDictionary } = props;
   const {
     volume,
     isAudioEnabled,
@@ -67,8 +68,16 @@ export function RecvStreamVideo(props: RecvStreamVideoProps): JSX.Element {
     <LiveParticipant
       isLoading={!isReady}
       isReconnecting={isReconnecting}
-      isLiveLabel="En Direct"
-      isReconnectingLabel="Reconnexion"
+      isLiveLabel={
+        liveDictionary
+          ? `${liveDictionary?.live[0].toUpperCase()}${liveDictionary.live?.substr(
+              1,
+            )}`
+          : "En direct"
+      }
+      isReconnectingLabel={
+        liveDictionary ? liveDictionary?.isReconnectingLabel : "Reconnexion"
+      }
       isLocal={false}
       isFrontFacing={false}
       isVideoEnabled={isVideoEnabled}

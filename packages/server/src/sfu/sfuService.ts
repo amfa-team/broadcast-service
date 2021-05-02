@@ -1,3 +1,4 @@
+import os from "os";
 import type {
   ConnectParams,
   ConnectionInfo,
@@ -40,9 +41,14 @@ async function initWorker(): Promise<void> {
 }
 
 export async function startup(): Promise<void> {
-  const workerCount = 1; // Number(process.env.WORKER_COUNT ?? os.cpus().length);
+  const workerCount = Number(process.env.WORKER_COUNT ?? os.cpus().length - 1);
 
   const tasks = [];
+
+  if (workerCount < 1) {
+    await initWorker();
+    return;
+  }
 
   for (let i = 0; i < workerCount; i += 1) {
     tasks.push(initWorker());
