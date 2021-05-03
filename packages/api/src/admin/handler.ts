@@ -24,6 +24,7 @@ import {
   init,
   parseHttpAdminRequest,
 } from "../io/io";
+import { closeConnection } from "../sfu/connectionService";
 import { requestServer } from "../sfu/serverService";
 
 export async function topology(
@@ -84,6 +85,10 @@ export async function registerServer(
     // // This is to ensure we're able to recover from Server failure restart
     if (existingServer !== null && existingServer.token !== data.token) {
       console.error("Server restarted, trigger client restart");
+      const connections = await getAllConnections();
+      await Promise.allSettled(
+        connections.map(async (c) => closeConnection({ connection: c })),
+      );
       await broadcastToConnections(
         JSON.stringify({
           type: "cmd",

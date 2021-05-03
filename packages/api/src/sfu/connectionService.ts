@@ -19,7 +19,9 @@ interface CloseConnectionParams {
   connection: Connection | null;
 }
 
-async function closeConnection(params: CloseConnectionParams): Promise<void> {
+export async function closeConnection(
+  params: CloseConnectionParams,
+): Promise<void> {
   const { connection } = params;
 
   if (connection == null) {
