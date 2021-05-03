@@ -1,3 +1,10 @@
+## @amfa-team/broadcast-service [1.3.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.3.0...@amfa-team/broadcast-service@1.3.1) (2021-05-03)
+
+
+### Bug Fixes
+
+* change bg color ([1f337f7](https://github.com/amfa-team/broadcast-service/commit/1f337f731f4baba214ebf09cf8ed6e336b83ab7d))
+
 ## @amfa-team/broadcast-service [1.3.1-beta.1](https://github.com/amfa-team/broadcast-service/compare/@amfa-team/broadcast-service@1.3.0...@amfa-team/broadcast-service@1.3.1-beta.1) (2021-05-03)
 
 
