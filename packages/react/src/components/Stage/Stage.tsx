@@ -661,7 +661,7 @@ function RawStage(props: StageProps): JSX.Element {
       h="full"
       w="full"
     >
-      <Flex w="full" h="full" bg="#006654">
+      <Flex w="full" h="full" bg="#fffefe">
         <ErrorShield
           errorTitle={dictionary.error.unknown.title}
           errorText={dictionary.error.unknown.text}
